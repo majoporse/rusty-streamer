@@ -1,0 +1,21 @@
+[package]
+name = "video"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = "4"
+actix-multipart = "0.7.2"
+
+utoipa = { version = "5", features = ["actix_extras"] }
+utoipa-swagger-ui = { version = "9", features = ["actix-web", "reqwest"] }
+utoipa-actix-web = "0.1.2"
+utoipa-redoc = { version = "6", features = ["actix-web"] }
+utoipa-rapidoc = { version = "6", features = ["actix-web"] }
+utoipa-scalar = { version = "0.3.0", features = ["actix-web"]}
+
+dotenv = "0.15.0"
+
+azure_storage_blobs = "0.21.0"
+azure_core = "0.29.1"
+azure_storage = "0.21.0"
