@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HLS Player with Variant Selector</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+    body { font-family: sans-serif; background: #000; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    video { width: 80%; height: auto; background: #000; }
+    select { margin-top: 10px; padding: 5px; font-size: 16px; }
+  </style>
+</head>
+<body>
+
+  <video id="video" controls></video>
+  <select id="variantSelector"></select>
+
+  <script>
+    const video = document.getElementById('video');
+    const selector = document.getElementById('variantSelector');
+    const hlsSrc = 'http://127.0.0.1:10000/devstoreaccount1/video/master.m3u8'; // Path to your master playlist
+
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari natively supports HLS
+      video.src = hlsSrc;
+    } else if (Hls.isSupported()) {
+      const hls = new Hls({ autoStartLoad: true, capLevelToPlayerSize: false });
+
+      hls.loadSource(hlsSrc);
+      hls.attachMedia(video);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
+        // Populate selector with available levels
+        data.levels.forEach((level, index) => {
+          const option = document.createElement('option');
+          option.value = index;
+          option.text = `${level.height}p (${Math.round(level.bitrate / 1000)} kbps)`;
+          selector.appendChild(option);
+        });
+
+        // Default: start playing highest quality
+        hls.startLevel = data.levels.length - 1;
+        hls.loadLevel = data.levels.length - 1;
+        video.play();
+      });
+
+      // Handle user changing the variant
+      selector.addEventListener('change', () => {
+        const levelIndex = parseInt(selector.value);
+        hls.currentLevel = levelIndex; // Switch to selected level
+      });
+    } else {
+      console.error("HLS not supported in this browser");
+    }
+  </script>
+
+</body>
+</html>

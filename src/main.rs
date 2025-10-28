@@ -24,7 +24,7 @@ struct ApiDoc;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // std::env::set_var("RUST_LOG", "debug");
+    std::env::set_var("RUST_LOG", "debug");
     dotenv().ok();
 
     env_logger::init(); 
@@ -52,7 +52,7 @@ async fn main() -> std::io::Result<()> {
             .openapi_service(|api| {
                 SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", api)
             })
-            .openapi_service(|api| RapiDoc::new("/api-docs/openapi.json").path("/rapidoc"))
+            .openapi_service(|_| RapiDoc::new("/api-docs/openapi.json").path("/rapidoc"))
             .openapi_service(|api| Scalar::with_url("/scalar", api))
             .into_app();
         app
