@@ -2,7 +2,6 @@ use actix_multipart::form::MultipartFormConfig;
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
 use dotenv::dotenv;
-use std::env;
 use std::sync::Mutex;
 use utoipa::OpenApi;
 use utoipa_actix_web::AppExt;
