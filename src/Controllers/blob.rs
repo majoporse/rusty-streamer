@@ -1,13 +1,16 @@
-use std::io::Read;
 
-use azure_storage::{prelude::*, ConnectionString};
+use std::path::PathBuf;
+
+use azure_storage::ConnectionString;
 use azure_storage_blobs::prelude::{BlobServiceClient, ClientBuilder};
 use futures::stream::StreamExt;
 
 use actix_web::{error::ErrorInternalServerError, put, Error, HttpResponse};
 
-use actix_multipart::form::{json::Json as MPJson, tempfile::TempFile, text::Text, MultipartForm};
+use actix_multipart::form::{tempfile::TempFile, text::Text, MultipartForm};
 use log::{debug, info};
+use tokio::io::AsyncReadExt;
+use walkdir::WalkDir;
 
 use crate::logic::ffmpeg;
 
@@ -29,7 +32,7 @@ struct UploadForm {
     )
 )]
 #[put("/file")]
-async fn upload_file(
+async fn upload_file_endpoint(
     MultipartForm(form): MultipartForm<UploadForm>,
 ) -> Result<HttpResponse, Error> {
     let file_name = form.json.clone();
@@ -55,19 +58,42 @@ async fn upload_file(
     client.container_client(&container).create().await.ok();
     info!("Container created or already exists");
 
-    let blob_client = builder.clone().blob_client(&container, &blob_name);
-
     debug!("account: {}, container: {}", account, container);
     debug!("blob: {}", &blob_name);
     debug!("key: {}", access_key);
 
-    let (file, path) = form.file.file.keep().map_err(|e| ErrorInternalServerError(e))?;
+    // let (file, path) = form.file.file.keep().map_err(|e| ErrorInternalServerError(e))?;
+    let path = form.file.file.path().to_path_buf();
 
     ffmpeg::convert_to_hls(&path, "output_hls/".to_string() + &file_name.clone()).await?;
 
-    let mut file = file;
+    // upload_file(&client, &container, &path).await?;
+
+    // tokio::fs::remove_file(path).await.map_err(|e| ErrorInternalServerError(e))?;
+    let upload_path = PathBuf::from("output_hls/".to_string() + &file_name.clone());
+
+    upload_folder(&client, &container, &upload_path).await?;
+    info!("Uploaded folder: {:?}", upload_path);
+
+    Ok(HttpResponse::Ok().body("File uploaded successfully"))
+}
+
+async fn upload_file(client: &BlobServiceClient, container: &str, file_path: &PathBuf) -> Result<(), Error> {
+    let file_name = file_path
+        .file_name()
+        .and_then(|name| name.to_str())
+        .ok_or_else(|| ErrorInternalServerError("Invalid file name"))?;
+
+    let blob_client = client.container_client(container).blob_client(file_name);
+
+    let mut file = tokio::fs::File::open(file_path)
+        .await
+        .map_err(|e| ErrorInternalServerError(e))?;
+
     let mut buffer = Vec::new();
+
     file.read_to_end(&mut buffer)
+        .await
         .map_err(|e| ErrorInternalServerError(e))?;
 
     blob_client
@@ -76,14 +102,11 @@ async fn upload_file(
         .await
         .map_err(|e| ErrorInternalServerError(e))?;
 
-
-    info!("Blob uploaded successfully");
-
-    tokio::fs::remove_file(path).await.map_err(|e| ErrorInternalServerError(e))?;
-
-    Ok(HttpResponse::Ok().body("File uploaded successfully"))
+    info!("Uploaded file: {}", file_name);
+    Ok(())
 }
 
+#[allow(unused)]
 async fn fetch_blob(
     client: &BlobServiceClient,
     container: &str,
@@ -108,7 +131,24 @@ async fn fetch_blob(
     Ok(result)
 }
 
+async fn upload_folder(
+    client: &BlobServiceClient,
+    container: &str,
+    folder: &PathBuf,
+) -> Result<(), Error> {
+    
+    for entry in WalkDir::new(folder) {
+        info!("Uploading entry: {:?}", entry);
+        let item = entry.map_err(|e| ErrorInternalServerError(e))?;
+        if item.file_type().is_dir() {
+            continue;
+        }
+        upload_file(client, container, &item.into_path()).await?;
+    }
+    Ok(())
+}
+
 
 pub fn scoped_config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(upload_file);
+    cfg.service(upload_file_endpoint);
 }
