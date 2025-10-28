@@ -1,8 +1,6 @@
-use actix_web::{get, post, put, web, HttpResponse};
-use std::fs::Metadata;
+use actix_web::{get, post, web, HttpResponse};
 use std::sync::Mutex;
 use utoipa_actix_web::service_config::ServiceConfig;
-use utoipa_redoc::Config;
 
 #[utoipa::path(
     responses(
