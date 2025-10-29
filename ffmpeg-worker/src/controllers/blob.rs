@@ -1,4 +1,3 @@
-
 use std::path::PathBuf;
 
 use azure_storage::ConnectionString;
@@ -16,8 +15,8 @@ use crate::logic::ffmpeg;
 
 #[derive(Debug, MultipartForm, utoipa::ToSchema)]
 #[allow(unused)]
-struct UploadForm {
-    #[multipart(limit = "100 MiB")]
+pub struct UploadForm {
+    #[multipart(limit = "5 GiB")]
     #[schema(value_type = String, format = Binary, content_media_type = "application/octet-stream")]
     file: TempFile,
 
@@ -32,9 +31,7 @@ struct UploadForm {
     )
 )]
 #[put("/file")]
-async fn upload_file_endpoint(
-    MultipartForm(form): MultipartForm<UploadForm>,
-) -> Result<HttpResponse, Error> {
+async fn upload(MultipartForm(form): MultipartForm<UploadForm>) -> Result<HttpResponse, Error> {
     let file_name = form.json.clone();
 
     // First we retrieve the account name and access key from environment variables.
@@ -78,13 +75,25 @@ async fn upload_file_endpoint(
     Ok(HttpResponse::Ok().body("File uploaded successfully"))
 }
 
-async fn upload_file(client: &BlobServiceClient, container: &str, file_path: &PathBuf) -> Result<(), Error> {
+async fn upload_file(
+    client: &BlobServiceClient,
+    container: &str,
+    file_path: &PathBuf,
+) -> Result<(), Error> {
     let file_name = file_path
         .file_name()
         .and_then(|name| name.to_str())
         .ok_or_else(|| ErrorInternalServerError("Invalid file name"))?;
 
-    let blob_client = client.container_client(container).blob_client(file_name);
+    let folder_name = file_path
+        .parent()
+        .ok_or_else(|| ErrorInternalServerError("Invalid folder name"))?
+        .to_str()
+        .ok_or_else(|| ErrorInternalServerError("Invalid folder name"))?;
+
+    let blob_client = client
+        .container_client(container)
+        .blob_client( folder_name.to_string() + "/" + file_name);
 
     let mut file = tokio::fs::File::open(file_path)
         .await
@@ -136,7 +145,6 @@ async fn upload_folder(
     container: &str,
     folder: &PathBuf,
 ) -> Result<(), Error> {
-    
     for entry in WalkDir::new(folder) {
         info!("Uploading entry: {:?}", entry);
         let item = entry.map_err(|e| ErrorInternalServerError(e))?;
@@ -149,6 +157,20 @@ async fn upload_folder(
 }
 
 
+async fn list_blobs(cliennt: &BlobServiceClient, cotainer:&str) -> Result<(), Error> {
+    let container_client = cliennt.container_client(cotainer);
+    let mut stream = container_client.list_blobs().into_stream();
+
+    while let Some(value) = stream.next().await {
+        let blobs = value.map_err(|e| ErrorInternalServerError(e))?;
+        for blob in blobs.blobs.blobs() {
+            info!("Blob name: {}", blob.name);
+            // if (blob.properties.)
+        }
+    }
+    Ok(())
+}
+
 pub fn scoped_config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
-    cfg.service(upload_file_endpoint);
+    cfg.service(upload);
 }

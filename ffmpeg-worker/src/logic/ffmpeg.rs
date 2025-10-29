@@ -5,11 +5,9 @@ use tokio::process::Command;
 pub async fn convert_to_hls(input_path: &Path, output_dir: String) -> Result<(), std::io::Error> {
     std::fs::create_dir_all(&output_dir)?;
 
-    let output_path = format!("{}/master.m3u8", output_dir);
     let input = input_path.to_str().ok_or_else(|| {
         std::io::Error::new(std::io::ErrorKind::InvalidInput, "Invalid input path")
     })?;
-
     let azure_user = std::env::var("AZURE_STORAGE_ACCOUNT").unwrap_or_else(|_| "devstoreaccount1".to_string());
 
     let mut com = Command::new("ffmpeg");
@@ -53,9 +51,9 @@ pub async fn convert_to_hls(input_path: &Path, output_dir: String) -> Result<(),
         "-master_pl_name", "master.m3u8", // optional, can be removed
 
         "-var_stream_map", "v:0,a:0 v:1,a:1 v:2,a:2 v:3,a:3",
-        "-hls_base_url", &format!("https://{}/{}/{}/{}", "localhost:10000", azure_user, "video", &output_path),
+        "-hls_base_url", &format!("http://{}/{}/{}/{}/", "localhost:10000", azure_user, "video", &output_dir),
         "-f", "hls",
-        &(output_path + "stream_%v.m3u8"),
+        &(output_dir + "/" + "stream_%v.m3u8"),
     ]);
 
     debug!("Running FFmpeg command: {:?}", com);

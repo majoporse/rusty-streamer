@@ -1,0 +1,29 @@
+[package]
+name = "movies"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = {workspace = true}
+actix-multipart = {workspace = true}
+
+utoipa = {workspace = true}
+utoipa-swagger-ui = {workspace = true} 
+utoipa-actix-web = {workspace = true}
+utoipa-redoc = {workspace = true}
+utoipa-rapidoc = {workspace = true}
+utoipa-scalar = {workspace = true}
+
+dotenv = "0.15.0"
+
+azure_storage_blobs = "0.21.0"
+azure_core = "0.29.1"
+azure_storage = "0.21.0"
+
+futures = "0.3.31"
+serde = "1.0.228"
+log = "0.4"
+env_logger = "0.11.8"
+
+tokio = { version = "1.48.0", features = ["process"] }
+walkdir = "2.5.0"

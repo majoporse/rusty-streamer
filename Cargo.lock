@@ -902,6 +902,30 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "37909eebbb50d72f9059c3b6d82c0463f2ff062c9e95845c43a6c9c0355411be"
 
 [[package]]
+name = "ffmpeg-worker"
+version = "0.1.0"
+dependencies = [
+ "actix-multipart",
+ "actix-web",
+ "azure_core 0.29.1",
+ "azure_storage",
+ "azure_storage_blobs",
+ "dotenv",
+ "env_logger",
+ "futures",
+ "log",
+ "serde",
+ "tokio",
+ "utoipa",
+ "utoipa-actix-web",
+ "utoipa-rapidoc",
+ "utoipa-redoc",
+ "utoipa-scalar",
+ "utoipa-swagger-ui",
+ "walkdir",
+]
+
+[[package]]
 name = "find-msvc-tools"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1621,6 +1645,30 @@ dependencies = [
  "log",
  "wasi 0.11.1+wasi-snapshot-preview1",
  "windows-sys 0.61.2",
+]
+
+[[package]]
+name = "movies"
+version = "0.1.0"
+dependencies = [
+ "actix-multipart",
+ "actix-web",
+ "azure_core 0.29.1",
+ "azure_storage",
+ "azure_storage_blobs",
+ "dotenv",
+ "env_logger",
+ "futures",
+ "log",
+ "serde",
+ "tokio",
+ "utoipa",
+ "utoipa-actix-web",
+ "utoipa-rapidoc",
+ "utoipa-redoc",
+ "utoipa-scalar",
+ "utoipa-swagger-ui",
+ "walkdir",
 ]
 
 [[package]]
@@ -2872,6 +2920,7 @@ dependencies = [
  "quote",
  "regex",
  "syn",
+ "uuid",
 ]
 
 [[package]]
@@ -2952,30 +3001,6 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
-
-[[package]]
-name = "video"
-version = "0.1.0"
-dependencies = [
- "actix-multipart",
- "actix-web",
- "azure_core 0.29.1",
- "azure_storage",
- "azure_storage_blobs",
- "dotenv",
- "env_logger",
- "futures",
- "log",
- "serde",
- "tokio",
- "utoipa",
- "utoipa-actix-web",
- "utoipa-rapidoc",
- "utoipa-redoc",
- "utoipa-scalar",
- "utoipa-swagger-ui",
- "walkdir",
-]
 
 [[package]]
 name = "waker-fn"

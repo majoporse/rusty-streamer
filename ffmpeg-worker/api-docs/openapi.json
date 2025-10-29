@@ -1,0 +1,64 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Video Server API",
+    "description": "API documentation for my video server.",
+    "license": {
+      "name": ""
+    },
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/file": {
+      "put": {
+        "tags": [
+          "controllers::blob"
+        ],
+        "operationId": "upload",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadForm"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Upload file to Azure Blob Storage"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UploadForm": {
+        "type": "object",
+        "required": [
+          "file",
+          "json"
+        ],
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "contentMediaType": "application/octet-stream"
+          },
+          "json": {
+            "type": "string",
+            "contentMediaType": "text/plain"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "video server",
+      "description": "Video Server API Documentation"
+    }
+  ]
+}
