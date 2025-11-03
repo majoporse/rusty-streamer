@@ -21,3 +21,9 @@ utoipa-actix-web = "0.1.2"
 utoipa-redoc = { version = "6", features = ["actix-web"] }
 utoipa-rapidoc = { version = "6", features = ["actix-web"] }
 utoipa-scalar = { version = "0.3.0", features = ["actix-web"]}
+
+# actix-web-opentelemetry = { version = "0.22.0", features = ["metrics"]}
+# opentelemetry-jaeger = { version = "0.22.0", features = ["rt-tokio-current-thread"] }
+opentelemetry = "0.31.0"
+opentelemetry_sdk = "0.31.0"
+opentelemetry-otlp = {version="0.31.0", features=["trace", "metrics", "logs"]}

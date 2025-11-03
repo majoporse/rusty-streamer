@@ -1,7 +1,7 @@
 use actix_multipart::form::MultipartFormConfig;
 use actix_web::middleware::Logger;
 use actix_web::{App, HttpServer};
-use dotenv::dotenv;
+use dotenvy::dotenv;
 use utoipa::OpenApi;
 use utoipa_actix_web::AppExt;
 use utoipa_rapidoc::RapiDoc;
