@@ -9,10 +9,7 @@ use actix_web::{
 };
 use futures::future::LocalBoxFuture;
 use opentelemetry::{
-    global::{self, ObjectSafeSpan},
-    metrics::{Counter, Histogram, Meter},
-    trace::Tracer,
-    KeyValue,
+    Context, KeyValue, global::{self, ObjectSafeSpan}, metrics::{Counter, Histogram, Meter}, trace::{FutureExt, TraceContextExt, Tracer}
 };
 
 // There are two steps in middleware processing.
@@ -94,20 +91,17 @@ where
         let counter = self.request_counter.clone();
         let histogram = self.latency_histogram.clone();
 
-        let tracer = global::tracer("otlp_metrics_logger");
-        let mut span = tracer.start(format!("HTTP {} {}", method, path));
-
-        span.set_attribute(KeyValue::new("method", method.to_string()));
-        span.set_attribute(KeyValue::new("path", path.clone()));
-
-        log::debug!("Started {} {}", method, path);
         let fut = self.service.call(req);
 
-        span.end();
-
         Box::pin(async move {
-            let res = fut.await?;
+            let tracer = global::tracer("otlp_metrics_logger");
 
+            let mut span = tracer.start(format!("HTTP {} {}", method, path));
+
+            span.set_attribute(KeyValue::new("method", method.to_string()));
+            span.set_attribute(KeyValue::new("path", path.clone()));
+
+            let res = fut.with_context(Context::current_with_span(span)).await?;
             let duration = start.elapsed().as_secs_f64();
 
             // Log request info

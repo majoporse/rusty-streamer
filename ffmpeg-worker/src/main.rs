@@ -5,6 +5,7 @@ use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
 use dotenvy::dotenv;
 use log::info;
+use opentelemetry::global::ObjectSafeSpan;
 use opentelemetry::trace::Tracer as _;
 use opentelemetry::{global, KeyValue};
 use opentelemetry_otlp::{Protocol, WithExportConfig as _};
@@ -54,6 +55,18 @@ async fn main() -> std::io::Result<()> {
     save_openapi_spec().await?;
 
     setup_otel().await?;
+
+    let aa = global::tracer("main_tracer");
+    let mut span = aa.start("aaaaaa");
+    let a = global::tracer("asdfas");
+    a.in_span("aaaaaaaa", |_cx| {
+        // Your application logic here...
+        let b = global::tracer("bbbbbb");
+        b.in_span("bbbbbbb", |_cx| {
+            // Nested span logic...
+        });
+    });
+    span.end();
 
     HttpServer::new(move || {
         let app = App::new()
@@ -120,10 +133,7 @@ async fn setup_otel() -> std::io::Result<()> {
     global::set_meter_provider(meter_provider);
     global::set_tracer_provider(tracer_provider);
 
-    let a = global::tracer("asdfas");
-    a.in_span("aaaaaaaa", |_cx| {
-        // Your application logic here...
-    });
+
 
     Ok(())
 }

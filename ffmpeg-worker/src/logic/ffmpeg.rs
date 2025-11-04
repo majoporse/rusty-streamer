@@ -1,5 +1,10 @@
-use std::path::Path;
 use log::debug;
+use opentelemetry::{
+    global,
+    trace::{FutureExt as _, Span, TraceContextExt as _, Tracer},
+    Context, KeyValue,
+};
+use std::path::Path;
 use tokio::process::Command;
 
 pub async fn convert_to_hls(input_path: &Path, output_dir: String) -> Result<(), std::io::Error> {
@@ -8,12 +13,12 @@ pub async fn convert_to_hls(input_path: &Path, output_dir: String) -> Result<(),
     let input = input_path.to_str().ok_or_else(|| {
         std::io::Error::new(std::io::ErrorKind::InvalidInput, "Invalid input path")
     })?;
-    let azure_user = std::env::var("AZURE_STORAGE_ACCOUNT").unwrap_or_else(|_| "devstoreaccount1".to_string());
+    let azure_user =
+        std::env::var("AZURE_STORAGE_ACCOUNT").unwrap_or_else(|_| "devstoreaccount1".to_string());
 
     let mut com = Command::new("ffmpeg");
     com.args(&[
         "-y", // Overwrite output files
-
         // "-loglevel", "debug",
 
         "-vsync", "0",
@@ -28,7 +33,6 @@ pub async fn convert_to_hls(input_path: &Path, output_dir: String) -> Result<(),
             [v2]scale=854:480[v2out];\
             [v3]scale=640:360[v3out]\
         ",
-
         // Video streams
         "-map", "[v0out]", "-map", "0:a?",
         "-map", "[v1out]", "-map", "0:a?",
@@ -53,11 +57,26 @@ pub async fn convert_to_hls(input_path: &Path, output_dir: String) -> Result<(),
         "-var_stream_map", "v:0,a:0 v:1,a:1 v:2,a:2 v:3,a:3",
         "-hls_base_url", &format!("http://{}/{}/{}/{}/", "localhost:10000", azure_user, "video", &output_dir),
         "-f", "hls",
-        &(output_dir + "/" + "stream_%v.m3u8"),
+        &(output_dir.clone() + "/" + "stream_%v.m3u8"),
     ]);
 
     debug!("Running FFmpeg command: {:?}", com);
-    let status = com.status().await?;
+
+    let tracer = global::tracer("ffmpeg_worker");
+    let context = Context::current();
+    let mut span = tracer.start("ffmpeg_conversion");
+
+    span.set_attributes(vec![
+        opentelemetry::KeyValue::new("input_path", input.to_string()),
+        opentelemetry::KeyValue::new("output_dir", output_dir.clone()),
+    ]);
+
+    let status = com.status().with_context(context).await?;
+
+    span.set_attribute(opentelemetry::KeyValue::new(
+        "exit_status",
+        format!("{:?}", status),
+    ));
 
     if !status.success() {
         return Err(std::io::Error::new(
