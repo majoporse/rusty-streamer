@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 actix-web = {workspace = true}
+actix-rt = "2.11.0"
 actix-multipart = {workspace = true}
 
 utoipa = {workspace = true}
@@ -14,7 +15,7 @@ utoipa-redoc = {workspace = true}
 utoipa-rapidoc = {workspace = true}
 utoipa-scalar = {workspace = true}
 
-# actix-web-opentelemetry = {workspace = true}
+actix-web-opentelemetry = {workspace = true}
 # opentelemetry-jaeger = {workspace = true}
 opentelemetry = {workspace = true}
 opentelemetry_sdk = {workspace = true}
@@ -36,8 +37,3 @@ walkdir = "2.5.0"
 
 anyhow = "1.0.100"
 reqwest = { version = "0.12.24", features = ["json", "gzip", "stream"] }
-tracing-opentelemetry = "0.32.0"
-tracing = "0.1.41"
-tracing-bunyan-formatter = "0.3.10"
-tracing-subscriber = { version = "0.3.20", features = ["env-filter", "registry"] }
-# tonic = {version="0.14.2", features=["transport","gzip"]}
