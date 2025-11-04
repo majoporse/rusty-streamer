@@ -13,10 +13,16 @@ receivers:
 exporters:
   debug:
     verbosity: detailed
-  otlphttp:
+  otlphttp/loki:
     endpoint: http://loki:3100/otlp
-  
-
+    tls:
+      insecure: true
+      insecure_skip_verify: true
+  otlphttp/jaeger:
+    endpoint: "http://jaeger:4318"
+    tls:
+      insecure: false
+      insecure_skip_verify: true
 
 extensions:
   health_check:
@@ -24,20 +30,20 @@ extensions:
   pprof:
     endpoint: 0.0.0.0:1777
   zpages:
-    endpoint: 0.0.0.0:55679
+    endpoint: 127.0.0.1:55555
 
 service:
   extensions: [health_check, pprof, zpages]
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [debug]
+      exporters: [debug, otlphttp/jaeger, otlphttp/loki]
     traces/2:
       receivers: [otlp/2]
-      exporters: [debug]
+      exporters: [debug, otlphttp/loki]
     metrics:
       receivers: [otlp]
-      exporters: [debug]
+      exporters: [debug, otlphttp/loki]
     logs:
       receivers: [otlp]
-      exporters: [debug]
+      exporters: [debug, otlphttp/loki]

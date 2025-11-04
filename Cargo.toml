@@ -12,7 +12,7 @@ members = [
 
 
 [workspace.dependencies]
-actix-web = "4"
+actix-web = "4.11.0"
 actix-multipart = "0.7.2"
 
 utoipa = { version = "5", features = ["actix_extras","macros", "chrono", "uuid"] }
@@ -22,8 +22,7 @@ utoipa-redoc = { version = "6", features = ["actix-web"] }
 utoipa-rapidoc = { version = "6", features = ["actix-web"] }
 utoipa-scalar = { version = "0.3.0", features = ["actix-web"]}
 
-# actix-web-opentelemetry = { version = "0.22.0", features = ["metrics"]}
-# opentelemetry-jaeger = { version = "0.22.0", features = ["rt-tokio-current-thread"] }
+actix-web-opentelemetry = { version = "0.22.0", features = ["metrics"]}
 opentelemetry = "0.31.0"
 opentelemetry_sdk = "0.31.0"
 opentelemetry-otlp = {version="0.31.0", features=["trace", "metrics", "logs"]}
