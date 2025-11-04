@@ -3,14 +3,11 @@ use std::path::PathBuf;
 use actix_multipart::form::MultipartFormConfig;
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
-use actix_web_opentelemetry::RequestMetrics;
-use actix_web_opentelemetry::{RequestTracing, RequestTracingMiddleware};
 use dotenvy::dotenv;
 use log::info;
-use opentelemetry::trace::{FutureExt, SpanContext, Tracer as _};
-use opentelemetry::{context, global, Context, KeyValue};
-use opentelemetry_otlp::{ExportConfig, Protocol, WithExportConfig as _, WithHttpConfig};
-use opentelemetry_sdk::trace::{BatchSpanProcessor, SdkTracerProvider};
+use opentelemetry::trace::Tracer as _;
+use opentelemetry::{global, KeyValue};
+use opentelemetry_otlp::{Protocol, WithExportConfig as _};
 use opentelemetry_sdk::Resource;
 use utoipa::OpenApi;
 use utoipa_actix_web::AppExt;
@@ -22,8 +19,8 @@ use utoipa_swagger_ui::SwaggerUi;
 use crate::log_middleware::OtlpMetricsLogger;
 
 mod controllers;
-mod logic;
 mod log_middleware;
+mod logic;
 
 #[derive(OpenApi)]
 #[openapi(
@@ -46,7 +43,10 @@ async fn index() -> &'static str {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "debug,opentelemetry=debug,opentelemetry_otlp=debug");
+    std::env::set_var(
+        "RUST_LOG",
+        "debug,opentelemetry=debug,opentelemetry_otlp=debug",
+    );
     dotenv().ok();
 
     env_logger::init();
@@ -85,7 +85,7 @@ async fn main() -> std::io::Result<()> {
 }
 
 async fn setup_otel() -> std::io::Result<()> {
-    let otlp_exporter = opentelemetry_otlp::SpanExporter::builder()
+    let span_exporter = opentelemetry_otlp::SpanExporter::builder()
         .with_http()
         .with_protocol(Protocol::HttpBinary)
         // .with_http_client(reqwest::Client::new())
@@ -100,7 +100,7 @@ async fn setup_otel() -> std::io::Result<()> {
         .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
 
     let tracer_provider = opentelemetry_sdk::trace::SdkTracerProvider::builder()
-        .with_batch_exporter(otlp_exporter)
+        .with_batch_exporter(span_exporter)
         .with_resource(
             Resource::builder_empty()
                 .with_attributes([KeyValue::new("service.name", "ffmpeg-worker")])
@@ -119,8 +119,8 @@ async fn setup_otel() -> std::io::Result<()> {
 
     global::set_meter_provider(meter_provider);
     global::set_tracer_provider(tracer_provider);
-    let a = global::tracer("asdfas");
 
+    let a = global::tracer("asdfas");
     a.in_span("aaaaaaaa", |_cx| {
         // Your application logic here...
     });
