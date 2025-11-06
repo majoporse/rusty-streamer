@@ -14,8 +14,17 @@ utoipa-redoc = {workspace = true}
 utoipa-rapidoc = {workspace = true}
 utoipa-scalar = {workspace = true}
 
+opentelemetry = {workspace = true}
+opentelemetry_sdk = {workspace = true}
+opentelemetry-otlp = {workspace = true}
+
+tokio = { version = "1.48.0", features = ["process"] }
+
 env_logger = "0.11.8"
+log = "0.4"
 
 dotenvy = "0.15.7"
 
 diesel = { version = "2.2.0", features = ["postgres"] }
+
+shared = { path = "../shared" }
