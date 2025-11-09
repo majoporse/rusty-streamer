@@ -25,6 +25,9 @@ log = "0.4"
 
 dotenvy = "0.15.7"
 
-diesel = { version = "2.2.0", features = ["postgres"] }
+diesel = { version = "2.3.3", features = ["postgres", "chrono", "r2d2"] }
+chrono = { version = "0.4.26", features = ["serde"] }
+anyhow = "1.0.100"
+serde = { version = "1.0.188", features = ["derive"] }
 
 shared = { path = "../shared" }

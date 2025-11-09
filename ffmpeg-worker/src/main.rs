@@ -17,10 +17,9 @@ use utoipa_redoc::{Redoc, Servable};
 use utoipa_scalar::{Scalar, Servable as _};
 use utoipa_swagger_ui::SwaggerUi;
 
-use crate::log_middleware::OtlpMetricsLogger;
+use shared::log_middleware::OtlpMetricsLogger;
 
 mod controllers;
-mod log_middleware;
 mod logic;
 
 #[derive(OpenApi)]
@@ -80,7 +79,7 @@ async fn main() -> std::io::Result<()> {
             .service(web::resource("/").to(index))
             .into_utoipa_app()
             // services
-            .configure(|cfg| controllers::blob::scoped_config(cfg))
+            .configure(controllers::blob::scoped_config)
             // OpenAPI docs
             .openapi(ApiDoc::openapi())
             .openapi_service(|api| Redoc::with_url("/redoc", api))

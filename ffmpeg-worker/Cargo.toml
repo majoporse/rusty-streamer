@@ -15,8 +15,6 @@ utoipa-redoc = {workspace = true}
 utoipa-rapidoc = {workspace = true}
 utoipa-scalar = {workspace = true}
 
-actix-web-opentelemetry = {workspace = true}
-# opentelemetry-jaeger = {workspace = true}
 opentelemetry = {workspace = true}
 opentelemetry_sdk = {workspace = true}
 opentelemetry-otlp = {workspace = true}
@@ -37,3 +35,5 @@ walkdir = "2.5.0"
 
 anyhow = "1.0.100"
 reqwest = { version = "0.12.24", features = ["json", "gzip", "stream"] }
+
+shared = { path = "../shared" }

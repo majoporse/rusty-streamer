@@ -1,11 +1,13 @@
 use std::path::PathBuf;
+use std::sync::Arc;
 
 use actix_multipart::form::MultipartFormConfig;
 use actix_web::middleware::Logger;
+use actix_web::web::Data;
 use actix_web::{App, HttpServer};
+use diesel::r2d2::{ConnectionManager, Pool};
 use dotenvy::dotenv;
 use log::info;
-use opentelemetry::trace::Tracer as _;
 use opentelemetry::{global, KeyValue};
 use opentelemetry_otlp::{Protocol, WithExportConfig as _};
 use opentelemetry_sdk::Resource;
@@ -17,6 +19,13 @@ use utoipa_scalar::{Scalar, Servable as _};
 use utoipa_swagger_ui::SwaggerUi;
 
 use shared::log_middleware::OtlpMetricsLogger;
+
+use crate::models::DbConnection;
+
+pub mod models;
+pub mod schema;
+pub mod controllers;
+pub mod data;
 
 #[derive(OpenApi)]
 #[openapi(
@@ -33,6 +42,17 @@ use shared::log_middleware::OtlpMetricsLogger;
 )]
 struct ApiDoc;
 
+pub fn get_connection_pool() -> anyhow::Result<Pool<ConnectionManager<DbConnection>>> {
+    let url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+
+    let manager = ConnectionManager::<DbConnection>::new(url);
+
+    Ok(Pool::builder()
+        .test_on_check_out(true)
+        .build(manager)
+        .expect("Could not build connection pool"))
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     std::env::set_var(
@@ -40,6 +60,10 @@ async fn main() -> std::io::Result<()> {
         "debug,opentelemetry=debug,opentelemetry_otlp=debug",
     );
     dotenv().ok();
+
+    let pool = Arc::new(get_connection_pool().map_err(|e| {
+        std::io::Error::new(std::io::ErrorKind::Other, format!("DB Pool Error: {}", e))
+    })?);
 
     env_logger::init();
 
@@ -57,7 +81,9 @@ async fn main() -> std::io::Result<()> {
             )
             .wrap(OtlpMetricsLogger::new())
             .into_utoipa_app()
+            .app_data(Data::new(pool.clone()))
             // services
+            .configure(controllers::actors::scoped_config)
             // OpenAPI docs
             .openapi(ApiDoc::openapi())
             .openapi_service(|api| Redoc::with_url("/redoc", api))

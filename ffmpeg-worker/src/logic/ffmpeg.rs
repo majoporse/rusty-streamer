@@ -1,8 +1,8 @@
 use log::debug;
 use opentelemetry::{
     global,
-    trace::{FutureExt as _, Span, TraceContextExt as _, Tracer},
-    Context, KeyValue,
+    trace::{FutureExt as _, Span, Tracer},
+    Context,
 };
 use std::path::Path;
 use tokio::process::Command;

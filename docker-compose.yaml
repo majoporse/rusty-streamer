@@ -58,7 +58,7 @@ services:
       - "5432:5432"
     restart: always
     volumes:
-      - movies-db-data:/var/lib/postgresql/data
+      - movies-db-data:/var/lib/postgresql
 
   jaeger:
     image: jaegertracing/all-in-one:1.51 # At least 1.35 if you want to have enabled collector

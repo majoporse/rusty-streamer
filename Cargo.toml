@@ -5,6 +5,7 @@
 
 [workspace]
 members = [
+    "shared",
     "ffmpeg-worker", 
     "movies",
     # "user-service"
@@ -22,7 +23,6 @@ utoipa-redoc = { version = "6", features = ["actix-web"] }
 utoipa-rapidoc = { version = "6", features = ["actix-web"] }
 utoipa-scalar = { version = "0.3.0", features = ["actix-web"]}
 
-actix-web-opentelemetry = { version = "0.22.0", features = ["metrics"]}
 opentelemetry = "0.31.0"
 opentelemetry_sdk = "0.31.0"
 opentelemetry-otlp = {version="0.31.0", features=["trace", "metrics", "logs"]}
