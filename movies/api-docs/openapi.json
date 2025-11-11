@@ -381,7 +381,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewReviewRequest"
+                "$ref": "#/components/schemas/NewReview"
               }
             }
           },
@@ -459,7 +459,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewReviewRequest"
+                "$ref": "#/components/schemas/NewReview"
               }
             }
           },
@@ -682,7 +682,7 @@
           }
         }
       },
-      "NewReviewRequest": {
+      "NewReview": {
         "type": "object",
         "required": [
           "movie_id",
@@ -759,11 +759,5 @@
         }
       }
     }
-  },
-  "tags": [
-    {
-      "name": "video server",
-      "description": "Video Server API Documentation"
-    }
-  ]
+  }
 }

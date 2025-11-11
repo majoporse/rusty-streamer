@@ -1,3 +1,6 @@
+use std::sync::Arc;
+
+use crate::controllers::error;
 use crate::data::movies;
 use crate::models::{
     movie::{Movie, NewMovie},
@@ -7,22 +10,24 @@ use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use diesel::r2d2::{self, ConnectionManager};
 use utoipa::OpenApi;
 
+static TAG: &str = "Movies";
+
 #[utoipa::path(
     responses(
         (status = 200, description = "List all movies", body = [Movie]),
         (status = 500, description = "Internal Server Error")
     ),
-    tag = "Movies"
+    tag = TAG
 )]
 #[get("/movies")]
 pub async fn get_all_movies(
-    pool: web::Data<r2d2::Pool<ConnectionManager<DbConnection>>>,
+    pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
     match movies::list_movies(&mut db_conn, 100, 0) {
         Ok(movies) => HttpResponse::Ok().json(movies),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) => return error::handle_db_error(&e, "get_all_movies"),
     }
 }
 
@@ -34,18 +39,18 @@ pub async fn get_all_movies(
         (status = 200, description = "Get movie by ID", body = Movie),
         (status = 500, description = "Internal Server Error")
     ),
-    tag = "Movies"
+    tag = TAG
 )]
 #[get("/movies/{movie_id}")]
 pub async fn get_movie_by_id(
-    pool: web::Data<r2d2::Pool<ConnectionManager<DbConnection>>>,
+    pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     movie_id: web::Path<i32>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
     match movies::get_movie_by_id(&mut db_conn, *movie_id) {
         Ok(movie) => HttpResponse::Ok().json(movie),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) => error::handle_db_error(&e, "get_movie_by_id"),
     }
 }
 
@@ -55,18 +60,18 @@ pub async fn get_movie_by_id(
         (status = 200, description = "Create a new movie", body = Movie),
         (status = 500, description = "Internal Server Error")
     ),
-    tag = "Movies"
+    tag = TAG
 )]
 #[post("/movies")]
 pub async fn create_movie(
-    pool: web::Data<r2d2::Pool<ConnectionManager<DbConnection>>>,
+    pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     new_movie: web::Json<NewMovie>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
     match movies::create_movie(&mut db_conn, new_movie.into_inner()) {
         Ok(movie) => HttpResponse::Ok().json(movie),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) =>  crate::controllers::error::handle_db_error(&e, "create_movie"),
     }
 }
 
@@ -78,18 +83,18 @@ pub async fn create_movie(
         (status = 200, description = "Delete movie by ID", body = usize),
         (status = 500, description = "Internal Server Error")
     ),
-    tag = "Movies"
+    tag = TAG
 )]
 #[delete("/movies/{movie_id}")]
 pub async fn delete_movie(
-    pool: web::Data<r2d2::Pool<ConnectionManager<DbConnection>>>,
+    pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     movie_id: web::Path<i32>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
     match movies::delete_movie(&mut db_conn, *movie_id) {
         Ok(deleted_rows) => HttpResponse::Ok().json(deleted_rows),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) => error::handle_db_error(&e, "delete_movie"),
     }
 }
 
@@ -102,11 +107,11 @@ pub async fn delete_movie(
         (status = 200, description = "Update movie by ID", body = Movie),
         (status = 500, description = "Internal Server Error")
     ),
-    tag = "Movies"
+    tag = TAG
 )]
 #[put("/movies/{movie_id}")]
 pub async fn update_movie(
-    pool: web::Data<r2d2::Pool<ConnectionManager<DbConnection>>>,
+    pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     movie_id: web::Path<i32>,
     updated_movie: web::Json<NewMovie>,
 ) -> impl Responder {
@@ -114,7 +119,7 @@ pub async fn update_movie(
 
     match movies::update_movie(&mut db_conn, *movie_id, updated_movie.into_inner()) {
         Ok(movie) => HttpResponse::Ok().json(movie),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) => error::handle_db_error(&e, "update_movie"),
     }
 }
 

@@ -8,7 +8,7 @@ use crate::{
     schema::reviews,
 };
 
-pub fn get_review_by_id(conn: &mut DbConnection, review_id: i32) -> anyhow::Result<Review> {
+pub fn get_review_by_id(conn: &mut DbConnection, review_id: i32) -> anyhow::Result<Review, diesel::result::Error> {
     let review_item = reviews::table
         .filter(reviews::id.eq(review_id))
         .first::<Review>(conn)?;
@@ -16,7 +16,7 @@ pub fn get_review_by_id(conn: &mut DbConnection, review_id: i32) -> anyhow::Resu
     Ok(review_item)
 }
 
-pub fn create_review(conn: &mut DbConnection, new_review: &NewReview) -> anyhow::Result<Review> {
+pub fn create_review(conn: &mut DbConnection, new_review: NewReview) -> anyhow::Result<Review, diesel::result::Error> {
     let review_item = diesel::insert_into(reviews::table)
         .values(new_review)
         .get_result::<Review>(conn)?;
@@ -28,7 +28,7 @@ pub fn list_reviews(
     conn: &mut DbConnection,
     limit: i64,
     offset: i64,
-) -> anyhow::Result<Vec<Review>> {
+) -> anyhow::Result<Vec<Review>, diesel::result::Error> {
     let review_items = reviews::table
         .limit(limit)
         .offset(offset)
@@ -37,7 +37,7 @@ pub fn list_reviews(
     Ok(review_items)
 }
 
-pub fn delete_review(conn: &mut DbConnection, review_id: i32) -> anyhow::Result<usize> {
+pub fn delete_review(conn: &mut DbConnection, review_id: i32) -> anyhow::Result<usize, diesel::result::Error> {
     let deleted_rows =
         diesel::delete(reviews::table.filter(reviews::id.eq(review_id))).execute(conn)?;
 
@@ -47,8 +47,8 @@ pub fn delete_review(conn: &mut DbConnection, review_id: i32) -> anyhow::Result<
 pub fn update_review(
     conn: &mut DbConnection,
     review_id: i32,
-    updated_review: &crate::models::review::NewReview,
-) -> anyhow::Result<Review> {
+    updated_review: NewReview,
+) -> anyhow::Result<Review, diesel::result::Error> {
     let review_item = diesel::update(reviews::table.filter(reviews::id.eq(review_id)))
         .set((
             reviews::movie_id.eq(updated_review.movie_id),

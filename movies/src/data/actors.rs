@@ -11,7 +11,7 @@ use crate::{
     schema::actors,
 };
 
-pub fn get_actor_by_id(conn: &mut DbConnection, actor_id: i32) -> anyhow::Result<Actor> {
+pub fn get_actor_by_id(conn: &mut DbConnection, actor_id: i32) -> anyhow::Result<Actor, diesel::result::Error> {
     let actor_item = actors::table
         .filter(actors::id.eq(actor_id))
         .first::<Actor>(conn)?;
@@ -19,7 +19,7 @@ pub fn get_actor_by_id(conn: &mut DbConnection, actor_id: i32) -> anyhow::Result
     Ok(actor_item)
 }
 
-pub fn create_actor(conn: &mut DbConnection, new_actor: NewActor) -> anyhow::Result<Actor> {
+pub fn create_actor(conn: &mut DbConnection, new_actor: NewActor) -> anyhow::Result<Actor, diesel::result::Error> {
     let actor_item = diesel::insert_into(actors::table)
         .values(new_actor)
         .get_result::<Actor>(conn)?;
@@ -27,7 +27,7 @@ pub fn create_actor(conn: &mut DbConnection, new_actor: NewActor) -> anyhow::Res
     Ok(actor_item)
 }
 
-pub fn list_actors(conn: &mut DbConnection, limit: i64, offset: i64) -> anyhow::Result<Vec<Actor>> {
+pub fn list_actors(conn: &mut DbConnection, limit: i64, offset: i64) -> anyhow::Result<Vec<Actor>, diesel::result::Error> {
     let actor_items = actors::table
         .limit(limit)
         .offset(offset)
@@ -36,7 +36,7 @@ pub fn list_actors(conn: &mut DbConnection, limit: i64, offset: i64) -> anyhow::
     Ok(actor_items)
 }
 
-pub fn delete_actor(conn: &mut DbConnection, actor_id: i32) -> anyhow::Result<usize> {
+pub fn delete_actor(conn: &mut DbConnection, actor_id: i32) -> anyhow::Result<usize, diesel::result::Error> {
     let deleted_rows =
         diesel::delete(actors::table.filter(actors::id.eq(actor_id))).execute(conn)?;
 
@@ -47,7 +47,7 @@ pub fn update_actor(
     conn: &mut DbConnection,
     actor_id: i32,
     updated_actor: NewActor,
-) -> anyhow::Result<Actor> {
+) -> anyhow::Result<Actor, diesel::result::Error> {
     let actor_item = diesel::update(actors::table.filter(actors::id.eq(actor_id)))
         .set((
             actors::first_name.eq(updated_actor.first_name),
@@ -65,7 +65,7 @@ pub fn search_actors_by_name(
     name_query: &str,
     limit: i64,
     offset: i64,
-) -> anyhow::Result<Vec<Actor>> {
+) -> anyhow::Result<Vec<Actor>, diesel::result::Error> {
     let pattern = format!("%{}%", name_query);
 
     let actor_items = actors::table

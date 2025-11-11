@@ -105,7 +105,7 @@ where
             let duration = start.elapsed().as_secs_f64();
 
             // Log request info
-            log::info!("{} {} -> {} ({:.3}s)", method, path, res.status(), duration);
+            // log::info!("{} {} -> {} ({:.3}s)", method, path, res.status(), duration);
 
             // Record metrics
             counter.add(

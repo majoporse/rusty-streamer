@@ -22,10 +22,10 @@ pub struct Review {
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Insertable)]
 #[diesel(table_name = reviews)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct NewReview<'a> {
+pub struct NewReview {
     pub movie_id: i32,
-    pub user_name: &'a str,
+    pub user_name: String,
     pub rating: i16,
-    pub title: Option<&'a str>,
-    pub body: Option<&'a str>,
+    pub title: Option<String>,
+    pub body: Option<String>,
 }

@@ -7,7 +7,7 @@ use crate::{models::{DbConnection, movie::{Movie, NewMovie}}, schema::movies};
 pub fn get_movie_by_id(
     conn: &mut DbConnection,
     movie_id: i32,
-) -> anyhow::Result<Movie> {
+) -> anyhow::Result<Movie, diesel::result::Error> {
 
     let movie_item = movies::table
         .filter(movies::id.eq(movie_id))
@@ -19,7 +19,7 @@ pub fn get_movie_by_id(
 pub fn create_movie(
     conn: &mut DbConnection,
     new_movie: NewMovie,
-) -> anyhow::Result<Movie> {
+) -> anyhow::Result<Movie, diesel::result::Error> {
 
     let movie_item = diesel::insert_into(movies::table)
         .values(new_movie)
@@ -32,7 +32,7 @@ pub fn list_movies(
     conn: &mut DbConnection,
     limit: i64,
     offset: i64,
-) -> anyhow::Result<Vec<Movie>> {
+) -> anyhow::Result<Vec<Movie>, diesel::result::Error> {
 
     let movie_items = movies::table
         .limit(limit)
@@ -46,7 +46,7 @@ pub fn list_movies(
 pub fn delete_movie(
     conn: &mut DbConnection,
     movie_id: i32,
-) -> anyhow::Result<usize> {
+) -> anyhow::Result<usize, diesel::result::Error> {
 
     let deleted_rows = diesel::delete(movies::table.filter(movies::id.eq(movie_id)))
         .execute(conn)?;
@@ -58,7 +58,7 @@ pub fn update_movie(
     conn: &mut DbConnection,
     movie_id: i32,
     updated_movie: NewMovie,
-) -> anyhow::Result<Movie> {
+) -> anyhow::Result<Movie, diesel::result::Error> {
 
     let movie_item = diesel::update(movies::table.filter(movies::id.eq(movie_id)))
         .set((

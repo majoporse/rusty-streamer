@@ -1,3 +1,6 @@
+use std::sync::Arc;
+
+use crate::controllers::error;
 use crate::data::reviews;
 use crate::models::{
     review::{NewReview, Review},
@@ -5,25 +8,26 @@ use crate::models::{
 };
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use diesel::r2d2::{self, ConnectionManager};
-use serde::Deserialize;
-use utoipa::{OpenApi, ToSchema};
+use utoipa::{OpenApi};
+
+static TAG: &str = "Reviews";
 
 #[utoipa::path(
 	responses(
 		(status = 200, description = "List all reviews", body = [Review]),
 		(status = 500, description = "Internal Server Error")
 	),
-	tag = "Reviews"
+	tag = TAG
 )]
 #[get("/reviews")]
 pub async fn get_all_reviews(
-    pool: web::Data<r2d2::Pool<ConnectionManager<DbConnection>>>,
+    pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
     match reviews::list_reviews(&mut db_conn, 100, 0) {
         Ok(reviews) => HttpResponse::Ok().json(reviews),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) => error::handle_db_error(&e, "get_all_reviews"),
     }
 }
 
@@ -35,57 +39,39 @@ pub async fn get_all_reviews(
 		(status = 200, description = "Get review by ID", body = Review),
 		(status = 500, description = "Internal Server Error")
 	),
-	tag = "Reviews"
+	tag = TAG
 )]
 #[get("/reviews/{review_id}")]
 pub async fn get_review_by_id(
-    pool: web::Data<r2d2::Pool<ConnectionManager<DbConnection>>>,
+    pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     review_id: web::Path<i32>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
     match reviews::get_review_by_id(&mut db_conn, *review_id) {
         Ok(review) => HttpResponse::Ok().json(review),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) => error::handle_db_error(&e, "get_review_by_id"),
     }
 }
 
-#[derive(Debug, Deserialize, ToSchema, Clone)]
-pub struct NewReviewRequest {
-    pub movie_id: i32,
-    pub user_name: String,
-    pub rating: i16,
-    pub title: Option<String>,
-    pub body: Option<String>,
-}
-
 #[utoipa::path(
-	request_body = NewReviewRequest,
+	request_body = NewReview,
 	responses(
 		(status = 200, description = "Create a new review", body = Review),
 		(status = 500, description = "Internal Server Error")
 	),
-	tag = "Reviews"
+	tag = TAG
 )]
 #[post("/reviews")]
 pub async fn create_review(
-    pool: web::Data<r2d2::Pool<ConnectionManager<DbConnection>>>,
-    new_review: web::Json<NewReviewRequest>,
+    pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
+    new_review: web::Json<NewReview>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
-    let req = new_review.into_inner();
-    let insert = NewReview {
-        movie_id: req.movie_id,
-        user_name: &req.user_name,
-        rating: req.rating,
-        title: req.title.as_deref(),
-        body: req.body.as_deref(),
-    };
-
-    match reviews::create_review(&mut db_conn, &insert) {
+    match reviews::create_review(&mut db_conn, new_review.into_inner()) {
         Ok(review) => HttpResponse::Ok().json(review),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) => error::handle_db_error(&e, "create_review"),
     }
 }
 
@@ -97,18 +83,18 @@ pub async fn create_review(
 		(status = 200, description = "Delete review by ID", body = usize),
 		(status = 500, description = "Internal Server Error")
 	),
-	tag = "Reviews"
+	tag = TAG
 )]
 #[delete("/reviews/{review_id}")]
 pub async fn delete_review(
-    pool: web::Data<r2d2::Pool<ConnectionManager<DbConnection>>>,
+    pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     review_id: web::Path<i32>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
     match reviews::delete_review(&mut db_conn, *review_id) {
         Ok(deleted_rows) => HttpResponse::Ok().json(deleted_rows),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) => error::handle_db_error(&e, "delete_review"),
     }
 }
 
@@ -116,33 +102,24 @@ pub async fn delete_review(
 	params(
 		("review_id" = i32, Path, description = "ID of the review to update")
 	),
-	request_body = NewReviewRequest,
+	request_body = NewReview,
 	responses(
 		(status = 200, description = "Update review by ID", body = Review),
 		(status = 500, description = "Internal Server Error")
 	),
-	tag = "Reviews"
+	tag = TAG
 )]
 #[put("/reviews/{review_id}")]
 pub async fn update_review(
-    pool: web::Data<r2d2::Pool<ConnectionManager<DbConnection>>>,
+    pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     review_id: web::Path<i32>,
-    updated_review: web::Json<NewReviewRequest>,
+    updated_review: web::Json<NewReview>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
-    let req = updated_review.into_inner();
-    let update = NewReview {
-        movie_id: req.movie_id,
-        user_name: &req.user_name,
-        rating: req.rating,
-        title: req.title.as_deref(),
-        body: req.body.as_deref(),
-    };
-
-    match reviews::update_review(&mut db_conn, *review_id, &update) {
+    match reviews::update_review(&mut db_conn, *review_id, updated_review.into_inner()) {
         Ok(review) => HttpResponse::Ok().json(review),
-        Err(_) => HttpResponse::InternalServerError().finish(),
+        Err(e) => error::handle_db_error(&e, "update_review"),
     }
 }
 

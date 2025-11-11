@@ -33,16 +33,12 @@ pub mod schema;
         title = "Video Server API",
         version = "1.0.0",
         description = "API documentation for my video server."
-    ),
-    paths(
-    ),
-    tags(
-        (name = "video server", description = "Video Server API Documentation")
     )
 )]
 struct ApiDoc;
 
 pub fn get_connection_pool() -> anyhow::Result<Pool<ConnectionManager<DbConnection>>> {
+    log::info!("Setting up database connection pool...");
     let url = std::env::var("MOVIES_DB_STRING").expect("MOVIES_DB_STRING must be set");
 
     let manager = ConnectionManager::<DbConnection>::new(url);
@@ -57,27 +53,21 @@ pub fn get_connection_pool() -> anyhow::Result<Pool<ConnectionManager<DbConnecti
 async fn main() -> std::io::Result<()> {
     std::env::set_var(
         "RUST_LOG",
-        "info,opentelemetry=debug,opentelemetry_otlp=debug",
+        "debug,opentelemetry=debug,opentelemetry_otlp=debug",
     );
     dotenv().ok();
     env_logger::init();
 
-    log::info!("Starting ffmpeg-worker...");
-
     let mut apidoc = ApiDoc::openapi();
-
-    log::info!("Merging OpenAPI docs from controllers...");
 
     apidoc.merge(controllers::actors::ApiDoc::openapi());
     apidoc.merge(controllers::movies::ApiDoc::openapi());
     apidoc.merge(controllers::reviews::ApiDoc::openapi());
 
-    log::info!("Setting up database connection pool...");
     let pool = Arc::new(get_connection_pool().map_err(|e| {
         std::io::Error::new(std::io::ErrorKind::Other, format!("DB Pool Error: {}", e))
     })?);
 
-    log::info!("Saving OpenAPI spec to file...");
 
     save_openapi_spec(&apidoc).await?;
     log::info!("setup openapi");
@@ -98,6 +88,8 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(pool.clone()))
             // services
             .configure(controllers::actors::scoped_config)
+            .configure(controllers::movies::scoped_config)
+            .configure(controllers::reviews::scoped_config)
             // OpenAPI docs
             .openapi(apidoc.clone())
             .openapi_service(|api| Redoc::with_url("/redoc", api))
