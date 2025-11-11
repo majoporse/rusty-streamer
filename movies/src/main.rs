@@ -22,10 +22,10 @@ use shared::log_middleware::OtlpMetricsLogger;
 
 use crate::models::DbConnection;
 
-pub mod models;
-pub mod schema;
 pub mod controllers;
 pub mod data;
+pub mod models;
+pub mod schema;
 
 #[derive(OpenApi)]
 #[openapi(
@@ -42,8 +42,6 @@ pub mod data;
 )]
 struct ApiDoc;
 
-
-
 pub fn get_connection_pool() -> anyhow::Result<Pool<ConnectionManager<DbConnection>>> {
     let url = std::env::var("MOVIES_DB_STRING").expect("MOVIES_DB_STRING must be set");
 
@@ -59,9 +57,11 @@ pub fn get_connection_pool() -> anyhow::Result<Pool<ConnectionManager<DbConnecti
 async fn main() -> std::io::Result<()> {
     std::env::set_var(
         "RUST_LOG",
-        "debug,opentelemetry=debug,opentelemetry_otlp=debug",
+        "info,opentelemetry=debug,opentelemetry_otlp=debug",
     );
     dotenv().ok();
+    env_logger::init();
+
     log::info!("Starting ffmpeg-worker...");
 
     let mut apidoc = ApiDoc::openapi();
@@ -77,11 +77,13 @@ async fn main() -> std::io::Result<()> {
         std::io::Error::new(std::io::ErrorKind::Other, format!("DB Pool Error: {}", e))
     })?);
 
-    env_logger::init();
+    log::info!("Saving OpenAPI spec to file...");
 
-    save_openapi_spec().await?;
+    save_openapi_spec(&apidoc).await?;
+    log::info!("setup openapi");
 
     setup_otel().await?;
+    log::info!("otel setup");
 
     HttpServer::new(move || {
         let app = App::new()
@@ -148,17 +150,19 @@ async fn setup_otel() -> std::io::Result<()> {
     global::set_meter_provider(meter_provider);
     global::set_tracer_provider(tracer_provider);
 
-
-
     Ok(())
 }
 
-async fn save_openapi_spec() -> std::io::Result<()> {
+async fn save_openapi_spec(apidoc: &utoipa::openapi::OpenApi) -> std::io::Result<()> {
     // save the api doc to a file
     let root = std::env::var("CARGO_MANIFEST_DIR").unwrap();
     let location = PathBuf::from(root).join("api-docs").join("openapi.json");
+    std::fs::create_dir_all(&location.parent().ok_or(std::io::Error::new(
+        std::io::ErrorKind::NotFound,
+        "parent not found",
+    ))?)?;
 
-    tokio::fs::write(&location, ApiDoc::openapi().to_pretty_json()?).await?;
+    tokio::fs::write(&location, apidoc.to_pretty_json()?).await?;
     info!("Wrote OpenAPI doc to {:?}", location);
     Ok(())
 }
