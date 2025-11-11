@@ -1,6 +1,6 @@
 use diesel::{
-    connection::LoadConnection, BoolExpressionMethods as _, ExpressionMethods,
-    PgTextExpressionMethods as _, QueryDsl, RunQueryDsl,
+    BoolExpressionMethods as _, ExpressionMethods, PgTextExpressionMethods as _, QueryDsl,
+    RunQueryDsl,
 };
 
 use crate::{
@@ -19,7 +19,7 @@ pub fn get_actor_by_id(conn: &mut DbConnection, actor_id: i32) -> anyhow::Result
     Ok(actor_item)
 }
 
-pub fn create_actor(conn: &mut DbConnection, new_actor: &NewActor) -> anyhow::Result<Actor> {
+pub fn create_actor(conn: &mut DbConnection, new_actor: NewActor) -> anyhow::Result<Actor> {
     let actor_item = diesel::insert_into(actors::table)
         .values(new_actor)
         .get_result::<Actor>(conn)?;
@@ -46,7 +46,7 @@ pub fn delete_actor(conn: &mut DbConnection, actor_id: i32) -> anyhow::Result<us
 pub fn update_actor(
     conn: &mut DbConnection,
     actor_id: i32,
-    updated_actor: &NewActor,
+    updated_actor: NewActor,
 ) -> anyhow::Result<Actor> {
     let actor_item = diesel::update(actors::table.filter(actors::id.eq(actor_id)))
         .set((

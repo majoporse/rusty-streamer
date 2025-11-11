@@ -1,10 +1,11 @@
 use chrono::NaiveDateTime;
 use diesel::prelude::{Associations, Identifiable, Insertable, Queryable};
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 use crate::{schema::reviews, models::movie::Movie};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, Associations)]
+#[derive(Debug, Clone, Serialize, Deserialize, Queryable, Identifiable, Associations, ToSchema)]
 #[diesel(belongs_to(Movie))]
 #[diesel(table_name = reviews)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
@@ -18,7 +19,7 @@ pub struct Review {
     pub created_at: NaiveDateTime,
 }
 
-#[derive(Debug, Insertable)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, Insertable)]
 #[diesel(table_name = reviews)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct NewReview<'a> {

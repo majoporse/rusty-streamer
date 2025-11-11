@@ -18,7 +18,7 @@ pub fn get_movie_by_id(
 
 pub fn create_movie(
     conn: &mut DbConnection,
-    new_movie: &NewMovie,
+    new_movie: NewMovie,
 ) -> anyhow::Result<Movie> {
 
     let movie_item = diesel::insert_into(movies::table)
@@ -57,7 +57,7 @@ pub fn delete_movie(
 pub fn update_movie(
     conn: &mut DbConnection,
     movie_id: i32,
-    updated_movie: &crate::models::movie::NewMovie,
+    updated_movie: NewMovie,
 ) -> anyhow::Result<Movie> {
 
     let movie_item = diesel::update(movies::table.filter(movies::id.eq(movie_id)))

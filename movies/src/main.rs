@@ -42,8 +42,10 @@ pub mod data;
 )]
 struct ApiDoc;
 
+
+
 pub fn get_connection_pool() -> anyhow::Result<Pool<ConnectionManager<DbConnection>>> {
-    let url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let url = std::env::var("MOVIES_DB_STRING").expect("MOVIES_DB_STRING must be set");
 
     let manager = ConnectionManager::<DbConnection>::new(url);
 
@@ -60,7 +62,17 @@ async fn main() -> std::io::Result<()> {
         "debug,opentelemetry=debug,opentelemetry_otlp=debug",
     );
     dotenv().ok();
+    log::info!("Starting ffmpeg-worker...");
 
+    let mut apidoc = ApiDoc::openapi();
+
+    log::info!("Merging OpenAPI docs from controllers...");
+
+    apidoc.merge(controllers::actors::ApiDoc::openapi());
+    apidoc.merge(controllers::movies::ApiDoc::openapi());
+    apidoc.merge(controllers::reviews::ApiDoc::openapi());
+
+    log::info!("Setting up database connection pool...");
     let pool = Arc::new(get_connection_pool().map_err(|e| {
         std::io::Error::new(std::io::ErrorKind::Other, format!("DB Pool Error: {}", e))
     })?);
@@ -85,7 +97,7 @@ async fn main() -> std::io::Result<()> {
             // services
             .configure(controllers::actors::scoped_config)
             // OpenAPI docs
-            .openapi(ApiDoc::openapi())
+            .openapi(apidoc.clone())
             .openapi_service(|api| Redoc::with_url("/redoc", api))
             .openapi_service(|api| {
                 SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-docs/openapi.json", api)

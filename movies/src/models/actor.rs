@@ -1,16 +1,15 @@
-use diesel::{Selectable, prelude::Queryable};
+use diesel::{prelude::Queryable, Selectable};
 
+use crate::schema;
 use chrono::{NaiveDate, NaiveDateTime};
 use diesel::prelude::{Identifiable, Insertable};
+use serde::Deserialize;
 use serde::Serialize;
 use utoipa::ToSchema;
 
-use crate::schema;
-
-
 #[derive(Debug, Clone, Serialize, Queryable, ToSchema, Identifiable, Selectable)]
 #[diesel(table_name = schema::actors)]
-// #[diesel(check_for_backend(diesel::pg::Pg))]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Actor {
     pub id: i32,
     pub first_name: String,
@@ -20,12 +19,12 @@ pub struct Actor {
     pub created_at: NaiveDateTime,
 }
 
-#[derive(Debug, Insertable)]
+#[derive(Debug, Clone, Serialize, Deserialize, Insertable, ToSchema)]
 #[diesel(table_name = schema::actors)]
-// #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct NewActor<'a> {
-    pub first_name: &'a str,
-    pub last_name: &'a str,
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct NewActor {
+    pub first_name: String,
+    pub last_name: String,
     pub birth_date: Option<NaiveDate>,
-    pub bio: Option<&'a str>,
+    pub bio: Option<String>,
 }
