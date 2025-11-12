@@ -55,17 +55,10 @@ async fn main() -> std::io::Result<()> {
 
     setup_otel().await?;
 
-    let aa = global::tracer("main_tracer");
-    let mut span = aa.start("aaaaaa");
-    let a = global::tracer("asdfas");
-    a.in_span("aaaaaaaa", |_cx| {
-        // Your application logic here...
-        let b = global::tracer("bbbbbb");
-        b.in_span("bbbbbbb", |_cx| {
-            // Nested span logic...
-        });
-    });
-    span.end();
+    let port = std::env::var("FFMPEG_PORT")
+        .unwrap_or_else(|_| "8082".to_string())
+        .parse::<u16>()
+        .expect("FFMPEG_PORT must be a valid u16");
 
     HttpServer::new(move || {
         let app = App::new()
@@ -91,7 +84,7 @@ async fn main() -> std::io::Result<()> {
             .into_app();
         app
     })
-    .bind(("127.0.0.1", 8081))?
+    .bind(("127.0.0.1", port))?
     .run()
     .await
 }

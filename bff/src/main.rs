@@ -1,11 +1,8 @@
 use std::path::PathBuf;
-use std::sync::Arc;
 
 use actix_multipart::form::MultipartFormConfig;
 use actix_web::middleware::Logger;
-use actix_web::web::Data;
 use actix_web::{App, HttpServer};
-use diesel::r2d2::{ConnectionManager, Pool};
 use dotenvy::dotenv;
 use log::info;
 use opentelemetry::{global, KeyValue};
@@ -20,34 +17,18 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use shared::log_middleware::OtlpMetricsLogger;
 
-use crate::models::DbConnection;
-
 pub mod controllers;
-pub mod data;
 pub mod models;
-pub mod schema;
 
 #[derive(OpenApi)]
 #[openapi(
     info(
-        title = "Video Server API",
+        title = "Backend For Frontend API",
         version = "1.0.0",
-        description = "API documentation for my video server."
+        description = "API documentation for the BFF service."
     )
 )]
 struct ApiDoc;
-
-pub fn get_connection_pool() -> anyhow::Result<Pool<ConnectionManager<DbConnection>>> {
-    log::info!("Setting up database connection pool...");
-    let url = std::env::var("MOVIES_DB_STRING").expect("MOVIES_DB_STRING must be set");
-
-    let manager = ConnectionManager::<DbConnection>::new(url);
-
-    Ok(Pool::builder()
-        .test_on_check_out(true)
-        .build(manager)
-        .expect("Could not build connection pool"))
-}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -58,20 +39,16 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
     env_logger::init();
 
-    let port = std::env::var("MOVIES_PORT")
-        .unwrap_or_else(|_| "8081".to_string())
+    let port = std::env::var("BFF_PORT")
+        .unwrap_or_else(|_| "8085".to_string())
         .parse::<u16>()
-        .expect("MOVIES_PORT is not defined");
+        .expect("BFF_PORT is not defined");
 
     let mut apidoc = ApiDoc::openapi();
 
+    apidoc.merge(controllers::movie::ApiDoc::openapi());
     apidoc.merge(controllers::actors::ApiDoc::openapi());
-    apidoc.merge(controllers::movies::ApiDoc::openapi());
     apidoc.merge(controllers::reviews::ApiDoc::openapi());
-
-    let pool = Arc::new(get_connection_pool().map_err(|e| {
-        std::io::Error::new(std::io::ErrorKind::Other, format!("DB Pool Error: {}", e))
-    })?);
 
 
     save_openapi_spec(&apidoc).await?;
@@ -90,10 +67,9 @@ async fn main() -> std::io::Result<()> {
             )
             .wrap(OtlpMetricsLogger::new())
             .into_utoipa_app()
-            .app_data(Data::new(pool.clone()))
             // services
+            .configure(controllers::movie::scoped_config)
             .configure(controllers::actors::scoped_config)
-            .configure(controllers::movies::scoped_config)
             .configure(controllers::reviews::scoped_config)
             // OpenAPI docs
             .openapi(apidoc.clone())
@@ -130,7 +106,7 @@ async fn setup_otel() -> std::io::Result<()> {
         .with_batch_exporter(span_exporter)
         .with_resource(
             Resource::builder_empty()
-                .with_attributes([KeyValue::new("service.name", "movies")])
+                .with_attributes([KeyValue::new("service.name", "backend-for-frontend")])
                 .build(),
         )
         .build();
@@ -139,7 +115,7 @@ async fn setup_otel() -> std::io::Result<()> {
         .with_periodic_exporter(exporter)
         .with_resource(
             Resource::builder_empty()
-                .with_attributes([KeyValue::new("service.name", "movies")])
+                .with_attributes([KeyValue::new("service.name", "backend-for-frontend")])
                 .build(),
         )
         .build();

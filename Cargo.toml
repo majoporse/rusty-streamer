@@ -8,6 +8,7 @@ members = [
     "shared",
     "ffmpeg-worker", 
     "movies",
+    "bff",
     # "user-service"
 ]
 

@@ -1,0 +1,12 @@
+pub mod actor;
+pub use self::actor::Actor;
+pub mod movie;
+pub use self::movie::Movie;
+pub mod new_actor;
+pub use self::new_actor::NewActor;
+pub mod new_movie;
+pub use self::new_movie::NewMovie;
+pub mod new_review;
+pub use self::new_review::NewReview;
+pub mod review;
+pub use self::review::Review;
