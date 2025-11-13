@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use crate::controllers::error;
 use crate::data::users; // <-- your Diesel CRUD functions module
-use crate::models::user::{User, NewUser, UpdateUser};
+use crate::models::user::{NewUser, UpdateUser, User};
 use crate::models::DbConnection;
 
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
@@ -13,6 +13,10 @@ use uuid::Uuid;
 static TAG: &str = "Users";
 
 #[utoipa::path(
+    params(
+        ("limit" = i64, Query, description = "Max number of users to return", example = 100),
+        ("offset" = i64, Query, description = "Pagination offset", example = 0)
+    ),
     responses(
         (status = 200, description = "List all users", body = [User]),
         (status = 500, description = "Internal Server Error")
@@ -22,10 +26,16 @@ static TAG: &str = "Users";
 #[get("/users")]
 pub async fn get_all_users(
     pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
+    limit: web::Query<Option<i64>>,
+    offset: web::Query<Option<i64>>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
-    match users::list_users(&mut db_conn, 100, 0) {
+    match users::list_users(
+        &mut db_conn,
+        limit.into_inner().unwrap_or(100),
+        offset.into_inner().unwrap_or(0),
+    ) {
         Ok(users) => HttpResponse::Ok().json(users),
         Err(e) => error::handle_db_error(&e, "get_all_users"),
     }
@@ -140,13 +150,7 @@ pub async fn delete_user(
 }
 
 #[derive(OpenApi)]
-#[openapi(paths(
-    get_all_users,
-    get_user_by_id,
-    create_user,
-    update_user,
-    delete_user,
-))]
+#[openapi(paths(get_all_users, get_user_by_id, create_user, update_user, delete_user,))]
 pub struct ApiDoc;
 
 pub fn scoped_config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {

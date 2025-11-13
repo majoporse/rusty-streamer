@@ -5,7 +5,7 @@ use crate::data::watch_room;
 use crate::models::watch_room::{NewWatchRoom, UpdateWatchRoom, WatchRoom};
 use crate::models::DbConnection;
 
-use actix_web::{get, post, put, delete, web, HttpResponse, Responder};
+use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use diesel::r2d2::{self, ConnectionManager};
 use utoipa::OpenApi;
 use uuid::Uuid;
@@ -56,7 +56,8 @@ pub async fn get_watch_room_by_id(
 pub async fn list_rooms_by_host(
     pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     host_user_id: web::Path<String>,
-    web::Query(pagination): web::Query<std::collections::HashMap<String, String>>,
+    limit: web::Query<Option<i64>>,
+    offset: web::Query<Option<i64>>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
@@ -65,16 +66,12 @@ pub async fn list_rooms_by_host(
         Err(_) => return HttpResponse::BadRequest().body("Invalid UUID format for host_user_id"),
     };
 
-    let limit = pagination
-        .get("limit")
-        .and_then(|v| v.parse::<i64>().ok())
-        .unwrap_or(50);
-    let offset = pagination
-        .get("offset")
-        .and_then(|v| v.parse::<i64>().ok())
-        .unwrap_or(0);
-
-    match watch_room::list_rooms_by_host(&mut db_conn, parsed_user_id, limit, offset) {
+    match watch_room::list_rooms_by_host(
+        &mut db_conn,
+        parsed_user_id,
+        limit.into_inner().unwrap_or(50),
+        offset.into_inner().unwrap_or(0),
+    ) {
         Ok(rooms) => HttpResponse::Ok().json(rooms),
         Err(e) => error::handle_db_error(&e, "list_rooms_by_host"),
     }

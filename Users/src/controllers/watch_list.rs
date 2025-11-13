@@ -28,7 +28,8 @@ static TAG: &str = "Watchlist";
 pub async fn get_watchlist_by_user(
     pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     user_id: web::Path<String>,
-    web::Query(pagination): web::Query<std::collections::HashMap<String, String>>,
+    limit: web::Query<Option<i64>>,
+    offset: web::Query<Option<i64>>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
@@ -37,16 +38,12 @@ pub async fn get_watchlist_by_user(
         Err(_) => return HttpResponse::BadRequest().body("Invalid UUID format for user_id"),
     };
 
-    let limit = pagination
-        .get("limit")
-        .and_then(|v| v.parse::<i64>().ok())
-        .unwrap_or(50);
-    let offset = pagination
-        .get("offset")
-        .and_then(|v| v.parse::<i64>().ok())
-        .unwrap_or(0);
-
-    match watch_list::get_watchlist_by_user(&mut db_conn, parsed_user_id, limit, offset) {
+    match watch_list::get_watchlist_by_user(
+        &mut db_conn,
+        parsed_user_id,
+        limit.into_inner().unwrap_or(50),
+        offset.into_inner().unwrap_or(0),
+    ) {
         Ok(items) => HttpResponse::Ok().json(items),
         Err(e) => error::handle_db_error(&e, "get_watchlist_by_user"),
     }
@@ -109,11 +106,7 @@ pub async fn delete_watchlist_item(
 }
 
 #[derive(OpenApi)]
-#[openapi(paths(
-    get_watchlist_by_user,
-    create_watchlist_item,
-    delete_watchlist_item,
-))]
+#[openapi(paths(get_watchlist_by_user, create_watchlist_item, delete_watchlist_item,))]
 pub struct ApiDoc;
 
 pub fn scoped_config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {

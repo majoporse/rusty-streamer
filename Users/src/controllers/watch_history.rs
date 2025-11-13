@@ -28,7 +28,8 @@ static TAG: &str = "Watch History";
 pub async fn list_watch_history_by_user(
     pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     user_id: web::Path<String>,
-    web::Query(pagination): web::Query<std::collections::HashMap<String, String>>,
+    limit: web::Query<Option<i64>>,
+    offset: web::Query<Option<i64>>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
@@ -37,16 +38,12 @@ pub async fn list_watch_history_by_user(
         Err(_) => return HttpResponse::BadRequest().body("Invalid UUID format"),
     };
 
-    let limit = pagination
-        .get("limit")
-        .and_then(|v| v.parse::<i64>().ok())
-        .unwrap_or(50);
-    let offset = pagination
-        .get("offset")
-        .and_then(|v| v.parse::<i64>().ok())
-        .unwrap_or(0);
-
-    match watch_history::list_watch_history_by_user(&mut db_conn, parsed_id, limit, offset) {
+    match watch_history::list_watch_history_by_user(
+        &mut db_conn,
+        parsed_id,
+        limit.into_inner().unwrap_or(50),
+        offset.into_inner().unwrap_or(0),
+    ) {
         Ok(items) => HttpResponse::Ok().json(items),
         Err(e) => error::handle_db_error(&e, "list_watch_history_by_user"),
     }

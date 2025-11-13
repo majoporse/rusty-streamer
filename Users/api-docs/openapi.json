@@ -547,6 +547,108 @@
         }
       }
     },
+    "/watch-room-messages": {
+      "post": {
+        "tags": [
+          "WatchRoomMessages"
+        ],
+        "operationId": "create_watch_room_message",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewWatchRoomMessage"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Create a new message in a watch room",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WatchRoomMessage"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/watch-room-messages/{message_id}": {
+      "get": {
+        "tags": [
+          "WatchRoomMessages"
+        ],
+        "operationId": "get_watch_room_message_by_id",
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "description": "ID of the message to retrieve",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get a watch room message by ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WatchRoomMessage"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "WatchRoomMessages"
+        ],
+        "operationId": "delete_watch_room_message",
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "description": "ID of the message to delete",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete a message from a watch room",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/watch-room-participants": {
       "post": {
         "tags": [
@@ -742,6 +844,98 @@
         "responses": {
           "200": {
             "description": "Delete a watch room",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/watch-rooms/{room_id}/messages": {
+      "get": {
+        "tags": [
+          "WatchRoomMessages"
+        ],
+        "operationId": "list_messages_by_room",
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "description": "UUID of the room whose messages to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of messages to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 50
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List messages by room",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WatchRoomMessage"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "WatchRoomMessages"
+        ],
+        "operationId": "delete_messages_by_room",
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "path",
+            "description": "UUID of the room whose messages to delete",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete all messages from a watch room",
             "content": {
               "text/plain": {
                 "schema": {
@@ -1037,6 +1231,35 @@
           }
         }
       },
+      "NewWatchRoomMessage": {
+        "type": "object",
+        "required": [
+          "room_id",
+          "message"
+        ],
+        "properties": {
+          "is_system_message": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "room_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
       "NewWatchRoomParticipant": {
         "type": "object",
         "required": [
@@ -1321,6 +1544,47 @@
               "null"
             ],
             "format": "date-time"
+          }
+        }
+      },
+      "WatchRoomMessage": {
+        "type": "object",
+        "required": [
+          "id",
+          "room_id",
+          "message"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "is_system_message": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "room_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sent_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "user_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
           }
         }
       },

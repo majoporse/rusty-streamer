@@ -70,7 +70,7 @@ async fn main() -> std::io::Result<()> {
     apidoc.merge(controllers::watch_list::ApiDoc::openapi());
     apidoc.merge(controllers::watch_room::ApiDoc::openapi());
     apidoc.merge(controllers::watch_room_participant::ApiDoc::openapi());
-    apidoc.merge(controllers::watch_room::ApiDoc::openapi());
+    apidoc.merge(controllers::watch_room_message::ApiDoc::openapi());
 
     let pool = Arc::new(get_connection_pool().map_err(|e| {
         std::io::Error::new(std::io::ErrorKind::Other, format!("DB Pool Error: {}", e))

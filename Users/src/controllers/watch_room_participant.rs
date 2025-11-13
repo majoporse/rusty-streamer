@@ -5,7 +5,7 @@ use crate::data::watch_room_participant;
 use crate::models::watch_room_participant::{NewWatchRoomParticipant, WatchRoomParticipant};
 use crate::models::DbConnection;
 
-use actix_web::{get, post, delete, web, HttpResponse, Responder};
+use actix_web::{delete, get, post, web, HttpResponse, Responder};
 use diesel::r2d2::{self, ConnectionManager};
 use utoipa::OpenApi;
 use uuid::Uuid;
@@ -51,7 +51,8 @@ pub async fn get_watch_room_participant_by_id(
 pub async fn list_participants_by_room(
     pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     room_id: web::Path<String>,
-    web::Query(pagination): web::Query<std::collections::HashMap<String, String>>,
+    limit: web::Query<Option<i64>>,
+    offset: web::Query<Option<i64>>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
@@ -60,16 +61,12 @@ pub async fn list_participants_by_room(
         Err(_) => return HttpResponse::BadRequest().body("Invalid UUID format for room_id"),
     };
 
-    let limit = pagination
-        .get("limit")
-        .and_then(|v| v.parse::<i64>().ok())
-        .unwrap_or(50);
-    let offset = pagination
-        .get("offset")
-        .and_then(|v| v.parse::<i64>().ok())
-        .unwrap_or(0);
-
-    match watch_room_participant::list_participants_by_room(&mut db_conn, parsed_room_id, limit, offset) {
+    match watch_room_participant::list_participants_by_room(
+        &mut db_conn,
+        parsed_room_id,
+        limit.into_inner().unwrap_or(50),
+        offset.into_inner().unwrap_or(0),
+    ) {
         Ok(participants) => HttpResponse::Ok().json(participants),
         Err(e) => error::handle_db_error(&e, "list_participants_by_room"),
     }
@@ -90,7 +87,10 @@ pub async fn create_watch_room_participant(
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
-    match watch_room_participant::create_watch_room_participant(&mut db_conn, new_participant.into_inner()) {
+    match watch_room_participant::create_watch_room_participant(
+        &mut db_conn,
+        new_participant.into_inner(),
+    ) {
         Ok(participant) => HttpResponse::Ok().json(participant),
         Err(e) => error::handle_db_error(&e, "create_watch_room_participant"),
     }
