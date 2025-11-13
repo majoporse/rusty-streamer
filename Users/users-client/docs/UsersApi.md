@@ -70,12 +70,16 @@ No authorization required
 
 ## get_all_users
 
-> Vec<models::User> get_all_users()
+> Vec<models::User> get_all_users(limit, offset)
 
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**limit** | **i64** | Max number of users to return | [required] |
+**offset** | **i64** | Pagination offset | [required] |
 
 ### Return type
 

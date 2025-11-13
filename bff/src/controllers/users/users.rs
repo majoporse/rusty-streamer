@@ -1,10 +1,11 @@
-use crate::models::users::{User, NewUser, UpdateUser};
 use crate::controllers::users::error::handle_client_error;
+use crate::controllers::users::pagination::Pagination;
+use crate::models::users::{NewUser, UpdateUser, User};
 
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use utoipa::OpenApi;
 
-use users_client::apis::{users_api, configuration::Configuration};
+use users_client::apis::{configuration::Configuration, users_api};
 use uuid::Uuid;
 
 static TAG: &str = "Users";
@@ -17,11 +18,17 @@ static TAG: &str = "Users";
     tag = TAG
 )]
 #[get("/users")]
-pub async fn get_all_users() -> impl Responder {
+pub async fn get_all_users(pagination: web::Query<Pagination>) -> impl Responder {
     let mut config = Configuration::new();
     config.base_path = "http://127.0.0.1:8082".to_string();
 
-    match users_api::get_all_users(&config, Some(100), Some(0)).await {
+    match users_api::get_all_users(
+        &config,
+        pagination.limit.unwrap_or(100),
+        pagination.offset.unwrap_or(0),
+    )
+    .await
+    {
         Ok(users) => HttpResponse::Ok().json(users),
         Err(err) => handle_client_error(err, "Fetching all users"),
     }
@@ -99,7 +106,13 @@ pub async fn update_user(
         return HttpResponse::BadRequest().body("Invalid UUID format");
     };
 
-    match users_api::update_user(&config, &*parsed_id.to_string(), updated_user.into_inner().into()).await {
+    match users_api::update_user(
+        &config,
+        &*user_id,
+        updated_user.into_inner().into(),
+    )
+    .await
+    {
         Ok(user) => HttpResponse::Ok().json(user),
         Err(err) => handle_client_error(err, &format!("Updating user {}", user_id)),
     }
@@ -132,13 +145,7 @@ pub async fn delete_user(user_id: web::Path<String>) -> impl Responder {
 }
 
 #[derive(OpenApi)]
-#[openapi(paths(
-    get_all_users,
-    get_user_by_id,
-    create_user,
-    update_user,
-    delete_user,
-))]
+#[openapi(paths(get_all_users, get_user_by_id, create_user, update_user, delete_user,))]
 pub struct ApiDoc;
 
 pub fn scoped_config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {

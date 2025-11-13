@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::controllers::error;
+use crate::controllers::pagination::Pagination;
 use crate::data::movies;
 use crate::models::{
     movie::{Movie, NewMovie},
@@ -26,12 +27,11 @@ static TAG: &str = "Movies";
 #[get("/movies")]
 pub async fn get_all_movies(
     pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
-    limit: web::Query<Option<i64>>,
-    offset: web::Query<Option<i64>>,
+    pagination: web::Query<Pagination>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
-    match movies::list_movies(&mut db_conn, limit.into_inner().unwrap_or(100), offset.into_inner().unwrap_or(0)) {
+    match movies::list_movies(&mut db_conn, pagination.limit.unwrap_or(100), pagination.offset.unwrap_or(0)) {
         Ok(movies) => HttpResponse::Ok().json(movies),
         Err(e) => return error::handle_db_error(&e, "get_all_movies"),
     }

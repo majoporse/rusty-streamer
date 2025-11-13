@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::controllers::error;
+use crate::controllers::pagination::Pagination;
 use crate::data::users; // <-- your Diesel CRUD functions module
 use crate::models::user::{NewUser, UpdateUser, User};
 use crate::models::DbConnection;
@@ -11,6 +12,7 @@ use utoipa::OpenApi;
 use uuid::Uuid;
 
 static TAG: &str = "Users";
+
 
 #[utoipa::path(
     params(
@@ -26,15 +28,14 @@ static TAG: &str = "Users";
 #[get("/users")]
 pub async fn get_all_users(
     pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
-    limit: web::Query<Option<i64>>,
-    offset: web::Query<Option<i64>>,
+    pagination: web::Query<Pagination>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
     match users::list_users(
         &mut db_conn,
-        limit.into_inner().unwrap_or(100),
-        offset.into_inner().unwrap_or(0),
+        pagination.limit.unwrap_or(100),
+        pagination.offset.unwrap_or(0),
     ) {
         Ok(users) => HttpResponse::Ok().json(users),
         Err(e) => error::handle_db_error(&e, "get_all_users"),

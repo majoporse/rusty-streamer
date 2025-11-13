@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::controllers::error;
+use crate::controllers::pagination::Pagination;
 use crate::data::watch_list;
 use crate::models::watch_list::{NewWatchlist, Watchlist};
 use crate::models::DbConnection;
@@ -28,8 +29,7 @@ static TAG: &str = "Watchlist";
 pub async fn get_watchlist_by_user(
     pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     user_id: web::Path<String>,
-    limit: web::Query<Option<i64>>,
-    offset: web::Query<Option<i64>>,
+    pagination: web::Query<Pagination>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
@@ -41,8 +41,8 @@ pub async fn get_watchlist_by_user(
     match watch_list::get_watchlist_by_user(
         &mut db_conn,
         parsed_user_id,
-        limit.into_inner().unwrap_or(50),
-        offset.into_inner().unwrap_or(0),
+        pagination.limit.unwrap_or(50),
+        pagination.offset.unwrap_or(0),
     ) {
         Ok(items) => HttpResponse::Ok().json(items),
         Err(e) => error::handle_db_error(&e, "get_watchlist_by_user"),

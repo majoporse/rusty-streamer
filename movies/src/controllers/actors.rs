@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::controllers::error;
+use crate::controllers::pagination::Pagination;
 use crate::data::actors;
 use crate::models::{
     actor::{Actor, NewActor},
@@ -25,12 +26,15 @@ static TAG: &str = "Actors";
 #[get("/actors")]
 pub async fn get_all_actors(
     pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
-    limit: web::Query<Option<i64>>,
-    offset: web::Query<Option<i64>>,
+    pagination: web::Query<Pagination>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
-    match actors::list_actors(&mut db_conn, limit.into_inner().unwrap_or(100), offset.into_inner().unwrap_or(0)) {
+    match actors::list_actors(
+        &mut db_conn,
+        pagination.limit.unwrap_or(100),
+        pagination.offset.unwrap_or(0),
+    ) {
         Ok(actors) => HttpResponse::Ok().json(actors),
         Err(e) => error::handle_db_error(&e, "get_all_actors"),
     }
@@ -78,7 +82,7 @@ pub async fn create_actor(
 
     match actors::create_actor(&mut db_conn, new_actor.into_inner()) {
         Ok(actor) => HttpResponse::Ok().json(actor),
-        Err(e) =>  error::handle_db_error(&e, "create_actor"),
+        Err(e) => error::handle_db_error(&e, "create_actor"),
     }
 }
 
@@ -101,7 +105,7 @@ pub async fn delete_actor(
 
     match actors::delete_actor(&mut db_conn, *actor_id) {
         Ok(deleted_rows) => HttpResponse::Ok().json(deleted_rows),
-        Err(e) =>  error::handle_db_error(&e, "delete_actor"),
+        Err(e) => error::handle_db_error(&e, "delete_actor"),
     }
 }
 
@@ -126,7 +130,7 @@ pub async fn update_actor(
 
     match actors::update_actor(&mut db_conn, *actor_id, updated_actor.into_inner()) {
         Ok(actor) => HttpResponse::Ok().json(actor),
-        Err(e) =>  error::handle_db_error(&e, "update_actor"),
+        Err(e) => error::handle_db_error(&e, "update_actor"),
     }
 }
 

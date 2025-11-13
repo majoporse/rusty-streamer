@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::controllers::error;
+use crate::controllers::pagination::Pagination;
 use crate::data::watch_room_participant;
 use crate::models::watch_room_participant::{NewWatchRoomParticipant, WatchRoomParticipant};
 use crate::models::DbConnection;
@@ -51,8 +52,7 @@ pub async fn get_watch_room_participant_by_id(
 pub async fn list_participants_by_room(
     pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
     room_id: web::Path<String>,
-    limit: web::Query<Option<i64>>,
-    offset: web::Query<Option<i64>>,
+    pagination: web::Query<Pagination>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
@@ -64,8 +64,8 @@ pub async fn list_participants_by_room(
     match watch_room_participant::list_participants_by_room(
         &mut db_conn,
         parsed_room_id,
-        limit.into_inner().unwrap_or(50),
-        offset.into_inner().unwrap_or(0),
+        pagination.limit.unwrap_or(50),
+        pagination.offset.unwrap_or(0),
     ) {
         Ok(participants) => HttpResponse::Ok().json(participants),
         Err(e) => error::handle_db_error(&e, "list_participants_by_room"),

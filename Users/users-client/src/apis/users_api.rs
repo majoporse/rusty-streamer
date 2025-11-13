@@ -130,11 +130,16 @@ pub async fn delete_user(configuration: &configuration::Configuration, user_id: 
     }
 }
 
-pub async fn get_all_users(configuration: &configuration::Configuration, ) -> Result<Vec<models::User>, Error<GetAllUsersError>> {
+pub async fn get_all_users(configuration: &configuration::Configuration, limit: i64, offset: i64) -> Result<Vec<models::User>, Error<GetAllUsersError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_query_limit = limit;
+    let p_query_offset = offset;
 
     let uri_str = format!("{}/users", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
+    req_builder = req_builder.query(&[("limit", &p_query_limit.to_string())]);
+    req_builder = req_builder.query(&[("offset", &p_query_offset.to_string())]);
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }

@@ -15,6 +15,30 @@
           "Users"
         ],
         "operationId": "get_all_users",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of users to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
         "responses": {
           "200": {
             "description": "List all users",
