@@ -1,4 +1,4 @@
-use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, BoolExpressionMethods, PgTextExpressionMethods};
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, PgTextExpressionMethods};
 use anyhow::Result;
 use crate::{
     models::user::{User, NewUser, UpdateUser},

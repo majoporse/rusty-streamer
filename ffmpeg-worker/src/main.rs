@@ -5,7 +5,6 @@ use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
 use dotenvy::dotenv;
 use log::info;
-use opentelemetry::global::ObjectSafeSpan;
 use opentelemetry::trace::Tracer as _;
 use opentelemetry::{global, KeyValue};
 use opentelemetry_otlp::{Protocol, WithExportConfig as _};

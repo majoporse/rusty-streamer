@@ -66,7 +66,7 @@ pub fn update_watch_room(
 ) -> Result<WatchRoom, diesel::result::Error> {
     use diesel::dsl::now;
 
-    let mut query = diesel::update(watch_rooms::table.filter(watch_rooms::id.eq(room_id)))
+    let query = diesel::update(watch_rooms::table.filter(watch_rooms::id.eq(room_id)))
         .set(watch_rooms::updated_at.eq(now))
         .into_boxed();
 
