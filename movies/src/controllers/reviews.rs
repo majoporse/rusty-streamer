@@ -13,6 +13,10 @@ use utoipa::{OpenApi};
 static TAG: &str = "Reviews";
 
 #[utoipa::path(
+    params(
+        ("limit" = i64, Query, description = "Max number of reviews to return", example = 100),
+        ("offset" = i64, Query, description = "Pagination offset", example = 0)
+    ),
 	responses(
 		(status = 200, description = "List all reviews", body = [Review]),
 		(status = 500, description = "Internal Server Error")
@@ -22,10 +26,12 @@ static TAG: &str = "Reviews";
 #[get("/reviews")]
 pub async fn get_all_reviews(
     pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
+    limit: web::Query<Option<i64>>,
+    offset: web::Query<Option<i64>>,
 ) -> impl Responder {
     let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
 
-    match reviews::list_reviews(&mut db_conn, 100, 0) {
+    match reviews::list_reviews(&mut db_conn, limit.into_inner().unwrap_or(100), offset.into_inner().unwrap_or(0)) {
         Ok(reviews) => HttpResponse::Ok().json(reviews),
         Err(e) => error::handle_db_error(&e, "get_all_reviews"),
     }

@@ -1,4 +1,4 @@
-use crate::models::wrappers::{WrapperReview, WrapperNewReview};
+use crate::models::movies::{WrapperReview, WrapperNewReview};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use movies_client::apis::{reviews_api, configuration::Configuration};
 use utoipa::OpenApi;

@@ -46,9 +46,9 @@ async fn main() -> std::io::Result<()> {
 
     let mut apidoc = ApiDoc::openapi();
 
-    apidoc.merge(controllers::movie::ApiDoc::openapi());
-    apidoc.merge(controllers::actors::ApiDoc::openapi());
-    apidoc.merge(controllers::reviews::ApiDoc::openapi());
+    apidoc.merge(controllers::movies::movies::ApiDoc::openapi());
+    apidoc.merge(controllers::movies::actors::ApiDoc::openapi());
+    apidoc.merge(controllers::movies::reviews::ApiDoc::openapi());
 
 
     save_openapi_spec(&apidoc).await?;
@@ -68,9 +68,9 @@ async fn main() -> std::io::Result<()> {
             .wrap(OtlpMetricsLogger::new())
             .into_utoipa_app()
             // services
-            .configure(controllers::movie::scoped_config)
-            .configure(controllers::actors::scoped_config)
-            .configure(controllers::reviews::scoped_config)
+            .configure(controllers::movies::actors::scoped_config)
+            .configure(controllers::movies::actors::scoped_config)
+            .configure(controllers::movies::reviews::scoped_config)
             // OpenAPI docs
             .openapi(apidoc.clone())
             .openapi_service(|api| Redoc::with_url("/redoc", api))

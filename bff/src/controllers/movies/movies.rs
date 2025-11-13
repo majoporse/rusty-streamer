@@ -1,4 +1,4 @@
-use crate::models::wrappers::{WrapperMovie, WrapperNewMovie};
+use crate::models::movies::{WrapperMovie, WrapperNewMovie};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use movies_client::apis::{movies_api, configuration::Configuration};
 use utoipa::OpenApi;

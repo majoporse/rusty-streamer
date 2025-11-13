@@ -32,4 +32,9 @@ serde = { version = "1.0.188", features = ["derive"] }
 shared = { path = "../shared" }
 ffmpeg_client = { path = "../ffmpeg-worker/ffmpeg-client" }
 movies_client = { path = "../movies/movies-client/" }
+users_client = { path = "../users/users-client" }
+
 derive_more = { version = "2.0.1", features = ["full"] }
+uuid = "1.18.1"
+chrono = { version = "0.4.42", features = ["serde"] }
+
