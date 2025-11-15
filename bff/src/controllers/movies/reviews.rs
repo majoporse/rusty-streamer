@@ -1,12 +1,16 @@
-use crate::models::movies::{WrapperReview, WrapperNewReview};
+use crate::{controllers::{movies::client_config, users::pagination::Pagination}, models::movies::{WrapperNewReview, WrapperReview}};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
-use movies_client::apis::{reviews_api, configuration::Configuration};
+use movies_client::apis::reviews_api;
 use utoipa::OpenApi;
 use crate::controllers::error::handle_client_error;
 
 static TAG: &str = "Reviews";
 
 #[utoipa::path(
+    params(
+        ("limit" = Option<i64>, Query, description = "Max number of reviews to return", example = 100),
+        ("offset" = Option<i64>, Query, description = "Pagination offset", example = 0)
+    ),
     responses(
         (status = 200, description = "List all reviews", body = [WrapperReview]),
         (status = 500, description = "Internal Server Error")
@@ -14,11 +18,12 @@ static TAG: &str = "Reviews";
     tag = TAG
 )]
 #[get("/reviews")]
-pub async fn get_all_reviews() -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+pub async fn get_all_reviews(
+    pagination: web::Query<Pagination>,
+) -> impl Responder {
+    let config = client_config();
 
-    match reviews_api::get_all_reviews(&config).await {
+    match reviews_api::get_all_reviews(&config, pagination.limit.unwrap_or(100), pagination.offset.unwrap_or(0)).await {
         Ok(reviews) => HttpResponse::Ok().json(reviews),
         Err(err) => handle_client_error(err, "Fetching all reviews"),
     }
@@ -37,8 +42,7 @@ pub async fn get_all_reviews() -> impl Responder {
 )]
 #[get("/reviews/{review_id}")]
 pub async fn get_review_by_id(review_id: web::Path<i32>) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+    let config = client_config();
 
     match reviews_api::get_review_by_id(&config, review_id.clone()).await {
         Ok(review) => HttpResponse::Ok().json(review),
@@ -56,8 +60,7 @@ pub async fn get_review_by_id(review_id: web::Path<i32>) -> impl Responder {
 )]
 #[post("/reviews")]
 pub async fn create_review(new_review: web::Json<WrapperNewReview>) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+    let config = client_config();
     let new_review = new_review.into_inner();
 
     match reviews_api::create_review(&config, new_review.into()).await {
@@ -79,8 +82,7 @@ pub async fn create_review(new_review: web::Json<WrapperNewReview>) -> impl Resp
 )]
 #[delete("/reviews/{review_id}")]
 pub async fn delete_review(review_id: web::Path<i32>) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+    let config = client_config();
 
     match reviews_api::delete_review(&config, review_id.clone()).await {
         Ok(deleted) => HttpResponse::Ok().json(deleted),
@@ -105,8 +107,7 @@ pub async fn update_review(
     review_id: web::Path<i32>,
     updated_review: web::Json<WrapperNewReview>,
 ) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+    let config = client_config();
     let updated_review = updated_review.into_inner();
 
     match reviews_api::update_review(&config, review_id.clone(), updated_review.into()).await {

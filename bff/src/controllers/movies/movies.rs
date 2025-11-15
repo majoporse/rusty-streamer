@@ -1,4 +1,4 @@
-use crate::models::movies::{WrapperMovie, WrapperNewMovie};
+use crate::{controllers::movies::client_config, models::movies::{WrapperMovie, WrapperNewMovie}};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use movies_client::apis::{movies_api, configuration::Configuration};
 use utoipa::OpenApi;
@@ -16,8 +16,7 @@ static TAG: &str = "Movies";
 )]
 #[post("/movies")]
 pub async fn create_movie(new_movie: web::Json<WrapperNewMovie>) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+    let config = client_config();
     let new_movie = new_movie.into_inner();
 
     match movies_api::create_movie(&config, new_movie.into()).await {
@@ -39,8 +38,7 @@ pub async fn create_movie(new_movie: web::Json<WrapperNewMovie>) -> impl Respond
 )]
 #[get("/movies/{movie_id}")]
 pub async fn get_movie_by_id(movie_id: web::Path<i32>) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+    let config = client_config();
 
     match movies_api::get_movie_by_id(&config, movie_id.clone()).await {
         Ok(movie) => HttpResponse::Ok().json(movie),
@@ -61,8 +59,7 @@ pub async fn get_movie_by_id(movie_id: web::Path<i32>) -> impl Responder {
 )]
 #[delete("/movies/{movie_id}")]
 pub async fn delete_movie(movie_id: web::Path<i32>) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+    let config = client_config();
 
     match movies_api::delete_movie(&config, movie_id.clone()).await {
         Ok(deleted) => HttpResponse::Ok().json(deleted),

@@ -70,12 +70,16 @@ No authorization required
 
 ## get_all_reviews
 
-> Vec<models::Review> get_all_reviews()
+> Vec<models::Review> get_all_reviews(limit, offset)
 
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**limit** | **i64** | Max number of reviews to return | [required] |
+**offset** | **i64** | Pagination offset | [required] |
 
 ### Return type
 

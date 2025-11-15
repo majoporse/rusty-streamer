@@ -1,4 +1,4 @@
-use crate::models::movies::{WrapperActor, WrapperNewActor};
+use crate::{controllers::{movies::client_config, users::pagination::Pagination}, models::movies::{WrapperActor, WrapperNewActor}};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use movies_client::apis::{actors_api, configuration::Configuration};
 use utoipa::OpenApi;
@@ -14,11 +14,12 @@ static TAG: &str = "Actors";
     tag = TAG
 )]
 #[get("/actors")]
-pub async fn get_all_actors() -> impl Responder {
-    let mut config = Configuration::new();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+pub async fn get_all_actors(
+    pagination: web::Query<Pagination>,
+) -> impl Responder {
+    let config = client_config();
 
-    match actors_api::get_all_actors(&config).await {
+    match actors_api::get_all_actors(&config, pagination.limit.unwrap_or(100), pagination.offset.unwrap_or(0)).await {
         Ok(actors) => HttpResponse::Ok().json(actors),
         Err(err) => handle_client_error(err, "Fetching all actors"),
     }
@@ -36,8 +37,8 @@ pub async fn get_all_actors() -> impl Responder {
 )]
 #[get("/actors/{actor_id}")]
 pub async fn get_actor_by_id(actor_id: web::Path<i32>) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+    let config = client_config();
+
 
     match actors_api::get_actor_by_id(&config, actor_id.clone()).await {
         Ok(actor) => HttpResponse::Ok().json(actor),
@@ -55,8 +56,7 @@ pub async fn get_actor_by_id(actor_id: web::Path<i32>) -> impl Responder {
 )]
 #[post("/actors")]
 pub async fn create_actor(new_actor: web::Json<WrapperNewActor>) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+    let config = client_config();
     let new_actor = new_actor.into_inner();
 
     match actors_api::create_actor(&config, new_actor.into()).await {
@@ -78,8 +78,8 @@ pub async fn create_actor(new_actor: web::Json<WrapperNewActor>) -> impl Respond
 )]
 #[delete("/actors/{actor_id}")]
 pub async fn delete_actor(actor_id: web::Path<i32>) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+    let config = client_config();
+
 
     match actors_api::delete_actor(&config, actor_id.clone()).await {
         Ok(deleted) => HttpResponse::Ok().json(deleted),
@@ -104,8 +104,7 @@ pub async fn update_actor(
     actor_id: web::Path<i32>,
     updated_actor: web::Json<WrapperNewActor>,
 ) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8081".to_string();
+    let config = client_config();
     let updated_actor = updated_actor.into_inner();
 
     match actors_api::update_actor(&config, actor_id.clone(), updated_actor.into()).await {

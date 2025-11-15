@@ -1,7 +1,5 @@
-
 use actix_web::HttpResponse;
 use log::error;
-static TAG: &str = "Actors";
 
 /// Maps the generated client error into an HttpResponse and logs it
 pub fn handle_client_error<T>(err: users_client::apis::Error<T>, context: &str) -> HttpResponse

@@ -8,6 +8,8 @@ use log::info;
 use opentelemetry::{global, KeyValue};
 use opentelemetry_otlp::{Protocol, WithExportConfig as _};
 use opentelemetry_sdk::Resource;
+use reqwest_middleware::{ClientBuilder, Extension};
+use reqwest_tracing::{OtelName, TracingMiddleware};
 use utoipa::OpenApi;
 use utoipa_actix_web::AppExt;
 use utoipa_rapidoc::RapiDoc;
@@ -21,20 +23,18 @@ pub mod controllers;
 pub mod models;
 
 #[derive(OpenApi)]
-#[openapi(
-    info(
-        title = "Backend For Frontend API",
-        version = "1.0.0",
-        description = "API documentation for the BFF service."
-    )
-)]
+#[openapi(info(
+    title = "Backend For Frontend API",
+    version = "1.0.0",
+    description = "API documentation for the BFF service."
+))]
 struct ApiDoc;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     std::env::set_var(
         "RUST_LOG",
-        "debug,opentelemetry=debug,opentelemetry_otlp=debug",
+        "debug,opentelemetry=debug,opentelemetry_otlp=debug, reqwest_tracing=debug, reqwest=debug",
     );
     dotenv().ok();
     env_logger::init();
@@ -50,6 +50,12 @@ async fn main() -> std::io::Result<()> {
     apidoc.merge(controllers::movies::actors::ApiDoc::openapi());
     apidoc.merge(controllers::movies::reviews::ApiDoc::openapi());
 
+    apidoc.merge(controllers::users::users::ApiDoc::openapi());
+    apidoc.merge(controllers::users::watch_history::ApiDoc::openapi());
+    apidoc.merge(controllers::users::watch_list::ApiDoc::openapi());
+    apidoc.merge(controllers::users::watch_room_messages::ApiDoc::openapi());
+    apidoc.merge(controllers::users::watch_room_participants::ApiDoc::openapi());
+    apidoc.merge(controllers::users::watch_room::ApiDoc::openapi());
 
     save_openapi_spec(&apidoc).await?;
     log::info!("setup openapi");
@@ -71,6 +77,12 @@ async fn main() -> std::io::Result<()> {
             .configure(controllers::movies::actors::scoped_config)
             .configure(controllers::movies::actors::scoped_config)
             .configure(controllers::movies::reviews::scoped_config)
+            .configure(controllers::users::users::scoped_config)
+            .configure(controllers::users::watch_history::scoped_config)
+            .configure(controllers::users::watch_list::scoped_config)
+            .configure(controllers::users::watch_room_messages::scoped_config)
+            .configure(controllers::users::watch_room_participants::scoped_config)
+            .configure(controllers::users::watch_room::scoped_config)
             // OpenAPI docs
             .openapi(apidoc.clone())
             .openapi_service(|api| Redoc::with_url("/redoc", api))

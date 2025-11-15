@@ -58,10 +58,10 @@ async fn main() -> std::io::Result<()> {
     dotenv().ok();
     env_logger::init();
 
-    let port = std::env::var("MOVIES_PORT")
-        .unwrap_or_else(|_| "8081".to_string())
+    let port = std::env::var("USERS_PORT")
+        .expect("USERS_PORT is not defined")
         .parse::<u16>()
-        .expect("MOVIES_PORT is not defined");
+        .expect("USERS_PORT is not defined");
 
     let mut apidoc = ApiDoc::openapi();
 
@@ -136,7 +136,7 @@ async fn setup_otel() -> std::io::Result<()> {
         .with_batch_exporter(span_exporter)
         .with_resource(
             Resource::builder_empty()
-                .with_attributes([KeyValue::new("service.name", "movies")])
+                .with_attributes([KeyValue::new("service.name", "users")])
                 .build(),
         )
         .build();
@@ -145,7 +145,7 @@ async fn setup_otel() -> std::io::Result<()> {
         .with_periodic_exporter(exporter)
         .with_resource(
             Resource::builder_empty()
-                .with_attributes([KeyValue::new("service.name", "movies")])
+                .with_attributes([KeyValue::new("service.name", "users")])
                 .build(),
         )
         .build();

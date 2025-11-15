@@ -59,7 +59,7 @@ async fn main() -> std::io::Result<()> {
     env_logger::init();
 
     let port = std::env::var("MOVIES_PORT")
-        .unwrap_or_else(|_| "8081".to_string())
+        .expect("MOVIES_PORT is not defined")
         .parse::<u16>()
         .expect("MOVIES_PORT is not defined");
 

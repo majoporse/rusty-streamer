@@ -129,11 +129,16 @@ pub async fn delete_movie(configuration: &configuration::Configuration, movie_id
     }
 }
 
-pub async fn get_all_movies(configuration: &configuration::Configuration, ) -> Result<Vec<models::Movie>, Error<GetAllMoviesError>> {
+pub async fn get_all_movies(configuration: &configuration::Configuration, limit: i64, offset: i64) -> Result<Vec<models::Movie>, Error<GetAllMoviesError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_query_limit = limit;
+    let p_query_offset = offset;
 
     let uri_str = format!("{}/movies", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
+    req_builder = req_builder.query(&[("limit", &p_query_limit.to_string())]);
+    req_builder = req_builder.query(&[("offset", &p_query_offset.to_string())]);
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }

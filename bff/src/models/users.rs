@@ -100,6 +100,15 @@ impl From<client_models::UpdateWatchRoom> for UpdateWatchRoom {
     }
 }
 
+impl From<UpdateWatchRoom> for client_models::UpdateWatchRoom {
+    fn from(w: UpdateWatchRoom) -> Self {
+        client_models::UpdateWatchRoom {
+            current_time_seconds: w.current_time_seconds,
+            is_live: w.is_live,
+        }
+    }
+}
+
 
 #[derive(ToSchema, Serialize, Deserialize, Debug, Clone)]
 pub struct WatchRoomParticipant {

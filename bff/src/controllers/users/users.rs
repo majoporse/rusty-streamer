@@ -1,3 +1,4 @@
+use crate::controllers::users::client_config;
 use crate::controllers::users::error::handle_client_error;
 use crate::controllers::users::pagination::Pagination;
 use crate::models::users::{NewUser, UpdateUser, User};
@@ -5,7 +6,7 @@ use crate::models::users::{NewUser, UpdateUser, User};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use utoipa::OpenApi;
 
-use users_client::apis::{configuration::Configuration, users_api};
+use users_client::apis::users_api;
 use uuid::Uuid;
 
 static TAG: &str = "Users";
@@ -19,8 +20,7 @@ static TAG: &str = "Users";
 )]
 #[get("/users")]
 pub async fn get_all_users(pagination: web::Query<Pagination>) -> impl Responder {
-    let mut config = Configuration::new();
-    config.base_path = "http://127.0.0.1:8082".to_string();
+    let config = client_config();
 
     match users_api::get_all_users(
         &config,
@@ -47,8 +47,7 @@ pub async fn get_all_users(pagination: web::Query<Pagination>) -> impl Responder
 )]
 #[get("/users/{user_id}")]
 pub async fn get_user_by_id(user_id: web::Path<String>) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8082".to_string();
+    let config = client_config();
 
     let parsed_id = match Uuid::parse_str(&user_id) {
         Ok(id) => id,
@@ -71,8 +70,7 @@ pub async fn get_user_by_id(user_id: web::Path<String>) -> impl Responder {
 )]
 #[post("/users")]
 pub async fn create_user(new_user: web::Json<NewUser>) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8082".to_string();
+    let config = client_config();
 
     let new_user = new_user.into_inner();
 
@@ -99,8 +97,7 @@ pub async fn update_user(
     user_id: web::Path<String>,
     updated_user: web::Json<UpdateUser>,
 ) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8082".to_string();
+    let config = client_config();
 
     if let Err(_) = Uuid::parse_str(&user_id) {
         return HttpResponse::BadRequest().body("Invalid UUID format");
@@ -131,8 +128,7 @@ pub async fn update_user(
 )]
 #[delete("/users/{user_id}")]
 pub async fn delete_user(user_id: web::Path<String>) -> impl Responder {
-    let mut config = Configuration::default();
-    config.base_path = "http://127.0.0.1:8082".to_string();
+    let config = client_config();
 
     if let Err(_) = Uuid::parse_str(&user_id) {
         return HttpResponse::BadRequest().body("Invalid UUID format");

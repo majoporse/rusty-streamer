@@ -165,11 +165,16 @@ pub async fn get_actor_by_id(configuration: &configuration::Configuration, actor
     }
 }
 
-pub async fn get_all_actors(configuration: &configuration::Configuration, ) -> Result<Vec<models::Actor>, Error<GetAllActorsError>> {
+pub async fn get_all_actors(configuration: &configuration::Configuration, limit: i64, offset: i64) -> Result<Vec<models::Actor>, Error<GetAllActorsError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_query_limit = limit;
+    let p_query_offset = offset;
 
     let uri_str = format!("{}/actors", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
+    req_builder = req_builder.query(&[("limit", &p_query_limit.to_string())]);
+    req_builder = req_builder.query(&[("offset", &p_query_offset.to_string())]);
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
     }

@@ -15,6 +15,30 @@
           "Actors"
         ],
         "operationId": "get_all_actors",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of actors to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
         "responses": {
           "200": {
             "description": "List all actors",
@@ -184,6 +208,30 @@
           "Movies"
         ],
         "operationId": "get_all_movies",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of movies to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
         "responses": {
           "200": {
             "description": "List all movies",
@@ -353,6 +401,30 @@
           "Reviews"
         ],
         "operationId": "get_all_reviews",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of reviews to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
         "responses": {
           "200": {
             "description": "List all reviews",
