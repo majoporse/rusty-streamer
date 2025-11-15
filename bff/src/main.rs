@@ -8,8 +8,6 @@ use log::info;
 use opentelemetry::{global, KeyValue};
 use opentelemetry_otlp::{Protocol, WithExportConfig as _};
 use opentelemetry_sdk::Resource;
-use reqwest_middleware::{ClientBuilder, Extension};
-use reqwest_tracing::{OtelName, TracingMiddleware};
 use utoipa::OpenApi;
 use utoipa_actix_web::AppExt;
 use utoipa_rapidoc::RapiDoc;

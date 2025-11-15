@@ -1,6 +1,6 @@
 use crate::{controllers::{movies::client_config, users::pagination::Pagination}, models::movies::{WrapperActor, WrapperNewActor}};
 use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
-use movies_client::apis::{actors_api, configuration::Configuration};
+use movies_client::apis::actors_api;
 use utoipa::OpenApi;
 use crate::controllers::error::handle_client_error;
 

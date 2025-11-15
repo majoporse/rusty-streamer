@@ -2,13 +2,11 @@ use crate::controllers::users::error::handle_client_error;
 use crate::controllers::users::pagination::Pagination;
 use crate::controllers::users::{client_config, redis_conn};
 use crate::models::users::{NewWatchRoom, UpdateWatchRoom, WatchRoom};
-use core::sync;
-use redis::Value::SimpleString;
 
 use actix_web::{delete, get, post, put, rt, web, HttpRequest, HttpResponse, Responder};
 use actix_ws::AggregatedMessage;
 use futures_util::StreamExt;
-use redis::{AsyncCommands, FromRedisValue, PushKind};
+use redis::AsyncCommands;
 use utoipa::OpenApi;
 use uuid::Uuid;
 
