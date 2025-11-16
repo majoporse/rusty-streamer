@@ -39,6 +39,14 @@ pub enum GetActorByIdError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`get_actor_by_movie_id`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum GetActorByMovieIdError {
+    Status500(),
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`get_all_actors`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -93,11 +101,11 @@ pub async fn create_actor(configuration: &configuration::Configuration, new_acto
     }
 }
 
-pub async fn delete_actor(configuration: &configuration::Configuration, actor_id: i32) -> Result<i32, Error<DeleteActorError>> {
+pub async fn delete_actor(configuration: &configuration::Configuration, actor_id: &str) -> Result<i32, Error<DeleteActorError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_actor_id = actor_id;
 
-    let uri_str = format!("{}/actors/{actor_id}", configuration.base_path, actor_id=p_path_actor_id);
+    let uri_str = format!("{}/actors/{actor_id}", configuration.base_path, actor_id=crate::apis::urlencode(p_path_actor_id));
     let mut req_builder = configuration.client.request(reqwest::Method::DELETE, &uri_str);
 
     if let Some(ref user_agent) = configuration.user_agent {
@@ -129,11 +137,11 @@ pub async fn delete_actor(configuration: &configuration::Configuration, actor_id
     }
 }
 
-pub async fn get_actor_by_id(configuration: &configuration::Configuration, actor_id: i32) -> Result<models::Actor, Error<GetActorByIdError>> {
+pub async fn get_actor_by_id(configuration: &configuration::Configuration, actor_id: &str) -> Result<models::Actor, Error<GetActorByIdError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_actor_id = actor_id;
 
-    let uri_str = format!("{}/actors/{actor_id}", configuration.base_path, actor_id=p_path_actor_id);
+    let uri_str = format!("{}/actors/{actor_id}", configuration.base_path, actor_id=crate::apis::urlencode(p_path_actor_id));
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
     if let Some(ref user_agent) = configuration.user_agent {
@@ -161,6 +169,42 @@ pub async fn get_actor_by_id(configuration: &configuration::Configuration, actor
     } else {
         let content = resp.text().await?;
         let entity: Option<GetActorByIdError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+pub async fn get_actor_by_movie_id(configuration: &configuration::Configuration, movie_id: &str) -> Result<Vec<models::Actor>, Error<GetActorByMovieIdError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_path_movie_id = movie_id;
+
+    let uri_str = format!("{}/actors/movie/{movie_id}", configuration.base_path, movie_id=crate::apis::urlencode(p_path_movie_id));
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `Vec&lt;models::Actor&gt;`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `Vec&lt;models::Actor&gt;`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<GetActorByMovieIdError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent { status, content, entity }))
     }
 }
@@ -204,12 +248,12 @@ pub async fn get_all_actors(configuration: &configuration::Configuration, limit:
     }
 }
 
-pub async fn update_actor(configuration: &configuration::Configuration, actor_id: i32, new_actor: models::NewActor) -> Result<models::Actor, Error<UpdateActorError>> {
+pub async fn update_actor(configuration: &configuration::Configuration, actor_id: &str, new_actor: models::NewActor) -> Result<models::Actor, Error<UpdateActorError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_actor_id = actor_id;
     let p_body_new_actor = new_actor;
 
-    let uri_str = format!("{}/actors/{actor_id}", configuration.base_path, actor_id=p_path_actor_id);
+    let uri_str = format!("{}/actors/{actor_id}", configuration.base_path, actor_id=crate::apis::urlencode(p_path_actor_id));
     let mut req_builder = configuration.client.request(reqwest::Method::PUT, &uri_str);
 
     if let Some(ref user_agent) = configuration.user_agent {

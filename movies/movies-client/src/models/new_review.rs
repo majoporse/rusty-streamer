@@ -1,7 +1,7 @@
 /*
- * Video Server API
+ * Movies API
  *
- * API documentation for my video server.
+ * API documentation for my movies server.
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -16,22 +16,25 @@ pub struct NewReview {
     #[serde(rename = "body", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub body: Option<Option<String>>,
     #[serde(rename = "movie_id")]
-    pub movie_id: i32,
+    pub movie_id: uuid::Uuid,
     #[serde(rename = "rating")]
     pub rating: i32,
     #[serde(rename = "title", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub title: Option<Option<String>>,
+    #[serde(rename = "user_id")]
+    pub user_id: uuid::Uuid,
     #[serde(rename = "user_name")]
     pub user_name: String,
 }
 
 impl NewReview {
-    pub fn new(movie_id: i32, rating: i32, user_name: String) -> NewReview {
+    pub fn new(movie_id: uuid::Uuid, rating: i32, user_id: uuid::Uuid, user_name: String) -> NewReview {
         NewReview {
             body: None,
             movie_id,
             rating,
             title: None,
+            user_id,
             user_name,
         }
     }

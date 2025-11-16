@@ -5,7 +5,9 @@ use actix_multipart::form::MultipartFormConfig;
 use actix_web::middleware::Logger;
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
-use diesel::r2d2::{ConnectionManager, Pool};
+use diesel_async::pooled_connection::bb8::Pool;
+use diesel_async::pooled_connection::AsyncDieselConnectionManager;
+use diesel_async::{AsyncConnection, AsyncPgConnection};
 use dotenvy::dotenv;
 use log::info;
 use opentelemetry::{global, KeyValue};
@@ -20,41 +22,37 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use shared::log_middleware::OtlpMetricsLogger;
 
-use crate::models::DbConnection;
+use crate::data::models::DbConnection;
 
 pub mod controllers;
 pub mod data;
-pub mod models;
+pub mod dtos;
 pub mod schema;
+pub mod services;
 
 #[derive(OpenApi)]
-#[openapi(
-    info(
-        title = "Video Server API",
-        version = "1.0.0",
-        description = "API documentation for my video server."
-    )
-)]
+#[openapi(info(
+    title = "Movies API",
+    version = "1.0.0",
+    description = "API documentation for my movies server."
+))]
 struct ApiDoc;
 
-pub fn get_connection_pool() -> anyhow::Result<Pool<ConnectionManager<DbConnection>>> {
+pub async fn get_connection_pool() -> Pool<AsyncPgConnection> {
     log::info!("Setting up database connection pool...");
     let url = std::env::var("MOVIES_DB_STRING").expect("MOVIES_DB_STRING must be set");
 
-    let manager = ConnectionManager::<DbConnection>::new(url);
-
-    Ok(Pool::builder()
-        .test_on_check_out(true)
-        .build(manager)
-        .expect("Could not build connection pool"))
+    let config = AsyncDieselConnectionManager::<diesel_async::AsyncPgConnection>::new(url);
+    let pool = Pool::builder()
+        .build(config)
+        .await
+        .expect("Could not build connection pool");
+    pool
 }
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var(
-        "RUST_LOG",
-        "debug,opentelemetry=debug,opentelemetry_otlp=debug",
-    );
+    std::env::set_var("RUST_LOG", "info,diesel=debug");
     dotenv().ok();
     env_logger::init();
 
@@ -65,14 +63,11 @@ async fn main() -> std::io::Result<()> {
 
     let mut apidoc = ApiDoc::openapi();
 
-    apidoc.merge(controllers::actors::ApiDoc::openapi());
-    apidoc.merge(controllers::movies::ApiDoc::openapi());
-    apidoc.merge(controllers::reviews::ApiDoc::openapi());
+    apidoc.merge(controllers::people_controller::ApiDoc::openapi());
+    apidoc.merge(controllers::movies_controller::ApiDoc::openapi());
+    apidoc.merge(controllers::reviews_controller::ApiDoc::openapi());
 
-    let pool = Arc::new(get_connection_pool().map_err(|e| {
-        std::io::Error::new(std::io::ErrorKind::Other, format!("DB Pool Error: {}", e))
-    })?);
-
+    let pool = Arc::new(get_connection_pool().await);
 
     save_openapi_spec(&apidoc).await?;
     log::info!("setup openapi");
@@ -92,9 +87,19 @@ async fn main() -> std::io::Result<()> {
             .into_utoipa_app()
             .app_data(Data::new(pool.clone()))
             // services
-            .configure(controllers::actors::scoped_config)
-            .configure(controllers::movies::scoped_config)
-            .configure(controllers::reviews::scoped_config)
+            .app_data(Data::new(services::movie_service::MovieService::new(
+                pool.clone(),
+            )))
+            .app_data(Data::new(services::review_service::ReviewService::new(
+                pool.clone(),
+            )))
+            .app_data(Data::new(services::people_service::PeopleService::new(
+                pool.clone(),
+            )))
+            // controllers
+            .configure(controllers::people_controller::scoped_config)
+            .configure(controllers::movies_controller::scoped_config)
+            .configure(controllers::reviews_controller::scoped_config)
             // OpenAPI docs
             .openapi(apidoc.clone())
             .openapi_service(|api| Redoc::with_url("/redoc", api))

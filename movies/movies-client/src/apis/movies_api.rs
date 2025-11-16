@@ -1,7 +1,7 @@
 /*
- * Video Server API
+ * Movies API
  *
- * API documentation for my video server.
+ * API documentation for my movies server.
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -43,6 +43,30 @@ pub enum GetAllMoviesError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetMovieByIdError {
+    Status500(),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`get_movie_details_by_id`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum GetMovieDetailsByIdError {
+    Status500(),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`search_movies_by_actor`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum SearchMoviesByActorError {
+    Status500(),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`search_movies_by_title`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum SearchMoviesByTitleError {
     Status500(),
     UnknownValue(serde_json::Value),
 }
@@ -93,11 +117,11 @@ pub async fn create_movie(configuration: &configuration::Configuration, new_movi
     }
 }
 
-pub async fn delete_movie(configuration: &configuration::Configuration, movie_id: i32) -> Result<i32, Error<DeleteMovieError>> {
+pub async fn delete_movie(configuration: &configuration::Configuration, movie_id: &str) -> Result<i32, Error<DeleteMovieError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_movie_id = movie_id;
 
-    let uri_str = format!("{}/movies/{movie_id}", configuration.base_path, movie_id=p_path_movie_id);
+    let uri_str = format!("{}/movies/{movie_id}", configuration.base_path, movie_id=crate::apis::urlencode(p_path_movie_id));
     let mut req_builder = configuration.client.request(reqwest::Method::DELETE, &uri_str);
 
     if let Some(ref user_agent) = configuration.user_agent {
@@ -168,11 +192,11 @@ pub async fn get_all_movies(configuration: &configuration::Configuration, limit:
     }
 }
 
-pub async fn get_movie_by_id(configuration: &configuration::Configuration, movie_id: i32) -> Result<models::Movie, Error<GetMovieByIdError>> {
+pub async fn get_movie_by_id(configuration: &configuration::Configuration, movie_id: &str) -> Result<models::Movie, Error<GetMovieByIdError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_movie_id = movie_id;
 
-    let uri_str = format!("{}/movies/{movie_id}", configuration.base_path, movie_id=p_path_movie_id);
+    let uri_str = format!("{}/movies/{movie_id}", configuration.base_path, movie_id=crate::apis::urlencode(p_path_movie_id));
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
     if let Some(ref user_agent) = configuration.user_agent {
@@ -204,12 +228,128 @@ pub async fn get_movie_by_id(configuration: &configuration::Configuration, movie
     }
 }
 
-pub async fn update_movie(configuration: &configuration::Configuration, movie_id: i32, new_movie: models::NewMovie) -> Result<models::Movie, Error<UpdateMovieError>> {
+pub async fn get_movie_details_by_id(configuration: &configuration::Configuration, movie_id: &str) -> Result<models::MovieDetail, Error<GetMovieDetailsByIdError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_path_movie_id = movie_id;
+
+    let uri_str = format!("{}/movies/{movie_id}/details", configuration.base_path, movie_id=crate::apis::urlencode(p_path_movie_id));
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::MovieDetail`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::MovieDetail`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<GetMovieDetailsByIdError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+pub async fn search_movies_by_actor(configuration: &configuration::Configuration, actor_name: &str, limit: i64, offset: i64) -> Result<Vec<models::Movie>, Error<SearchMoviesByActorError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_path_actor_name = actor_name;
+    let p_query_limit = limit;
+    let p_query_offset = offset;
+
+    let uri_str = format!("{}/search/movies/people/{actor_name}", configuration.base_path, actor_name=crate::apis::urlencode(p_path_actor_name));
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    req_builder = req_builder.query(&[("limit", &p_query_limit.to_string())]);
+    req_builder = req_builder.query(&[("offset", &p_query_offset.to_string())]);
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `Vec&lt;models::Movie&gt;`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `Vec&lt;models::Movie&gt;`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<SearchMoviesByActorError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+pub async fn search_movies_by_title(configuration: &configuration::Configuration, title_name: &str, limit: i64, offset: i64) -> Result<Vec<models::Movie>, Error<SearchMoviesByTitleError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_path_title_name = title_name;
+    let p_query_limit = limit;
+    let p_query_offset = offset;
+
+    let uri_str = format!("{}/search/movies/title/{title_name}", configuration.base_path, title_name=crate::apis::urlencode(p_path_title_name));
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    req_builder = req_builder.query(&[("limit", &p_query_limit.to_string())]);
+    req_builder = req_builder.query(&[("offset", &p_query_offset.to_string())]);
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `Vec&lt;models::Movie&gt;`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `Vec&lt;models::Movie&gt;`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<SearchMoviesByTitleError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+pub async fn update_movie(configuration: &configuration::Configuration, movie_id: &str, new_movie: models::NewMovie) -> Result<models::Movie, Error<UpdateMovieError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_movie_id = movie_id;
     let p_body_new_movie = new_movie;
 
-    let uri_str = format!("{}/movies/{movie_id}", configuration.base_path, movie_id=p_path_movie_id);
+    let uri_str = format!("{}/movies/{movie_id}", configuration.base_path, movie_id=crate::apis::urlencode(p_path_movie_id));
     let mut req_builder = configuration.client.request(reqwest::Method::PUT, &uri_str);
 
     if let Some(ref user_agent) = configuration.user_agent {

@@ -1,6 +1,6 @@
 # Rust API client for movies_client
 
-API documentation for my video server.
+API documentation for my movies server.
 
 
 ## Overview
@@ -26,30 +26,39 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*ActorsApi* | [**create_actor**](docs/ActorsApi.md#create_actor) | **POST** /actors | 
-*ActorsApi* | [**delete_actor**](docs/ActorsApi.md#delete_actor) | **DELETE** /actors/{actor_id} | 
-*ActorsApi* | [**get_actor_by_id**](docs/ActorsApi.md#get_actor_by_id) | **GET** /actors/{actor_id} | 
-*ActorsApi* | [**get_all_actors**](docs/ActorsApi.md#get_all_actors) | **GET** /actors | 
-*ActorsApi* | [**update_actor**](docs/ActorsApi.md#update_actor) | **PUT** /actors/{actor_id} | 
 *MoviesApi* | [**create_movie**](docs/MoviesApi.md#create_movie) | **POST** /movies | 
 *MoviesApi* | [**delete_movie**](docs/MoviesApi.md#delete_movie) | **DELETE** /movies/{movie_id} | 
 *MoviesApi* | [**get_all_movies**](docs/MoviesApi.md#get_all_movies) | **GET** /movies | 
 *MoviesApi* | [**get_movie_by_id**](docs/MoviesApi.md#get_movie_by_id) | **GET** /movies/{movie_id} | 
+*MoviesApi* | [**get_movie_details_by_id**](docs/MoviesApi.md#get_movie_details_by_id) | **GET** /movies/{movie_id}/details | 
+*MoviesApi* | [**search_movies_by_actor**](docs/MoviesApi.md#search_movies_by_actor) | **GET** /search/movies/people/{actor_name} | 
+*MoviesApi* | [**search_movies_by_title**](docs/MoviesApi.md#search_movies_by_title) | **GET** /search/movies/title/{title_name} | 
 *MoviesApi* | [**update_movie**](docs/MoviesApi.md#update_movie) | **PUT** /movies/{movie_id} | 
+*PeopleApi* | [**create_person**](docs/PeopleApi.md#create_person) | **POST** /people | 
+*PeopleApi* | [**delete_person**](docs/PeopleApi.md#delete_person) | **DELETE** /people/{person_id} | 
+*PeopleApi* | [**get_all_people**](docs/PeopleApi.md#get_all_people) | **GET** /people | 
+*PeopleApi* | [**get_person_by_id**](docs/PeopleApi.md#get_person_by_id) | **GET** /people/{person_id} | 
+*PeopleApi* | [**get_person_by_movie_id**](docs/PeopleApi.md#get_person_by_movie_id) | **GET** /search/people/movie/{movie_id} | 
+*PeopleApi* | [**update_person**](docs/PeopleApi.md#update_person) | **PUT** /people/{person_id} | 
 *ReviewsApi* | [**create_review**](docs/ReviewsApi.md#create_review) | **POST** /reviews | 
 *ReviewsApi* | [**delete_review**](docs/ReviewsApi.md#delete_review) | **DELETE** /reviews/{review_id} | 
 *ReviewsApi* | [**get_all_reviews**](docs/ReviewsApi.md#get_all_reviews) | **GET** /reviews | 
 *ReviewsApi* | [**get_review_by_id**](docs/ReviewsApi.md#get_review_by_id) | **GET** /reviews/{review_id} | 
+*ReviewsApi* | [**get_reviews_by_movie_id**](docs/ReviewsApi.md#get_reviews_by_movie_id) | **GET** /search/reviews/movie/{movie_id} | 
+*ReviewsApi* | [**get_reviews_by_user_id**](docs/ReviewsApi.md#get_reviews_by_user_id) | **GET** /search/reviews/user/{user_id} | 
 *ReviewsApi* | [**update_review**](docs/ReviewsApi.md#update_review) | **PUT** /reviews/{review_id} | 
 
 
 ## Documentation For Models
 
- - [Actor](docs/Actor.md)
+ - [Genre](docs/Genre.md)
  - [Movie](docs/Movie.md)
- - [NewActor](docs/NewActor.md)
+ - [MovieCrewDetail](docs/MovieCrewDetail.md)
+ - [MovieDetail](docs/MovieDetail.md)
  - [NewMovie](docs/NewMovie.md)
+ - [NewPerson](docs/NewPerson.md)
  - [NewReview](docs/NewReview.md)
+ - [Person](docs/Person.md)
  - [Review](docs/Review.md)
 
 

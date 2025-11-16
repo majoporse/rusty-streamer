@@ -22,13 +22,13 @@ pub struct Actor {
     #[serde(rename = "first_name")]
     pub first_name: String,
     #[serde(rename = "id")]
-    pub id: i32,
+    pub id: uuid::Uuid,
     #[serde(rename = "last_name")]
     pub last_name: String,
 }
 
 impl Actor {
-    pub fn new(created_at: String, first_name: String, id: i32, last_name: String) -> Actor {
+    pub fn new(created_at: String, first_name: String, id: uuid::Uuid, last_name: String) -> Actor {
         Actor {
             bio: None,
             birth_date: None,

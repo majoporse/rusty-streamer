@@ -1,207 +1,14 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Video Server API",
-    "description": "API documentation for my video server.",
+    "title": "Movies API",
+    "description": "API documentation for my movies server.",
     "license": {
       "name": ""
     },
     "version": "1.0.0"
   },
   "paths": {
-    "/actors": {
-      "get": {
-        "tags": [
-          "Actors"
-        ],
-        "operationId": "get_all_actors",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Max number of actors to return",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "example": 100
-          },
-          {
-            "name": "offset",
-            "in": "query",
-            "description": "Pagination offset",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            },
-            "example": 0
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List all actors",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Actor"
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Actors"
-        ],
-        "operationId": "create_actor",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewActor"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Create a new actor",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Actor"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/actors/{actor_id}": {
-      "get": {
-        "tags": [
-          "Actors"
-        ],
-        "operationId": "get_actor_by_id",
-        "parameters": [
-          {
-            "name": "actor_id",
-            "in": "path",
-            "description": "ID of the actor to retrieve",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Get actor by ID",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Actor"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Actors"
-        ],
-        "operationId": "update_actor",
-        "parameters": [
-          {
-            "name": "actor_id",
-            "in": "path",
-            "description": "ID of the actor to update",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewActor"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Update actor by ID",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Actor"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Actors"
-        ],
-        "operationId": "delete_actor",
-        "parameters": [
-          {
-            "name": "actor_id",
-            "in": "path",
-            "description": "ID of the actor to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Delete actor by ID",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "integer",
-                  "minimum": 0
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
     "/movies": {
       "get": {
         "tags": [
@@ -296,8 +103,8 @@
             "description": "ID of the movie to retrieve",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -329,8 +136,8 @@
             "description": "ID of the movie to update",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -372,14 +179,242 @@
             "description": "ID of the movie to delete",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
         "responses": {
           "200": {
             "description": "Delete movie by ID",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/movies/{movie_id}/details": {
+      "get": {
+        "tags": [
+          "Movies"
+        ],
+        "operationId": "get_movie_details_by_id",
+        "parameters": [
+          {
+            "name": "movie_id",
+            "in": "path",
+            "description": "ID of the movie to retrieve details for",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get movie details by ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MovieDetail"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/people": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "get_all_people",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of people to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List all people",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Person"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "create_person",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewPerson"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Create a new person",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Person"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/people/{person_id}": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "get_person_by_id",
+        "parameters": [
+          {
+            "name": "person_id",
+            "in": "path",
+            "description": "ID of the person to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get person by ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Person"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "update_person",
+        "parameters": [
+          {
+            "name": "person_id",
+            "in": "path",
+            "description": "ID of the person to update",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewPerson"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Update person by ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Person"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "delete_person",
+        "parameters": [
+          {
+            "name": "person_id",
+            "in": "path",
+            "description": "ID of the person to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete person by ID",
             "content": {
               "text/plain": {
                 "schema": {
@@ -489,8 +524,8 @@
             "description": "ID of the review to retrieve",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -522,8 +557,8 @@
             "description": "ID of the review to update",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -565,8 +600,8 @@
             "description": "ID of the review to delete",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -587,44 +622,300 @@
           }
         }
       }
+    },
+    "/search/movies/people/{actor_name}": {
+      "get": {
+        "tags": [
+          "Movies"
+        ],
+        "operationId": "search_movies_by_actor",
+        "parameters": [
+          {
+            "name": "actor_name",
+            "in": "path",
+            "description": "Actor name to search for movies",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Leonardo DiCaprio"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of movies to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search movies by actor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Movie"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/search/movies/title/{title_name}": {
+      "get": {
+        "tags": [
+          "Movies"
+        ],
+        "operationId": "search_movies_by_title",
+        "parameters": [
+          {
+            "name": "title_name",
+            "in": "path",
+            "description": "Title query string to search for movies",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Inception"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of movies to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search movies by title",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Movie"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/search/people/movie/{movie_id}": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "get_person_by_movie_id",
+        "parameters": [
+          {
+            "name": "movie_id",
+            "in": "path",
+            "description": "ID of the movie to get persons for",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get persons by movie ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Person"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/search/reviews/movie/{movie_id}": {
+      "get": {
+        "tags": [
+          "Reviews"
+        ],
+        "operationId": "get_reviews_by_movie_id",
+        "parameters": [
+          {
+            "name": "movie_id",
+            "in": "path",
+            "description": "ID of the movie to get reviews for",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of reviews to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get reviews by movie ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Review"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/search/reviews/user/{user_id}": {
+      "get": {
+        "tags": [
+          "Reviews"
+        ],
+        "operationId": "get_reviews_by_user_id",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "description": "ID of the user to get reviews for",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of reviews to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get reviews by user ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Review"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
-      "Actor": {
+      "Genre": {
         "type": "object",
         "required": [
           "id",
-          "first_name",
-          "last_name",
-          "created_at"
+          "name"
         ],
         "properties": {
-          "bio": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "birth_date": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "first_name": {
-            "type": "string"
-          },
           "id": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "uuid"
           },
-          "last_name": {
+          "name": {
             "type": "string"
           }
         }
@@ -657,8 +948,8 @@
             "format": "int32"
           },
           "id": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "uuid"
           },
           "mpaa_rating": {
             "type": [
@@ -685,31 +976,114 @@
           }
         }
       },
-      "NewActor": {
+      "MovieCrewDetail": {
         "type": "object",
         "required": [
-          "first_name",
-          "last_name"
+          "movie_id",
+          "person_id",
+          "person"
         ],
         "properties": {
-          "bio": {
+          "billing_order": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "character_name": {
             "type": [
               "string",
               "null"
             ]
           },
-          "birth_date": {
+          "movie_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "person": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "person_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "MovieDetail": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "created_at",
+          "updated_at",
+          "people",
+          "genres",
+          "reviews"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "duration_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Genre"
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mpaa_rating": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "people": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovieCrewDetail"
+            }
+          },
+          "release_date": {
             "type": [
               "string",
               "null"
             ],
             "format": "date"
           },
-          "first_name": {
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Review"
+            }
+          },
+          "slug": {
             "type": "string"
           },
-          "last_name": {
+          "title": {
             "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -754,10 +1128,45 @@
           }
         }
       },
+      "NewPerson": {
+        "type": "object",
+        "required": [
+          "first_name",
+          "last_name"
+        ],
+        "properties": {
+          "bio": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "birth_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "role": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "NewReview": {
         "type": "object",
         "required": [
           "movie_id",
+          "user_id",
           "user_name",
           "rating"
         ],
@@ -769,8 +1178,8 @@
             ]
           },
           "movie_id": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "uuid"
           },
           "rating": {
             "type": "integer",
@@ -782,8 +1191,56 @@
               "null"
             ]
           },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
           "user_name": {
             "type": "string"
+          }
+        }
+      },
+      "Person": {
+        "type": "object",
+        "required": [
+          "id",
+          "first_name",
+          "last_name",
+          "created_at"
+        ],
+        "properties": {
+          "bio": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "birth_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "role": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -793,6 +1250,7 @@
           "id",
           "movie_id",
           "user_name",
+          "user_id",
           "rating",
           "created_at"
         ],
@@ -808,12 +1266,12 @@
             "format": "date-time"
           },
           "id": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "uuid"
           },
           "movie_id": {
-            "type": "integer",
-            "format": "int32"
+            "type": "string",
+            "format": "uuid"
           },
           "rating": {
             "type": "integer",
@@ -824,6 +1282,10 @@
               "string",
               "null"
             ]
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
           },
           "user_name": {
             "type": "string"

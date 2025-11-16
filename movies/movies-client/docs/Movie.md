@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **created_at** | **String** |  | 
 **description** | Option<**String**> |  | [optional]
 **duration_minutes** | Option<**i32**> |  | [optional]
-**id** | **i32** |  | 
+**id** | [**uuid::Uuid**](uuid::Uuid.md) |  | 
 **mpaa_rating** | Option<**String**> |  | [optional]
 **release_date** | Option<[**String**](string.md)> |  | [optional]
 **slug** | **String** |  | 

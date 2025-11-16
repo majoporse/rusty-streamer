@@ -8,6 +8,8 @@ Method | HTTP request | Description
 [**delete_review**](ReviewsApi.md#delete_review) | **DELETE** /reviews/{review_id} | 
 [**get_all_reviews**](ReviewsApi.md#get_all_reviews) | **GET** /reviews | 
 [**get_review_by_id**](ReviewsApi.md#get_review_by_id) | **GET** /reviews/{review_id} | 
+[**get_reviews_by_movie_id**](ReviewsApi.md#get_reviews_by_movie_id) | **GET** /search/reviews/movie/{movie_id} | 
+[**get_reviews_by_user_id**](ReviewsApi.md#get_reviews_by_user_id) | **GET** /search/reviews/user/{user_id} | 
 [**update_review**](ReviewsApi.md#update_review) | **PUT** /reviews/{review_id} | 
 
 
@@ -50,7 +52,7 @@ No authorization required
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**review_id** | **i32** | ID of the review to delete | [required] |
+**review_id** | **uuid::Uuid** | ID of the review to delete | [required] |
 
 ### Return type
 
@@ -107,11 +109,71 @@ No authorization required
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**review_id** | **i32** | ID of the review to retrieve | [required] |
+**review_id** | **uuid::Uuid** | ID of the review to retrieve | [required] |
 
 ### Return type
 
 [**models::Review**](Review.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## get_reviews_by_movie_id
+
+> Vec<models::Review> get_reviews_by_movie_id(movie_id, limit, offset)
+
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**movie_id** | **uuid::Uuid** | ID of the movie to get reviews for | [required] |
+**limit** | **i64** | Max number of reviews to return | [required] |
+**offset** | **i64** | Pagination offset | [required] |
+
+### Return type
+
+[**Vec<models::Review>**](Review.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## get_reviews_by_user_id
+
+> Vec<models::Review> get_reviews_by_user_id(user_id, limit, offset)
+
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**user_id** | **uuid::Uuid** | ID of the user to get reviews for | [required] |
+**limit** | **i64** | Max number of reviews to return | [required] |
+**offset** | **i64** | Pagination offset | [required] |
+
+### Return type
+
+[**Vec<models::Review>**](Review.md)
 
 ### Authorization
 
@@ -135,7 +197,7 @@ No authorization required
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**review_id** | **i32** | ID of the review to update | [required] |
+**review_id** | **uuid::Uuid** | ID of the review to update | [required] |
 **new_review** | [**NewReview**](NewReview.md) |  | [required] |
 
 ### Return type

@@ -1,7 +1,7 @@
 /*
- * Video Server API
+ * Movies API
  *
- * API documentation for my video server.
+ * API documentation for my movies server.
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -43,6 +43,22 @@ pub enum GetAllReviewsError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetReviewByIdError {
+    Status500(),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`get_reviews_by_movie_id`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum GetReviewsByMovieIdError {
+    Status500(),
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`get_reviews_by_user_id`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum GetReviewsByUserIdError {
     Status500(),
     UnknownValue(serde_json::Value),
 }
@@ -93,11 +109,11 @@ pub async fn create_review(configuration: &configuration::Configuration, new_rev
     }
 }
 
-pub async fn delete_review(configuration: &configuration::Configuration, review_id: i32) -> Result<i32, Error<DeleteReviewError>> {
+pub async fn delete_review(configuration: &configuration::Configuration, review_id: &str) -> Result<i32, Error<DeleteReviewError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_review_id = review_id;
 
-    let uri_str = format!("{}/reviews/{review_id}", configuration.base_path, review_id=p_path_review_id);
+    let uri_str = format!("{}/reviews/{review_id}", configuration.base_path, review_id=crate::apis::urlencode(p_path_review_id));
     let mut req_builder = configuration.client.request(reqwest::Method::DELETE, &uri_str);
 
     if let Some(ref user_agent) = configuration.user_agent {
@@ -168,11 +184,11 @@ pub async fn get_all_reviews(configuration: &configuration::Configuration, limit
     }
 }
 
-pub async fn get_review_by_id(configuration: &configuration::Configuration, review_id: i32) -> Result<models::Review, Error<GetReviewByIdError>> {
+pub async fn get_review_by_id(configuration: &configuration::Configuration, review_id: &str) -> Result<models::Review, Error<GetReviewByIdError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_review_id = review_id;
 
-    let uri_str = format!("{}/reviews/{review_id}", configuration.base_path, review_id=p_path_review_id);
+    let uri_str = format!("{}/reviews/{review_id}", configuration.base_path, review_id=crate::apis::urlencode(p_path_review_id));
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
     if let Some(ref user_agent) = configuration.user_agent {
@@ -204,12 +220,92 @@ pub async fn get_review_by_id(configuration: &configuration::Configuration, revi
     }
 }
 
-pub async fn update_review(configuration: &configuration::Configuration, review_id: i32, new_review: models::NewReview) -> Result<models::Review, Error<UpdateReviewError>> {
+pub async fn get_reviews_by_movie_id(configuration: &configuration::Configuration, movie_id: &str, limit: i64, offset: i64) -> Result<Vec<models::Review>, Error<GetReviewsByMovieIdError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_path_movie_id = movie_id;
+    let p_query_limit = limit;
+    let p_query_offset = offset;
+
+    let uri_str = format!("{}/search/reviews/movie/{movie_id}", configuration.base_path, movie_id=crate::apis::urlencode(p_path_movie_id));
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    req_builder = req_builder.query(&[("limit", &p_query_limit.to_string())]);
+    req_builder = req_builder.query(&[("offset", &p_query_offset.to_string())]);
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `Vec&lt;models::Review&gt;`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `Vec&lt;models::Review&gt;`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<GetReviewsByMovieIdError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+pub async fn get_reviews_by_user_id(configuration: &configuration::Configuration, user_id: &str, limit: i64, offset: i64) -> Result<Vec<models::Review>, Error<GetReviewsByUserIdError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_path_user_id = user_id;
+    let p_query_limit = limit;
+    let p_query_offset = offset;
+
+    let uri_str = format!("{}/search/reviews/user/{user_id}", configuration.base_path, user_id=crate::apis::urlencode(p_path_user_id));
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    req_builder = req_builder.query(&[("limit", &p_query_limit.to_string())]);
+    req_builder = req_builder.query(&[("offset", &p_query_offset.to_string())]);
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `Vec&lt;models::Review&gt;`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `Vec&lt;models::Review&gt;`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<GetReviewsByUserIdError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+pub async fn update_review(configuration: &configuration::Configuration, review_id: &str, new_review: models::NewReview) -> Result<models::Review, Error<UpdateReviewError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_review_id = review_id;
     let p_body_new_review = new_review;
 
-    let uri_str = format!("{}/reviews/{review_id}", configuration.base_path, review_id=p_path_review_id);
+    let uri_str = format!("{}/reviews/{review_id}", configuration.base_path, review_id=crate::apis::urlencode(p_path_review_id));
     let mut req_builder = configuration.client.request(reqwest::Method::PUT, &uri_str);
 
     if let Some(ref user_agent) = configuration.user_agent {

@@ -1,28 +1,32 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    actors (id) {
-        id -> Int4,
-        first_name -> Text,
-        last_name -> Text,
-        birth_date -> Nullable<Date>,
-        bio -> Nullable<Text>,
-        created_at -> Timestamptz,
+    genres (id) {
+        id -> Uuid,
+        name -> Text,
     }
 }
 
 diesel::table! {
-    movie_actors (movie_id, actor_id) {
-        movie_id -> Int4,
-        actor_id -> Int4,
+    movie_crew (movie_id, person_id, role) {
+        movie_id -> Uuid,
+        person_id -> Uuid,
+        role -> Text,
         character_name -> Nullable<Text>,
         billing_order -> Nullable<Int4>,
     }
 }
 
 diesel::table! {
+    movie_genres (movie_id, genre_id) {
+        movie_id -> Uuid,
+        genre_id -> Uuid,
+    }
+}
+
+diesel::table! {
     movies (id) {
-        id -> Int4,
+        id -> Uuid,
         title -> Text,
         slug -> Text,
         description -> Nullable<Text>,
@@ -35,10 +39,23 @@ diesel::table! {
 }
 
 diesel::table! {
+    people (id) {
+        id -> Uuid,
+        first_name -> Text,
+        last_name -> Text,
+        birth_date -> Nullable<Date>,
+        bio -> Nullable<Text>,
+        role -> Nullable<Text>,
+        created_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
     reviews (id) {
-        id -> Int4,
-        movie_id -> Int4,
+        id -> Uuid,
+        movie_id -> Uuid,
         user_name -> Text,
+        user_id -> Uuid,
         rating -> Int2,
         title -> Nullable<Text>,
         body -> Nullable<Text>,
@@ -46,8 +63,17 @@ diesel::table! {
     }
 }
 
-diesel::joinable!(movie_actors -> actors (actor_id));
-diesel::joinable!(movie_actors -> movies (movie_id));
+diesel::joinable!(movie_crew -> movies (movie_id));
+diesel::joinable!(movie_crew -> people (person_id));
+diesel::joinable!(movie_genres -> genres (genre_id));
+diesel::joinable!(movie_genres -> movies (movie_id));
 diesel::joinable!(reviews -> movies (movie_id));
 
-diesel::allow_tables_to_appear_in_same_query!(actors, movie_actors, movies, reviews,);
+diesel::allow_tables_to_appear_in_same_query!(
+    genres,
+    movie_crew,
+    movie_genres,
+    movies,
+    people,
+    reviews,
+);

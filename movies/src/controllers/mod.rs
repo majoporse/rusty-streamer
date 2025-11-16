@@ -1,6 +1,8 @@
-pub mod actors;
+pub mod people_controller;
 pub mod error;
-pub mod movies;
-pub mod reviews;
+pub mod movies_controller;
+pub mod reviews_controller;
 pub mod pagination;
+
+pub mod models;
 

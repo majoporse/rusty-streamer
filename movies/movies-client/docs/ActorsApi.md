@@ -7,6 +7,7 @@ Method | HTTP request | Description
 [**create_actor**](ActorsApi.md#create_actor) | **POST** /actors | 
 [**delete_actor**](ActorsApi.md#delete_actor) | **DELETE** /actors/{actor_id} | 
 [**get_actor_by_id**](ActorsApi.md#get_actor_by_id) | **GET** /actors/{actor_id} | 
+[**get_actor_by_movie_id**](ActorsApi.md#get_actor_by_movie_id) | **GET** /actors/movie/{movie_id} | 
 [**get_all_actors**](ActorsApi.md#get_all_actors) | **GET** /actors | 
 [**update_actor**](ActorsApi.md#update_actor) | **PUT** /actors/{actor_id} | 
 
@@ -50,7 +51,7 @@ No authorization required
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**actor_id** | **i32** | ID of the actor to delete | [required] |
+**actor_id** | **uuid::Uuid** | ID of the actor to delete | [required] |
 
 ### Return type
 
@@ -78,11 +79,39 @@ No authorization required
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**actor_id** | **i32** | ID of the actor to retrieve | [required] |
+**actor_id** | **uuid::Uuid** | ID of the actor to retrieve | [required] |
 
 ### Return type
 
 [**models::Actor**](Actor.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## get_actor_by_movie_id
+
+> Vec<models::Actor> get_actor_by_movie_id(movie_id)
+
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**movie_id** | **uuid::Uuid** | ID of the movie to get actors for | [required] |
+
+### Return type
+
+[**Vec<models::Actor>**](Actor.md)
 
 ### Authorization
 
@@ -135,7 +164,7 @@ No authorization required
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**actor_id** | **i32** | ID of the actor to update | [required] |
+**actor_id** | **uuid::Uuid** | ID of the actor to update | [required] |
 **new_actor** | [**NewActor**](NewActor.md) |  | [required] |
 
 ### Return type

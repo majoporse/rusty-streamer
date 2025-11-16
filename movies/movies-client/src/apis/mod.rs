@@ -120,8 +120,8 @@ impl From<&str> for ContentType {
     }
 }
 
-pub mod actors_api;
 pub mod movies_api;
+pub mod people_api;
 pub mod reviews_api;
 
 pub mod configuration;

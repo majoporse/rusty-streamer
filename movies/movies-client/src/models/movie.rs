@@ -1,7 +1,7 @@
 /*
- * Video Server API
+ * Movies API
  *
- * API documentation for my video server.
+ * API documentation for my movies server.
  *
  * The version of the OpenAPI document: 1.0.0
  * 
@@ -20,7 +20,7 @@ pub struct Movie {
     #[serde(rename = "duration_minutes", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub duration_minutes: Option<Option<i32>>,
     #[serde(rename = "id")]
-    pub id: i32,
+    pub id: uuid::Uuid,
     #[serde(rename = "mpaa_rating", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub mpaa_rating: Option<Option<String>>,
     #[serde(rename = "release_date", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
@@ -34,7 +34,7 @@ pub struct Movie {
 }
 
 impl Movie {
-    pub fn new(created_at: String, id: i32, slug: String, title: String, updated_at: String) -> Movie {
+    pub fn new(created_at: String, id: uuid::Uuid, slug: String, title: String, updated_at: String) -> Movie {
         Movie {
             created_at,
             description: None,
