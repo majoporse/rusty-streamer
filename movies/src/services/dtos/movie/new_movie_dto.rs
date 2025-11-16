@@ -1,3 +1,4 @@
+use uuid::Uuid;
 use chrono::NaiveDate;
 use serde::Deserialize;
 use serde::Serialize;
@@ -11,6 +12,8 @@ pub struct NewMovieDto {
     pub release_date: Option<NaiveDate>,
     pub duration_minutes: Option<i32>,
     pub mpaa_rating: Option<String>,
+    pub people_ids: Option<Vec<Uuid>>,
+    pub genre_ids: Option<Vec<Uuid>>,
 }
 
 impl From<NewMovieDto> for NewMovie {
@@ -35,6 +38,8 @@ impl From<NewMovie> for NewMovieDto {
             release_date: model.release_date,
             duration_minutes: model.duration_minutes,
             mpaa_rating: model.mpaa_rating,
+            people_ids: None,
+            genre_ids: None,
         }
     }
 }
