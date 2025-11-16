@@ -32,7 +32,7 @@ struct ApiDoc;
 async fn main() -> std::io::Result<()> {
     std::env::set_var(
         "RUST_LOG",
-        "debug,opentelemetry=debug,opentelemetry_otlp=debug, reqwest_tracing=debug, reqwest=debug",
+        "info",
     );
     dotenv().ok();
     env_logger::init();
@@ -44,16 +44,16 @@ async fn main() -> std::io::Result<()> {
 
     let mut apidoc = ApiDoc::openapi();
 
-    apidoc.merge(controllers::movies::movies::ApiDoc::openapi());
-    apidoc.merge(controllers::movies::actors::ApiDoc::openapi());
-    apidoc.merge(controllers::movies::reviews::ApiDoc::openapi());
+    apidoc.merge(controllers::movies::movies_controller::ApiDoc::openapi());
+    apidoc.merge(controllers::movies::people_controller::ApiDoc::openapi());
+    apidoc.merge(controllers::movies::reviews_controller::ApiDoc::openapi());
 
-    apidoc.merge(controllers::users::users::ApiDoc::openapi());
-    apidoc.merge(controllers::users::watch_history::ApiDoc::openapi());
-    apidoc.merge(controllers::users::watch_list::ApiDoc::openapi());
-    apidoc.merge(controllers::users::watch_room_messages::ApiDoc::openapi());
-    apidoc.merge(controllers::users::watch_room_participants::ApiDoc::openapi());
-    apidoc.merge(controllers::users::watch_room::ApiDoc::openapi());
+    apidoc.merge(controllers::users::users_controller::ApiDoc::openapi());
+    apidoc.merge(controllers::users::watch_history_controller::ApiDoc::openapi());
+    apidoc.merge(controllers::users::watch_list_controller::ApiDoc::openapi());
+    apidoc.merge(controllers::users::watch_room_messages_controller::ApiDoc::openapi());
+    apidoc.merge(controllers::users::watch_room_participants_controller::ApiDoc::openapi());
+    apidoc.merge(controllers::users::watch_room_controller::ApiDoc::openapi());
 
     save_openapi_spec(&apidoc).await?;
     log::info!("setup openapi");
@@ -72,15 +72,15 @@ async fn main() -> std::io::Result<()> {
             .wrap(OtlpMetricsLogger::new())
             .into_utoipa_app()
             // services
-            .configure(controllers::movies::actors::scoped_config)
-            .configure(controllers::movies::actors::scoped_config)
-            .configure(controllers::movies::reviews::scoped_config)
-            .configure(controllers::users::users::scoped_config)
-            .configure(controllers::users::watch_history::scoped_config)
-            .configure(controllers::users::watch_list::scoped_config)
-            .configure(controllers::users::watch_room_messages::scoped_config)
-            .configure(controllers::users::watch_room_participants::scoped_config)
-            .configure(controllers::users::watch_room::scoped_config)
+            .configure(controllers::movies::movies_controller::scoped_config)
+            .configure(controllers::movies::people_controller::scoped_config)
+            .configure(controllers::movies::reviews_controller::scoped_config)
+            .configure(controllers::users::users_controller::scoped_config)
+            .configure(controllers::users::watch_history_controller::scoped_config)
+            .configure(controllers::users::watch_list_controller::scoped_config)
+            .configure(controllers::users::watch_room_messages_controller::scoped_config)
+            .configure(controllers::users::watch_room_participants_controller::scoped_config)
+            .configure(controllers::users::watch_room_controller::scoped_config)
             // OpenAPI docs
             .openapi(apidoc.clone())
             .openapi_service(|api| Redoc::with_url("/redoc", api))

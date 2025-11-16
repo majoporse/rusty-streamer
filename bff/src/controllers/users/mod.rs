@@ -3,12 +3,12 @@ use users_client::apis::configuration::Configuration;
 
 pub mod error;
 pub mod pagination;
-pub mod users;
-pub mod watch_history;
-pub mod watch_list;
-pub mod watch_room;
-pub mod watch_room_messages;
-pub mod watch_room_participants;
+pub mod users_controller;
+pub mod watch_history_controller;
+pub mod watch_list_controller;
+pub mod watch_room_controller;
+pub mod watch_room_messages_controller;
+pub mod watch_room_participants_controller;
 use shared::http_logging_middleware::LoggingMiddleware;
 
 use reqwest_middleware::ClientBuilder;

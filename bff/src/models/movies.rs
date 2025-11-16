@@ -1,24 +1,29 @@
+use std::str::FromStr;
+
 use movies_client::models as client_models;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
-
+use uuid::Uuid;
+use chrono::{NaiveDate, NaiveDateTime};
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
-pub struct WrapperActor {
-    pub bio: Option<Option<String>>,
-    pub birth_date: Option<Option<String>>,
-    pub created_at: String,
+pub struct WrapperPerson {
+    pub id: Uuid,
     pub first_name: String,
-    pub id: i32,
     pub last_name: String,
+    pub birth_date: Option<NaiveDate>,
+    pub bio: Option<String>,
+    pub role: Option<String>,
+    pub created_at: NaiveDateTime,
 }
 
-impl From<client_models::Actor> for WrapperActor {
-    fn from(v: client_models::Actor) -> Self {
-        WrapperActor {
-            bio: v.bio,
-            birth_date: v.birth_date,
-            created_at: v.created_at,
+impl From<client_models::Person> for WrapperPerson {
+    fn from(v: client_models::Person) -> Self {
+        WrapperPerson {
+            role: v.role.flatten(),
+            bio: v.bio.flatten(),
+            birth_date: v.birth_date.flatten().map(|d| NaiveDate::from_str(&*d).unwrap()),
+            created_at: NaiveDateTime::from_str(&v.created_at).unwrap(),
             first_name: v.first_name,
             id: v.id,
             last_name: v.last_name,
@@ -26,12 +31,13 @@ impl From<client_models::Actor> for WrapperActor {
     }
 }
 
-impl From<WrapperActor> for client_models::Actor {
-    fn from(w: WrapperActor) -> Self {
-        client_models::Actor {
-            bio: w.bio,
-            birth_date: w.birth_date,
-            created_at: w.created_at,
+impl From<WrapperPerson> for client_models::Person {
+    fn from(w: WrapperPerson) -> Self {
+        client_models::Person {
+            role: Some(w.role),
+            bio: Some(w.bio),
+            birth_date: Some(w.birth_date.map(|d| d.to_string())),
+            created_at: w.created_at.to_string(),
             first_name: w.first_name,
             id: w.id,
             last_name: w.last_name,
@@ -40,29 +46,32 @@ impl From<WrapperActor> for client_models::Actor {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
-pub struct WrapperNewActor {
-    pub bio: Option<Option<String>>,
-    pub birth_date: Option<Option<String>>,
+pub struct WrapperNewPerson {
     pub first_name: String,
     pub last_name: String,
+    pub birth_date: Option<NaiveDate>,
+    pub bio: Option<String>,
+    pub role: Option<String>,
 }
 
-impl From<client_models::NewActor> for WrapperNewActor {
-    fn from(v: client_models::NewActor) -> Self {
-        WrapperNewActor {
-            bio: v.bio,
-            birth_date: v.birth_date,
+impl From<client_models::NewPerson> for WrapperNewPerson {
+    fn from(v: client_models::NewPerson) -> Self {
+        WrapperNewPerson {
+            role: v.role.flatten(),
+            bio: v.bio.flatten(),
+            birth_date: v.birth_date.flatten().map(|d| NaiveDate::from_str(&d).unwrap()),
             first_name: v.first_name,
             last_name: v.last_name,
         }
     }
 }
 
-impl From<WrapperNewActor> for client_models::NewActor {
-    fn from(w: WrapperNewActor) -> Self {
-        client_models::NewActor {
-            bio: w.bio,
-            birth_date: w.birth_date,
+impl From<WrapperNewPerson> for client_models::NewPerson {
+    fn from(w: WrapperNewPerson) -> Self {
+        client_models::NewPerson {
+            role: Some(w.role),
+            bio: Some(w.bio),
+            birth_date: Some(w.birth_date.map(|d| d.to_string())),
             first_name: w.first_name,
             last_name: w.last_name,
         }
@@ -74,7 +83,7 @@ pub struct WrapperMovie {
     pub created_at: String,
     pub description: Option<Option<String>>,
     pub duration_minutes: Option<Option<i32>>,
-    pub id: i32,
+    pub id: Uuid,
     pub mpaa_rating: Option<Option<String>>,
     pub release_date: Option<Option<String>>,
     pub slug: String,
@@ -154,8 +163,9 @@ impl From<WrapperNewMovie> for client_models::NewMovie {
 pub struct WrapperReview {
     pub body: Option<Option<String>>,
     pub created_at: String,
-    pub id: i32,
-    pub movie_id: i32,
+    pub id: Uuid,
+    pub movie_id: Uuid,
+    pub user_id: Uuid,
     pub rating: i32,
     pub title: Option<Option<String>>,
     pub user_name: String,
@@ -168,6 +178,7 @@ impl From<client_models::Review> for WrapperReview {
             created_at: v.created_at,
             id: v.id,
             movie_id: v.movie_id,
+            user_id: v.user_id,
             rating: v.rating,
             title: v.title,
             user_name: v.user_name,
@@ -178,6 +189,7 @@ impl From<client_models::Review> for WrapperReview {
 impl From<WrapperReview> for client_models::Review {
     fn from(w: WrapperReview) -> Self {
         client_models::Review {
+            user_id: w.user_id,
             body: w.body,
             created_at: w.created_at,
             id: w.id,
@@ -192,7 +204,8 @@ impl From<WrapperReview> for client_models::Review {
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct WrapperNewReview {
     pub body: Option<Option<String>>,
-    pub movie_id: i32,
+    pub movie_id: Uuid,
+    pub user_id: Uuid,
     pub rating: i32,
     pub title: Option<Option<String>>,
     pub user_name: String,
@@ -205,6 +218,7 @@ impl From<client_models::NewReview> for WrapperNewReview {
             movie_id: v.movie_id,
             rating: v.rating,
             title: v.title,
+            user_id: v.user_id,
             user_name: v.user_name,
         }
     }
@@ -217,6 +231,7 @@ impl From<WrapperNewReview> for client_models::NewReview {
             movie_id: w.movie_id,
             rating: w.rating,
             title: w.title,
+            user_id: w.user_id,
             user_name: w.user_name,
         }
     }

@@ -10,7 +10,6 @@ use redis::AsyncCommands;
 use utoipa::OpenApi;
 use uuid::Uuid;
 
-// Generated OpenAPI client
 use users_client::apis::watch_rooms_api;
 
 static TAG: &str = "WatchRooms";
