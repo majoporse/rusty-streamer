@@ -19,6 +19,7 @@ impl Middleware for LoggingMiddleware {
         let path = req.url().path().to_string();
 
         let mut span = tracer.start(format!("HTTP {} {}", method.to_string(), path));
+        log::info!("Request: {} {}", method, req.url());
 
         span.set_attribute(KeyValue::new("method", method.to_string()));
         span.set_attribute(KeyValue::new("url", req.url().to_string()));
@@ -32,7 +33,7 @@ impl Middleware for LoggingMiddleware {
                 .unwrap_or_else(|e| format!("error: {}", e)),
         ));
 
-        println!("Result: {:?}", res);
+        log::info!("Result: {:?}", res);
         res
     }
 }

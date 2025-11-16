@@ -1,5 +1,4 @@
 
-use actix_web::HttpResponse;
 use log::error;
 
 /// Maps the generated client error into an HttpResponse and logs it

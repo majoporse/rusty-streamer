@@ -7,7 +7,7 @@ use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use diesel_async::pooled_connection::bb8::Pool;
 use diesel_async::pooled_connection::AsyncDieselConnectionManager;
-use diesel_async::{AsyncConnection, AsyncPgConnection};
+use diesel_async::AsyncPgConnection;
 use dotenvy::dotenv;
 use log::info;
 use opentelemetry::{global, KeyValue};
@@ -22,7 +22,6 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use shared::log_middleware::OtlpMetricsLogger;
 
-use crate::data::models::DbConnection;
 
 pub mod controllers;
 pub mod data;

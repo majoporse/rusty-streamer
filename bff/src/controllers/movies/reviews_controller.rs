@@ -3,11 +3,8 @@ use crate::{
     controllers::{movies::client_config, users::pagination::Pagination},
     models::movies::{WrapperNewReview, WrapperReview},
 };
-use actix_web::error::ErrorInternalServerError;
-use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
+use actix_web::{delete, get, post, put, web};
 use movies_client::apis::reviews_api;
-use movies_client::models::review;
-use users_client::models::user;
 use utoipa::OpenApi;
 use uuid::Uuid;
 

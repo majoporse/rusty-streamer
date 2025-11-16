@@ -1,5 +1,4 @@
-use crate::controllers::models::movies::movie::{self, Movie};
-use crate::controllers::models::movies::movie_detail::MovieDetail;
+use crate::controllers::models::movies::movie::Movie;
 use crate::controllers::models::movies::new_movie::NewMovie;
 use crate::controllers::pagination::Pagination;
 use crate::{controllers::error, services::movie_service::MovieService};

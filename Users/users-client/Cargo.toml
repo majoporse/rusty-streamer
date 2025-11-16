@@ -2,7 +2,7 @@
 name = "users_client"
 version = "1.0.0"
 authors = ["OpenAPI Generator team and contributors"]
-description = "API documentation for my video server."
+description = "API documentation for my users server."
 license = ""
 edition = "2021"
 

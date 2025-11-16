@@ -3,7 +3,7 @@ use crate::{
     controllers::{movies::client_config, users::pagination::Pagination},
     models::movies::{WrapperPerson, WrapperNewPerson},
 };
-use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
+use actix_web::{delete, get, post, put, web, HttpResponse};
 use movies_client::apis::people_api;
 use utoipa::OpenApi;
 use uuid::Uuid;

@@ -30,9 +30,9 @@ pub mod schema;
 #[derive(OpenApi)]
 #[openapi(
     info(
-        title = "Video Server API",
+        title = "Users API",
         version = "1.0.0",
-        description = "API documentation for my video server."
+        description = "API documentation for my users server."
     )
 )]
 struct ApiDoc;
@@ -53,7 +53,7 @@ pub fn get_connection_pool() -> anyhow::Result<Pool<ConnectionManager<DbConnecti
 async fn main() -> std::io::Result<()> {
     std::env::set_var(
         "RUST_LOG",
-        "debug,opentelemetry=debug,opentelemetry_otlp=debug",
+        "info",
     );
     dotenv().ok();
     env_logger::init();

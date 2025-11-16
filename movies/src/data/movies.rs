@@ -1,5 +1,4 @@
-use diesel_async::{AsyncConnection, RunQueryDsl};
-use std::collections::HashSet;
+use diesel_async::RunQueryDsl;
 
 use crate::{
     data::models::{
@@ -11,7 +10,7 @@ use crate::{
         review::Review,
         DbConnection,
     },
-    schema::{genres, movie_crew, movie_genres, movies, people, reviews},
+    schema::{genres, movie_crew, movies, people, reviews},
 };
 use diesel::{
     BelongingToDsl, BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgTextExpressionMethods,

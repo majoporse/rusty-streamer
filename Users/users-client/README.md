@@ -1,6 +1,6 @@
 # Rust API client for users_client
 
-API documentation for my video server.
+API documentation for my users server.
 
 
 ## Overview

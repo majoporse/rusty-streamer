@@ -4,7 +4,7 @@ use crate::{
     controllers::movies::client_config,
     models::movies::{WrapperMovie, WrapperNewMovie},
 };
-use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
+use actix_web::{delete, get, post, put, web};
 use movies_client::apis::{configuration::Configuration, movies_api};
 use utoipa::OpenApi;
 use uuid::Uuid;

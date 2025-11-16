@@ -1,11 +1,6 @@
-use crate::data::models::genre::Genre;
-use crate::data::models::movie_crew::MovieCrew;
-use crate::data::models::person::Person;
-use crate::data::models::review::Review;
 use crate::schema;
 use chrono::NaiveDate;
 use chrono::NaiveDateTime;
-use diesel::pg::Pg;
 use diesel::prelude::{Identifiable, Insertable, Queryable, Selectable};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;

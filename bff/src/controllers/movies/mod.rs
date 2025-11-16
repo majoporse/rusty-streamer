@@ -1,7 +1,6 @@
-use movies_client::{apis::configuration::Configuration, models::movie};
+use movies_client::apis::configuration::Configuration;
 use reqwest_middleware::ClientBuilder;
 use shared::http_logging_middleware::LoggingMiddleware;
-use utoipa::openapi::info;
 
 pub mod people_controller;
 pub mod movies_controller;

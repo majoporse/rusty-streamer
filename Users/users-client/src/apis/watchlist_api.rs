@@ -1,7 +1,7 @@
 /*
- * Video Server API
+ * Users API
  *
- * API documentation for my video server.
+ * API documentation for my users server.
  *
  * The version of the OpenAPI document: 1.0.0
  * 
