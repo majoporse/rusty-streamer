@@ -1,5 +1,6 @@
 use crate::controllers::error::handle_client_error;
 use crate::controllers::movies::pagination::Pagination;
+use crate::models::movies::WrapperMovieDetail;
 use crate::{
     controllers::movies::client_config,
     models::movies::{WrapperMovie, WrapperNewMovie},
@@ -20,7 +21,9 @@ static TAG: &str = "Movies";
     tag = TAG
 )]
 #[post("/movies")]
-pub async fn create_movie(new_movie: web::Json<WrapperNewMovie>) -> Result<web::Json<WrapperMovie>, actix_web::Error> {
+pub async fn create_movie(
+    new_movie: web::Json<WrapperNewMovie>,
+) -> Result<web::Json<WrapperMovie>, actix_web::Error> {
     let config = client_config();
     let new_movie = new_movie.into_inner();
 
@@ -42,12 +45,17 @@ pub async fn create_movie(new_movie: web::Json<WrapperNewMovie>) -> Result<web::
     tag = TAG
 )]
 #[get("/movies/{movie_id}")]
-pub async fn get_movie_by_id(movie_id: web::Path<Uuid>) -> Result<web::Json<WrapperMovie>, actix_web::Error> {
+pub async fn get_movie_by_id(
+    movie_id: web::Path<Uuid>,
+) -> Result<web::Json<WrapperMovie>, actix_web::Error> {
     let config = client_config();
 
     match movies_api::get_movie_by_id(&config, &movie_id.clone().to_string()).await {
         Ok(movie) => Ok(web::Json(movie.into())),
-        Err(err) => Err(handle_client_error(err, &format!("Fetching movie {}", movie_id))),
+        Err(err) => Err(handle_client_error(
+            err,
+            &format!("Fetching movie {}", movie_id),
+        )),
     }
 }
 
@@ -68,7 +76,10 @@ pub async fn delete_movie(movie_id: web::Path<Uuid>) -> Result<web::Json<i32>, a
 
     match movies_api::delete_movie(&config, &movie_id.clone().to_string()).await {
         Ok(deleted) => Ok(web::Json(deleted)),
-        Err(err) => Err(handle_client_error(err, &format!("Deleting movie {}", movie_id))),
+        Err(err) => Err(handle_client_error(
+            err,
+            &format!("Deleting movie {}", movie_id),
+        )),
     }
 }
 
@@ -96,7 +107,33 @@ pub async fn update_movie(
         .await
     {
         Ok(movie) => Ok(web::Json(movie.into())),
-        Err(err) => Err(handle_client_error(err, &format!("Updating movie {}", movie_id))),
+        Err(err) => Err(handle_client_error(
+            err,
+            &format!("Updating movie {}", movie_id),
+        )),
+    }
+}
+
+#[utoipa::path(
+    params(
+        ("movie_id" = Uuid, Path, description = "ID of the movie to retrieve details for")
+    ),
+    responses(
+        (status = 200, description = "Get movie details by ID", body = WrapperMovieDetail),
+        (status = 500, description = "Internal Server Error")
+    ),
+    tag = TAG
+)]
+#[get("/movies/{movie_id}/details")]
+pub async fn get_movie_details_by_id(
+    movie_id: web::Path<Uuid>,
+) -> Result<web::Json<WrapperMovieDetail>, actix_web::Error> {
+    let config = client_config();
+    let movie_id = movie_id.into_inner().to_string();
+
+    match movies_api::get_movie_details_by_id(&config, &movie_id).await {
+        Ok(movie) => Ok(web::Json(movie.into())),
+        Err(err) => Err(handle_client_error(err, "Searching movies by title")),
     }
 }
 
@@ -182,7 +219,8 @@ pub async fn search_movies_by_actor(
     delete_movie,
     update_movie,
     search_movies_by_title,
-    search_movies_by_actor
+    search_movies_by_actor,
+    get_movie_details_by_id,
 ))]
 pub struct ApiDoc;
 
@@ -193,4 +231,5 @@ pub fn scoped_config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) 
     cfg.service(update_movie);
     cfg.service(search_movies_by_title);
     cfg.service(search_movies_by_actor);
+    cfg.service(get_movie_details_by_id);
 }

@@ -166,6 +166,41 @@
         }
       }
     },
+    "/movies/{movie_id}/details": {
+      "get": {
+        "tags": [
+          "Movies"
+        ],
+        "operationId": "get_movie_details_by_id",
+        "parameters": [
+          {
+            "name": "movie_id",
+            "in": "path",
+            "description": "ID of the movie to retrieve details for",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get movie details by ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WrapperMovieDetail"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/people": {
       "get": {
         "tags": [
@@ -1819,6 +1854,40 @@
   },
   "components": {
     "schemas": {
+      "MovieCrewDetail": {
+        "type": "object",
+        "required": [
+          "movie_id",
+          "person",
+          "person_id"
+        ],
+        "properties": {
+          "billing_order": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "character_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "movie_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "person": {
+            "$ref": "#/components/schemas/WrapperPerson"
+          },
+          "person_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "NewUser": {
         "type": "object",
         "required": [
@@ -2353,6 +2422,22 @@
           }
         }
       },
+      "WrapperGenre": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "WrapperMovie": {
         "type": "object",
         "required": [
@@ -2403,6 +2488,83 @@
           },
           "updated_at": {
             "type": "string"
+          }
+        }
+      },
+      "WrapperMovieDetail": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "slug",
+          "created_at",
+          "updated_at",
+          "people",
+          "genres",
+          "reviews"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "duration_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WrapperGenre"
+            }
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mpaa_rating": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "people": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovieCrewDetail"
+            }
+          },
+          "release_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "reviews": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WrapperReview"
+            }
+          },
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },

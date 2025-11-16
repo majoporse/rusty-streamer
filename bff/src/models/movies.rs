@@ -236,3 +236,76 @@ impl From<WrapperNewReview> for client_models::NewReview {
         }
     }
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct WrapperMovieDetail {
+    pub id: Uuid,
+    pub title: String,
+    pub slug: String,
+    pub description: Option<String>,
+    pub release_date: Option<NaiveDate>,
+    pub duration_minutes: Option<i32>,
+    pub mpaa_rating: Option<String>,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime,
+    pub people: Vec<MovieCrewDetail>,
+    pub genres: Vec<WrapperGenre>,
+    pub reviews: Vec<WrapperReview>,
+}
+
+impl From<client_models::MovieDetail> for WrapperMovieDetail {
+    fn from(v: client_models::MovieDetail) -> Self {
+        WrapperMovieDetail {
+            id: v.id,
+            title: v.title,
+            slug: v.slug,
+            description: v.description.flatten(),
+            release_date: v.release_date.flatten().map(|d| NaiveDate::from_str(&d).unwrap()),
+            duration_minutes: v.duration_minutes.flatten(),
+            mpaa_rating: v.mpaa_rating.flatten(),
+            created_at: NaiveDateTime::from_str(&v.created_at).unwrap(),
+            updated_at: NaiveDateTime::from_str(&v.updated_at).unwrap(),
+            people: v.people.into_iter().map(MovieCrewDetail::from).collect(),
+            genres: v.genres.into_iter().map(WrapperGenre::from).collect(),
+            reviews: v.reviews.into_iter().map(WrapperReview::from).collect(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct WrapperGenre {
+    pub id: Uuid,
+    pub name: String,
+}
+
+impl From<client_models::Genre> for WrapperGenre {
+    fn from(v: client_models::Genre) -> Self {
+        WrapperGenre {
+            id: v.id,
+            name: v.name,
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct MovieCrewDetail {
+    pub movie_id: Uuid,
+    pub person: WrapperPerson,
+    person_id: Uuid,
+    pub character_name: Option<String>,
+    pub billing_order: Option<i32>,
+}
+
+impl From<client_models::MovieCrewDetail> for MovieCrewDetail {
+    fn from(v: client_models::MovieCrewDetail) -> Self {
+        MovieCrewDetail {
+            movie_id: v.movie_id,
+            person_id: v.person_id,
+            person: (*v.person).into(),
+            character_name: v.character_name.flatten(),
+            billing_order: v.billing_order.flatten(),
+        }
+    }
+}
+

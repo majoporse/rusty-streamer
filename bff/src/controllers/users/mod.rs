@@ -1,4 +1,3 @@
-use opentelemetry::trace::Tracer;
 use users_client::apis::configuration::Configuration;
 
 pub mod error;
