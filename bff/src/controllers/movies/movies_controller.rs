@@ -212,6 +212,35 @@ pub async fn search_movies_by_actor(
     }
 }
 
+#[utoipa::path(
+    params(
+        ("limit" = i64, Query, description = "Max number of movies to return", example = 100),
+        ("offset" = i64, Query, description = "Pagination offset", example = 0)
+    ),
+    responses(
+        (status = 200, description = "Get all movies", body = [WrapperMovie]),
+        (status = 500, description = "Internal Server Error")
+    ),
+    tag = TAG
+)]
+#[get("/movies")]
+pub async fn get_all_movies(
+    pagination: web::Query<Pagination>,
+) -> anyhow::Result<web::Json<Vec<WrapperMovie>>, actix_web::Error> {
+    let config = client_config();
+
+    match movies_api::get_all_movies(
+        &config,
+        pagination.limit.unwrap_or(100),
+        pagination.offset.unwrap_or(0),
+    )
+    .await
+    {
+        Ok(movies) => Ok(web::Json(movies.into_iter().map(WrapperMovie::from).collect())),
+        Err(err) => Err(handle_client_error(err, "Searching movies by title")),
+    }
+}
+
 #[derive(OpenApi)]
 #[openapi(paths(
     create_movie,
@@ -221,6 +250,7 @@ pub async fn search_movies_by_actor(
     search_movies_by_title,
     search_movies_by_actor,
     get_movie_details_by_id,
+    get_all_movies,
 ))]
 pub struct ApiDoc;
 
@@ -232,4 +262,5 @@ pub fn scoped_config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) 
     cfg.service(search_movies_by_title);
     cfg.service(search_movies_by_actor);
     cfg.service(get_movie_details_by_id);
+    cfg.service(get_all_movies);
 }

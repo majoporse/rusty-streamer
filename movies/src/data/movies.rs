@@ -75,6 +75,7 @@ pub async fn list_movies(
     let movie_items = movies::table
         .limit(limit)
         .offset(offset)
+        .order_by(movies::created_at.desc())
         .load::<Movie>(conn)
         .await?;
 

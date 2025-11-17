@@ -10,6 +10,54 @@
   },
   "paths": {
     "/movies": {
+      "get": {
+        "tags": [
+          "Movies"
+        ],
+        "operationId": "get_all_movies",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of movies to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get all movies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WrapperMovie"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
       "post": {
         "tags": [
           "Movies"
