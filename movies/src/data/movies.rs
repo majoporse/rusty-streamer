@@ -2,19 +2,13 @@ use diesel_async::RunQueryDsl;
 
 use crate::{
     data::models::{
-        genre::Genre,
-        movie::{Movie, MovieDetails, NewMovie},
-        movie_crew::{MovieCrew, MovieCrewDetail},
-        movie_genres::MovieGenre,
-        person::Person,
-        review::Review,
-        DbConnection,
+        DbConnection, genre::Genre, movie::{Movie, MovieDetails, NewMovie}, movie_crew::{MovieCrew, MovieCrewDetail, NewMovieCrew}, movie_genres::{MovieGenre, NewMovieGenre}, person::Person, review::Review
     },
     schema::{genres, movie_crew, movies, people, reviews},
 };
 use diesel::{
-    BelongingToDsl, BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgTextExpressionMethods,
-    QueryDsl, SelectableHelper,
+    associations::HasTable, BelongingToDsl, BoolExpressionMethods, ExpressionMethods, JoinOnDsl,
+    PgTextExpressionMethods, QueryDsl, SelectableHelper,
 };
 use uuid::Uuid;
 
@@ -40,6 +34,37 @@ pub async fn create_movie(
         .await?;
 
     Ok(movie_item)
+}
+
+pub async fn add_genres_to_movie(
+    conn: &mut DbConnection,
+    movie_id: Uuid,
+    genre_ids: Vec<Uuid>,
+) -> anyhow::Result<(), diesel::result::Error> {
+    let new_movie_genres: Vec<NewMovieGenre> = genre_ids
+        .into_iter()
+        .map(|genre_id| NewMovieGenre { movie_id, genre_id })
+        .collect();
+
+    diesel::insert_into(MovieGenre::table())
+        .values(&new_movie_genres)
+        .execute(conn)
+        .await?;
+
+    Ok(())
+}
+
+pub async fn add_people_to_movie(
+    conn: &mut DbConnection,
+    people_ids: Vec<NewMovieCrew>,
+) -> anyhow::Result<(), diesel::result::Error> {
+
+    diesel::insert_into(MovieCrew::table())
+        .values(&people_ids)
+        .execute(conn)
+        .await?;
+
+    Ok(())
 }
 
 pub async fn list_movies(

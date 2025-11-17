@@ -3,6 +3,7 @@ use chrono::NaiveDate;
 use serde::Deserialize;
 use serde::Serialize;
 use crate::data::models::movie::NewMovie;
+use crate::services::dtos::movie_crew::movie_crew_dto::MovieCrewDto;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NewMovieDto {
@@ -12,7 +13,7 @@ pub struct NewMovieDto {
     pub release_date: Option<NaiveDate>,
     pub duration_minutes: Option<i32>,
     pub mpaa_rating: Option<String>,
-    pub people_ids: Option<Vec<Uuid>>,
+    pub people_ids: Option<Vec<MovieCrewDto>>,
     pub genre_ids: Option<Vec<Uuid>>,
 }
 

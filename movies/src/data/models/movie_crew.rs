@@ -32,10 +32,10 @@ pub struct MovieCrew {
 #[derive(Debug, Insertable)]
 #[diesel(table_name = schema::movie_crew)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct NewMovieCrew<'a> {
+pub struct NewMovieCrew {
     pub movie_id: Uuid,
     pub person_id: Uuid,
-    pub character_name: Option<&'a str>,
+    pub character_name: Option<String>,
     pub billing_order: Option<i32>,
 }
 

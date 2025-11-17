@@ -18,22 +18,6 @@ pub struct MovieDto {
     pub updated_at: NaiveDateTime,
 }
 
-impl MovieDto {
-    pub fn from(movie: &Movie) -> Self {
-        MovieDto {
-            id: movie.id,
-            title: movie.title.clone(),
-            slug: movie.slug.clone(),
-            description: movie.description.clone(),
-            release_date: movie.release_date,
-            duration_minutes: movie.duration_minutes,
-            mpaa_rating: movie.mpaa_rating.clone(),
-            created_at: movie.created_at,
-            updated_at: movie.updated_at,
-        }
-    }
-}
-
 impl From<Movie> for MovieDto {
     fn from(m: Movie) -> Self {
         Self {

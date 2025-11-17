@@ -9,6 +9,199 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/genres": {
+      "get": {
+        "tags": [
+          "Genres"
+        ],
+        "operationId": "list_genres",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of genres to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List all genres",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Genre"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Genres"
+        ],
+        "operationId": "create_genre",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewGenre"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Create a new genre",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Genre"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/genres/{genre_id}": {
+      "get": {
+        "tags": [
+          "Genres"
+        ],
+        "operationId": "get_genre_by_id",
+        "parameters": [
+          {
+            "name": "genre_id",
+            "in": "path",
+            "description": "ID of the genre to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get genre by ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Genre"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Genres"
+        ],
+        "operationId": "update_genre",
+        "parameters": [
+          {
+            "name": "genre_id",
+            "in": "path",
+            "description": "ID of the genre to update",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewGenre"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Update genre by ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Genre"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Genres"
+        ],
+        "operationId": "delete_genre",
+        "parameters": [
+          {
+            "name": "genre_id",
+            "in": "path",
+            "description": "ID of the genre to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete genre by ID",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/movies": {
       "get": {
         "tags": [
@@ -976,6 +1169,36 @@
           }
         }
       },
+      "MovieCrew": {
+        "type": "object",
+        "required": [
+          "movie_id",
+          "person_id"
+        ],
+        "properties": {
+          "billing_order": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "character_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "movie_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "person_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "MovieCrewDetail": {
         "type": "object",
         "required": [
@@ -1087,6 +1310,17 @@
           }
         }
       },
+      "NewGenre": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "NewMovie": {
         "type": "object",
         "required": [
@@ -1107,11 +1341,30 @@
             ],
             "format": "int32"
           },
+          "genre_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
           "mpaa_rating": {
             "type": [
               "string",
               "null"
             ]
+          },
+          "people_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/MovieCrew"
+            }
           },
           "release_date": {
             "type": [

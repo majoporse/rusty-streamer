@@ -14,7 +14,7 @@ pub struct PeopleService {
 }
 
 impl PeopleService {
-    pub async fn new(pool: Arc<Pool<DbConnection>>) -> Self {
+    pub fn new(pool: Arc<Pool<DbConnection>>) -> Self {
         Self { pool }
     }
 

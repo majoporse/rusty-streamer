@@ -15,6 +15,6 @@ pub struct Genre {
 #[derive(Debug, Insertable)]
 #[diesel(table_name = schema::genres)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct NewGenre<'a> {
-    pub name: &'a str,
+pub struct NewGenre {
+    pub name: String,
 }

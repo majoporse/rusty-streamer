@@ -25,7 +25,6 @@ use shared::log_middleware::OtlpMetricsLogger;
 
 pub mod controllers;
 pub mod data;
-pub mod dtos;
 pub mod schema;
 pub mod services;
 
@@ -51,7 +50,7 @@ pub async fn get_connection_pool() -> Pool<AsyncPgConnection> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var("RUST_LOG", "info,diesel=debug");
+    std::env::set_var("RUST_LOG", "debug,diesel=debug");
     dotenv().ok();
     env_logger::init();
 
@@ -65,6 +64,7 @@ async fn main() -> std::io::Result<()> {
     apidoc.merge(controllers::people_controller::ApiDoc::openapi());
     apidoc.merge(controllers::movies_controller::ApiDoc::openapi());
     apidoc.merge(controllers::reviews_controller::ApiDoc::openapi());
+    apidoc.merge(controllers::genre_controller::ApiDoc::openapi());
 
     let pool = Arc::new(get_connection_pool().await);
 
@@ -84,7 +84,7 @@ async fn main() -> std::io::Result<()> {
             )
             .wrap(OtlpMetricsLogger::new())
             .into_utoipa_app()
-            .app_data(Data::new(pool.clone()))
+            // .app_data(Data::new(pool.clone()))
             // services
             .app_data(Data::new(services::movie_service::MovieService::new(
                 pool.clone(),
@@ -95,10 +95,14 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(services::people_service::PeopleService::new(
                 pool.clone(),
             )))
+            .app_data(Data::new(services::genre_service::GenreService::new(
+                pool.clone(),
+            )))
             // controllers
             .configure(controllers::people_controller::scoped_config)
             .configure(controllers::movies_controller::scoped_config)
             .configure(controllers::reviews_controller::scoped_config)
+            .configure(controllers::genre_controller::scoped_config)
             // OpenAPI docs
             .openapi(apidoc.clone())
             .openapi_service(|api| Redoc::with_url("/redoc", api))
