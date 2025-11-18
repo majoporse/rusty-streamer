@@ -26,6 +26,11 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*GenresApi* | [**create_genre**](docs/GenresApi.md#create_genre) | **POST** /genres | 
+*GenresApi* | [**delete_genre**](docs/GenresApi.md#delete_genre) | **DELETE** /genres/{genre_id} | 
+*GenresApi* | [**get_genre_by_id**](docs/GenresApi.md#get_genre_by_id) | **GET** /genres/{genre_id} | 
+*GenresApi* | [**list_genres**](docs/GenresApi.md#list_genres) | **GET** /genres | 
+*GenresApi* | [**update_genre**](docs/GenresApi.md#update_genre) | **PUT** /genres/{genre_id} | 
 *MoviesApi* | [**create_movie**](docs/MoviesApi.md#create_movie) | **POST** /movies | 
 *MoviesApi* | [**delete_movie**](docs/MoviesApi.md#delete_movie) | **DELETE** /movies/{movie_id} | 
 *MoviesApi* | [**get_all_movies**](docs/MoviesApi.md#get_all_movies) | **GET** /movies | 
@@ -39,6 +44,7 @@ Class | Method | HTTP request | Description
 *PeopleApi* | [**get_all_people**](docs/PeopleApi.md#get_all_people) | **GET** /people | 
 *PeopleApi* | [**get_person_by_id**](docs/PeopleApi.md#get_person_by_id) | **GET** /people/{person_id} | 
 *PeopleApi* | [**get_person_by_movie_id**](docs/PeopleApi.md#get_person_by_movie_id) | **GET** /search/people/movie/{movie_id} | 
+*PeopleApi* | [**get_person_by_name**](docs/PeopleApi.md#get_person_by_name) | **GET** /search/people/name/{name} | 
 *PeopleApi* | [**update_person**](docs/PeopleApi.md#update_person) | **PUT** /people/{person_id} | 
 *ReviewsApi* | [**create_review**](docs/ReviewsApi.md#create_review) | **POST** /reviews | 
 *ReviewsApi* | [**delete_review**](docs/ReviewsApi.md#delete_review) | **DELETE** /reviews/{review_id} | 
@@ -53,8 +59,10 @@ Class | Method | HTTP request | Description
 
  - [Genre](docs/Genre.md)
  - [Movie](docs/Movie.md)
+ - [MovieCrew](docs/MovieCrew.md)
  - [MovieCrewDetail](docs/MovieCrewDetail.md)
  - [MovieDetail](docs/MovieDetail.md)
+ - [NewGenre](docs/NewGenre.md)
  - [NewMovie](docs/NewMovie.md)
  - [NewPerson](docs/NewPerson.md)
  - [NewReview](docs/NewReview.md)

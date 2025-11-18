@@ -131,6 +131,8 @@ pub struct WrapperNewMovie {
     pub release_date: Option<Option<String>>,
     pub slug: String,
     pub title: String,
+    pub genre_ids: Option<Option<Vec<Uuid>>>,
+    pub people_ids: Option<Option<Vec<WrapperMovieCrew>>>,
 }
 
 impl From<client_models::NewMovie> for WrapperNewMovie {
@@ -142,6 +144,10 @@ impl From<client_models::NewMovie> for WrapperNewMovie {
             release_date: v.release_date,
             slug: v.slug,
             title: v.title,
+            genre_ids: v.genre_ids,
+            people_ids: v.people_ids.map(|opt_vec| {
+                opt_vec.map(|vec| vec.into_iter().map(WrapperMovieCrew::from).collect())
+            }),
         }
     }
 }
@@ -155,6 +161,40 @@ impl From<WrapperNewMovie> for client_models::NewMovie {
             release_date: w.release_date,
             slug: w.slug,
             title: w.title,
+            genre_ids: w.genre_ids,
+            people_ids: w.people_ids.map(|opt_vec| {
+                opt_vec.map(|vec| vec.into_iter().map(client_models::MovieCrew::from).collect())
+            }),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct WrapperMovieCrew {
+    pub movie_id: Uuid,
+    pub person_id: Uuid,
+    pub character_name: Option<String>,
+    pub billing_order: Option<i32>,
+}
+
+impl From<client_models::MovieCrew> for WrapperMovieCrew {
+    fn from(v: client_models::MovieCrew) -> Self {
+        WrapperMovieCrew {
+            movie_id: v.movie_id,
+            person_id: v.person_id,
+            character_name: v.character_name.flatten(),
+            billing_order: v.billing_order.flatten(),
+        }
+    }
+}
+
+impl From<WrapperMovieCrew> for client_models::MovieCrew {
+    fn from(w: WrapperMovieCrew) -> Self {
+        client_models::MovieCrew {
+            movie_id: w.movie_id,
+            person_id: w.person_id,
+            character_name: Some(w.character_name),
+            billing_order: Some(w.billing_order),
         }
     }
 }

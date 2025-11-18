@@ -17,8 +17,12 @@ pub struct NewMovie {
     pub description: Option<Option<String>>,
     #[serde(rename = "duration_minutes", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub duration_minutes: Option<Option<i32>>,
+    #[serde(rename = "genre_ids", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub genre_ids: Option<Option<Vec<uuid::Uuid>>>,
     #[serde(rename = "mpaa_rating", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub mpaa_rating: Option<Option<String>>,
+    #[serde(rename = "people_ids", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub people_ids: Option<Option<Vec<models::MovieCrew>>>,
     #[serde(rename = "release_date", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub release_date: Option<Option<String>>,
     #[serde(rename = "slug")]
@@ -32,7 +36,9 @@ impl NewMovie {
         NewMovie {
             description: None,
             duration_minutes: None,
+            genre_ids: None,
             mpaa_rating: None,
+            people_ids: None,
             release_date: None,
             slug,
             title,

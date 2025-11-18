@@ -146,6 +146,31 @@ pub async fn get_person_by_movie_id(
     }
 }
 
+#[utoipa::path(
+    params(
+        ("name" = String, Path, description = "Name of the person to search for"),
+        ("limit" = i64, Query, description = "Max number of people to return", example = 100),
+        ("offset" = i64, Query, description = "Pagination offset", example = 0)
+    ),
+    responses(
+        (status = 200, description = "Get persons by name", body = [Person]),
+        (status = 500, description = "Internal Server Error")
+    ),
+    tag = TAG
+)]
+#[get("/search/people/name/{name}")]
+pub async fn get_person_by_name(
+    people_service: web::Data<PeopleService>,
+    name: web::Path<String>,
+    pagination: web::Query<Pagination>,
+) -> Result<web::Json<Vec<Person>>, actix_web::Error> {
+
+    match people_service.get_people_by_name(&name.into_inner(), pagination.limit.unwrap_or(100), pagination.offset.unwrap_or(0)).await {
+        Ok(persons) => Ok(web::Json(persons.into_iter().map(|p| Person::from(p)).collect())),
+        Err(e) => Err(error::handle_db_error(&e, "get_person_by_name")),
+    }
+}
+
 #[derive(OpenApi)]
 #[openapi(paths(
     get_all_people,
@@ -154,6 +179,7 @@ pub async fn get_person_by_movie_id(
     delete_person,
     update_person,
     get_person_by_movie_id,
+    get_person_by_name,
 ))]
 pub struct ApiDoc;
 
@@ -164,5 +190,5 @@ pub fn scoped_config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) 
     cfg.service(delete_person);
     cfg.service(update_person);
     cfg.service(get_person_by_movie_id);
-    
+    cfg.service(get_person_by_name);
 }

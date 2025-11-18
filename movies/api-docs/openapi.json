@@ -974,6 +974,65 @@
         }
       }
     },
+    "/search/people/name/{name}": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "get_person_by_name",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the person to search for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of people to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get persons by name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Person"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/search/reviews/movie/{movie_id}": {
       "get": {
         "tags": [

@@ -306,6 +306,44 @@
         }
       }
     },
+    "/people/movie/{movie_id}": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "get_person_by_movie_id",
+        "parameters": [
+          {
+            "name": "movie_id",
+            "in": "path",
+            "description": "ID of the movie to get people for",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get people by movie ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WrapperPerson"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/people/{person_id}": {
       "get": {
         "tags": [
@@ -743,6 +781,65 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/WrapperMovie"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/search/people/name/{name}": {
+      "get": {
+        "tags": [
+          "People"
+        ],
+        "operationId": "get_person_by_name",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "Name of the person to search for",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of people to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get persons by name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WrapperPerson"
                   }
                 }
               }
@@ -2539,6 +2636,36 @@
           }
         }
       },
+      "WrapperMovieCrew": {
+        "type": "object",
+        "required": [
+          "movie_id",
+          "person_id"
+        ],
+        "properties": {
+          "billing_order": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "character_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "movie_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "person_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "WrapperMovieDetail": {
         "type": "object",
         "required": [
@@ -2636,11 +2763,30 @@
             ],
             "format": "int32"
           },
+          "genre_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
           "mpaa_rating": {
             "type": [
               "string",
               "null"
             ]
+          },
+          "people_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/WrapperMovieCrew"
+            }
           },
           "release_date": {
             "type": [

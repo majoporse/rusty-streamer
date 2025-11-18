@@ -1,0 +1,1856 @@
+---
+openapi: 3.1.0
+info:
+  title: Backend For Frontend API
+  description: API documentation for the BFF service.
+  license:
+    name: ''
+  version: 1.0.0
+paths:
+  "/movies":
+    get:
+      tags:
+      - Movies
+      operationId: get_all_movies
+      parameters:
+      - name: limit
+        in: query
+        description: Max number of movies to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 100
+      - name: offset
+        in: query
+        description: Pagination offset
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 0
+      responses:
+        '200':
+          description: Get all movies
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/WrapperMovie"
+        '500':
+          description: Internal Server Error
+    post:
+      tags:
+      - Movies
+      operationId: create_movie
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/WrapperNewMovie"
+        required: true
+      responses:
+        '200':
+          description: Movie created successfully
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WrapperMovie"
+        '400':
+          description: Invalid input
+        '500':
+          description: Internal server error
+  "/movies/{movie_id}":
+    get:
+      tags:
+      - Movies
+      operationId: get_movie_by_id
+      parameters:
+      - name: movie_id
+        in: path
+        description: ID of the movie to retrieve
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Get movie by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WrapperMovie"
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    put:
+      tags:
+      - Movies
+      operationId: update_movie
+      parameters:
+      - name: movie_id
+        in: path
+        description: ID of the movie to update
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/WrapperNewMovie"
+        required: true
+      responses:
+        '200':
+          description: Update movie by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WrapperMovie"
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+      - Movies
+      operationId: delete_movie
+      parameters:
+      - name: movie_id
+        in: path
+        description: ID of the movie to delete
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Delete movie by ID
+          content:
+            text/plain:
+              schema:
+                type: integer
+                minimum: 0
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  "/movies/{movie_id}/details":
+    get:
+      tags:
+      - Movies
+      operationId: get_movie_details_by_id
+      parameters:
+      - name: movie_id
+        in: path
+        description: ID of the movie to retrieve details for
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Get movie details by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WrapperMovieDetail"
+        '500':
+          description: Internal Server Error
+  "/people":
+    get:
+      tags:
+      - People
+      operationId: get_all_people
+      responses:
+        '200':
+          description: List all people
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/WrapperPerson"
+        '500':
+          description: Internal Server Error
+    post:
+      tags:
+      - People
+      operationId: create_person
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/WrapperNewPerson"
+        required: true
+      responses:
+        '200':
+          description: Create a new person
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WrapperPerson"
+        '500':
+          description: Internal Server Error
+  "/people/{person_id}":
+    get:
+      tags:
+      - People
+      operationId: get_person_by_id
+      parameters:
+      - name: person_id
+        in: path
+        description: ID of the person to retrieve
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Get person by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WrapperPerson"
+        '500':
+          description: Internal Server Error
+    put:
+      tags:
+      - People
+      operationId: update_person
+      parameters:
+      - name: person_id
+        in: path
+        description: ID of the person to update
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/WrapperNewPerson"
+        required: true
+      responses:
+        '200':
+          description: Update person by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WrapperPerson"
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+      - People
+      operationId: delete_person
+      parameters:
+      - name: person_id
+        in: path
+        description: ID of the person to delete
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Delete person by ID
+          content:
+            text/plain:
+              schema:
+                type: integer
+                minimum: 0
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  "/reviews":
+    get:
+      tags:
+      - Reviews
+      operationId: get_all_reviews
+      parameters:
+      - name: limit
+        in: query
+        description: Max number of reviews to return
+        required: false
+        schema:
+          type: integer
+          format: int64
+        example: 100
+      - name: offset
+        in: query
+        description: Pagination offset
+        required: false
+        schema:
+          type: integer
+          format: int64
+        example: 0
+      responses:
+        '200':
+          description: List all reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/WrapperReview"
+        '500':
+          description: Internal Server Error
+    post:
+      tags:
+      - Reviews
+      operationId: create_review
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/WrapperNewReview"
+        required: true
+      responses:
+        '200':
+          description: Create a new review
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WrapperReview"
+        '500':
+          description: Internal Server Error
+  "/reviews/{review_id}":
+    get:
+      tags:
+      - Reviews
+      operationId: get_review_by_id
+      parameters:
+      - name: review_id
+        in: path
+        description: ID of the review to retrieve
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: Get review by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WrapperReview"
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    put:
+      tags:
+      - Reviews
+      operationId: update_review
+      parameters:
+      - name: review_id
+        in: path
+        description: ID of the review to update
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/WrapperNewReview"
+        required: true
+      responses:
+        '200':
+          description: Update review by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WrapperReview"
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+      - Reviews
+      operationId: delete_review
+      parameters:
+      - name: review_id
+        in: path
+        description: ID of the review to delete
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: Delete review by ID
+          content:
+            text/plain:
+              schema:
+                type: integer
+                minimum: 0
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  "/search/movies/person/{person_name}":
+    get:
+      tags:
+      - Movies
+      operationId: search_movies_by_actor
+      parameters:
+      - name: actor_name
+        in: query
+        description: Actor name to search for movies
+        required: true
+        schema:
+          type: string
+        example: Leonardo DiCaprio
+      - name: limit
+        in: query
+        description: Max number of movies to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 100
+      - name: offset
+        in: query
+        description: Pagination offset
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 0
+      - name: person_name
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Search movies by actor
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/WrapperMovie"
+        '500':
+          description: Internal Server Error
+  "/search/movies/title/{title_name}":
+    get:
+      tags:
+      - Movies
+      operationId: search_movies_by_title
+      parameters:
+      - name: title_name
+        in: path
+        description: Title query string to search for movies
+        required: true
+        schema:
+          type: string
+        example: Inception
+      - name: limit
+        in: query
+        description: Max number of movies to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 100
+      - name: offset
+        in: query
+        description: Pagination offset
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 0
+      responses:
+        '200':
+          description: Search movies by title
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/WrapperMovie"
+        '500':
+          description: Internal Server Error
+  "/users":
+    get:
+      tags:
+      - Users
+      operationId: get_all_users
+      responses:
+        '200':
+          description: List all users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/User"
+        '500':
+          description: Internal Server Error
+    post:
+      tags:
+      - Users
+      operationId: create_user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NewUser"
+        required: true
+      responses:
+        '200':
+          description: Create a new user
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/User"
+        '500':
+          description: Internal Server Error
+  "/users/{host_user_id}/watch-rooms":
+    get:
+      tags:
+      - WatchRooms
+      operationId: list_rooms_by_host
+      parameters:
+      - name: host_user_id
+        in: path
+        description: UUID of the user hosting the rooms
+        required: true
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Max number of rooms to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 50
+      - name: offset
+        in: query
+        description: Pagination offset
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 0
+      responses:
+        '200':
+          description: List rooms hosted by user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/WatchRoom"
+        '500':
+          description: Internal Server Error
+  "/users/{user_id}":
+    get:
+      tags:
+      - Users
+      operationId: get_user_by_id
+      parameters:
+      - name: user_id
+        in: path
+        description: UUID of the user to retrieve
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Get user by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/User"
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+    put:
+      tags:
+      - Users
+      operationId: update_user
+      parameters:
+      - name: user_id
+        in: path
+        description: UUID of the user to update
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/UpdateUser"
+        required: true
+      responses:
+        '200':
+          description: Update user by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/User"
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+      - Users
+      operationId: delete_user
+      parameters:
+      - name: user_id
+        in: path
+        description: UUID of the user to delete
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Delete user by ID
+          content:
+            text/plain:
+              schema:
+                type: integer
+                minimum: 0
+        '404':
+          description: User not found
+        '500':
+          description: Internal Server Error
+  "/users/{user_id}/watch-history":
+    get:
+      tags:
+      - Watch History
+      operationId: list_watch_history_by_user
+      parameters:
+      - name: user_id
+        in: path
+        description: UUID of the user whose history to retrieve
+        required: true
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Max number of items to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: offset
+        in: query
+        description: Pagination offset
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: List user watch history
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/WatchHistory"
+        '500':
+          description: Internal Server Error
+  "/users/{user_id}/watchlist":
+    get:
+      tags:
+      - Watchlist
+      operationId: get_watchlist_by_user
+      parameters:
+      - name: user_id
+        in: path
+        description: UUID of the user whose watchlist to retrieve
+        required: true
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Max number of items to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 50
+      - name: offset
+        in: query
+        description: Pagination offset
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 0
+      responses:
+        '200':
+          description: List user watchlist
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/Watchlist"
+        '500':
+          description: Internal Server Error
+  "/users/{user_id}/watchlist/{content_id}":
+    delete:
+      tags:
+      - Watchlist
+      operationId: delete_watchlist_item
+      parameters:
+      - name: user_id
+        in: path
+        description: UUID of the user
+        required: true
+        schema:
+          type: string
+      - name: content_id
+        in: path
+        description: UUID of the content item
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Delete item from watchlist
+          content:
+            text/plain:
+              schema:
+                type: integer
+                minimum: 0
+        '500':
+          description: Internal Server Error
+  "/watch-history":
+    post:
+      tags:
+      - Watch History
+      operationId: create_watch_history
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NewWatchHistory"
+        required: true
+      responses:
+        '200':
+          description: Create a new watch history entry
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WatchHistory"
+        '500':
+          description: Internal Server Error
+  "/watch-history/{id}":
+    get:
+      tags:
+      - Watch History
+      operationId: get_watch_history_by_id
+      parameters:
+      - name: id
+        in: path
+        description: ID of the watch history entry
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Get watch history by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WatchHistory"
+        '404':
+          description: Not found
+        '500':
+          description: Internal Server Error
+    put:
+      tags:
+      - Watch History
+      operationId: update_watch_history
+      parameters:
+      - name: id
+        in: path
+        description: ID of the watch history entry to update
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/UpdateWatchHistory"
+        required: true
+      responses:
+        '200':
+          description: Update watch history entry
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WatchHistory"
+        '404':
+          description: Not found
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+      - Watch History
+      operationId: delete_watch_history
+      parameters:
+      - name: id
+        in: path
+        description: ID of the watch history entry to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Delete watch history entry
+          content:
+            text/plain:
+              schema:
+                type: integer
+                minimum: 0
+        '500':
+          description: Internal Server Error
+  "/watch-room-messages":
+    post:
+      tags:
+      - WatchRoomMessages
+      operationId: create_watch_room_message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NewWatchRoomMessage"
+        required: true
+      responses:
+        '200':
+          description: Create a new message in a watch room
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WatchRoomMessage"
+        '500':
+          description: Internal Server Error
+  "/watch-room-messages/{message_id}":
+    get:
+      tags:
+      - WatchRoomMessages
+      operationId: get_watch_room_message_by_id
+      parameters:
+      - name: message_id
+        in: path
+        description: ID of the message to retrieve
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Get a watch room message by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WatchRoomMessage"
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+      - WatchRoomMessages
+      operationId: delete_watch_room_message
+      parameters:
+      - name: message_id
+        in: path
+        description: ID of the message to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Delete a message
+          content:
+            text/plain:
+              schema:
+                type: integer
+                minimum: 0
+        '500':
+          description: Internal Server Error
+  "/watch-room-participants":
+    post:
+      tags:
+      - WatchRoomParticipants
+      operationId: create_watch_room_participant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NewWatchRoomParticipant"
+        required: true
+      responses:
+        '200':
+          description: Add a new participant to a watch room
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WatchRoomParticipant"
+        '500':
+          description: Internal Server Error
+  "/watch-room-participants/{participant_id}":
+    get:
+      tags:
+      - WatchRoomParticipants
+      operationId: get_watch_room_participant_by_id
+      parameters:
+      - name: participant_id
+        in: path
+        description: ID of the participant to retrieve
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Get a watch room participant by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WatchRoomParticipant"
+        '500':
+          description: Internal Server Error
+  "/watch-rooms":
+    post:
+      tags:
+      - WatchRooms
+      operationId: create_watch_room
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NewWatchRoom"
+        required: true
+      responses:
+        '200':
+          description: Create a new watch room
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WatchRoom"
+        '500':
+          description: Internal Server Error
+  "/watch-rooms/{room_id}":
+    get:
+      tags:
+      - WatchRooms
+      operationId: get_watch_room_by_id
+      parameters:
+      - name: room_id
+        in: path
+        description: UUID of the watch room to retrieve
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Get watch room by ID
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WatchRoom"
+        '500':
+          description: Internal Server Error
+    put:
+      tags:
+      - WatchRooms
+      operationId: update_watch_room
+      parameters:
+      - name: room_id
+        in: path
+        description: UUID of the room to update
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/UpdateWatchRoom"
+        required: true
+      responses:
+        '200':
+          description: Update an existing watch room
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/WatchRoom"
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+      - WatchRooms
+      operationId: delete_watch_room
+      parameters:
+      - name: room_id
+        in: path
+        description: UUID of the room to delete
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Delete a watch room
+          content:
+            text/plain:
+              schema:
+                type: integer
+                minimum: 0
+        '500':
+          description: Internal Server Error
+  "/watch-rooms/{room_id}/connect":
+    get:
+      tags:
+      - WatchRooms
+      operationId: connect_room
+      parameters:
+      - name: room_id
+        in: path
+        description: UUID of the room to connect to
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Connect to a watch room
+        '500':
+          description: Internal Server Error
+  "/watch-rooms/{room_id}/messages":
+    get:
+      tags:
+      - WatchRoomMessages
+      operationId: list_messages_by_room
+      parameters:
+      - name: room_id
+        in: path
+        description: UUID of the room whose messages to retrieve
+        required: true
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Max number of messages
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 50
+      - name: offset
+        in: query
+        description: Pagination offset
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 0
+      responses:
+        '200':
+          description: List messages by room
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/WatchRoomMessage"
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+      - WatchRoomMessages
+      operationId: delete_messages_by_room
+      parameters:
+      - name: room_id
+        in: path
+        description: UUID of the room whose messages to delete
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Delete all messages from a room
+          content:
+            text/plain:
+              schema:
+                type: integer
+                minimum: 0
+        '500':
+          description: Internal Server Error
+  "/watch-rooms/{room_id}/participants":
+    get:
+      tags:
+      - WatchRoomParticipants
+      operationId: list_participants_by_room
+      parameters:
+      - name: room_id
+        in: path
+        description: UUID of the room whose participants to retrieve
+        required: true
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Max number of participants
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 50
+      - name: offset
+        in: query
+        description: Pagination offset
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: 0
+      responses:
+        '200':
+          description: List participants by room
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/WatchRoomParticipant"
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+      - WatchRoomParticipants
+      operationId: delete_participants_by_room
+      parameters:
+      - name: room_id
+        in: path
+        description: UUID of the room whose participants to delete
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Delete all participants from a watch room
+          content:
+            text/plain:
+              schema:
+                type: integer
+                minimum: 0
+        '500':
+          description: Internal Server Error
+  "/watch-rooms/{room_id}/participants/{user_id}":
+    delete:
+      tags:
+      - WatchRoomParticipants
+      operationId: delete_watch_room_participant
+      parameters:
+      - name: room_id
+        in: path
+        description: UUID of the room
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: path
+        description: UUID of the participant to remove
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Delete a participant from a room
+          content:
+            text/plain:
+              schema:
+                type: integer
+                minimum: 0
+        '500':
+          description: Internal Server Error
+  "/watchlist":
+    post:
+      tags:
+      - Watchlist
+      operationId: create_watchlist_item
+      requestBody:
+        content:
+          application/json:
+            schema:
+              "$ref": "#/components/schemas/NewWatchlist"
+        required: true
+      responses:
+        '200':
+          description: Add a new item to the watchlist
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/Watchlist"
+        '500':
+          description: Internal Server Error
+components:
+  schemas:
+    MovieCrewDetail:
+      type: object
+      required:
+      - movie_id
+      - person
+      - person_id
+      properties:
+        billing_order:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        character_name:
+          type:
+          - string
+          - 'null'
+        movie_id:
+          type: string
+          format: uuid
+        person:
+          "$ref": "#/components/schemas/WrapperPerson"
+        person_id:
+          type: string
+          format: uuid
+    NewUser:
+      type: object
+      required:
+      - username
+      - email
+      - password_hash
+      properties:
+        country:
+          type:
+          - string
+          - 'null'
+        display_name:
+          type:
+          - string
+          - 'null'
+        email:
+          type: string
+        language_preference:
+          type:
+          - string
+          - 'null'
+        password_hash:
+          type: string
+        profile_picture_url:
+          type:
+          - string
+          - 'null'
+        username:
+          type: string
+    NewWatchHistory:
+      type: object
+      required:
+      - user_id
+      - content_id
+      properties:
+        completed:
+          type:
+          - boolean
+          - 'null'
+        content_id:
+          type: string
+          format: uuid
+        progress_seconds:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        user_id:
+          type: string
+          format: uuid
+    NewWatchRoom:
+      type: object
+      required:
+      - host_user_id
+      - content_id
+      properties:
+        content_id:
+          type: string
+          format: uuid
+        host_user_id:
+          type: string
+          format: uuid
+        invite_code:
+          type:
+          - string
+          - 'null'
+        is_private:
+          type:
+          - boolean
+          - 'null'
+        room_name:
+          type:
+          - string
+          - 'null'
+    NewWatchRoomMessage:
+      type: object
+      required:
+      - room_id
+      - message
+      properties:
+        is_system_message:
+          type:
+          - boolean
+          - 'null'
+        message:
+          type: string
+        room_id:
+          type: string
+          format: uuid
+        user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+    NewWatchRoomParticipant:
+      type: object
+      required:
+      - room_id
+      - user_id
+      properties:
+        is_host:
+          type:
+          - boolean
+          - 'null'
+        room_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+    NewWatchlist:
+      type: object
+      required:
+      - user_id
+      - content_id
+      properties:
+        content_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+    UpdateUser:
+      type: object
+      properties:
+        country:
+          type:
+          - string
+          - 'null'
+        display_name:
+          type:
+          - string
+          - 'null'
+        language_preference:
+          type:
+          - string
+          - 'null'
+        profile_picture_url:
+          type:
+          - string
+          - 'null'
+        status:
+          type:
+          - string
+          - 'null'
+    UpdateWatchHistory:
+      type: object
+      properties:
+        completed:
+          type:
+          - boolean
+          - 'null'
+        progress_seconds:
+          type:
+          - integer
+          - 'null'
+          format: int32
+    UpdateWatchRoom:
+      type: object
+      properties:
+        current_time_seconds:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        is_live:
+          type:
+          - boolean
+          - 'null'
+    User:
+      type: object
+      required:
+      - id
+      - username
+      - email
+      - password_hash
+      - display_name
+      - created_at
+      properties:
+        country:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+          format: date-time
+        display_name:
+          type: string
+        email:
+          type: string
+        id:
+          type: string
+          format: uuid
+        language_preference:
+          type:
+          - string
+          - 'null'
+        last_login_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        password_hash:
+          type: string
+        profile_picture_url:
+          type:
+          - string
+          - 'null'
+        status:
+          type:
+          - string
+          - 'null'
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        username:
+          type: string
+    WatchHistory:
+      type: object
+      required:
+      - id
+      - user_id
+      - content_id
+      properties:
+        completed:
+          type:
+          - boolean
+          - 'null'
+        content_id:
+          type: string
+          format: uuid
+        id:
+          type: integer
+          format: int64
+        last_watched_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        progress_seconds:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        user_id:
+          type: string
+          format: uuid
+    WatchRoom:
+      type: object
+      required:
+      - id
+      - host_user_id
+      - content_id
+      - is_private
+      - created_at
+      properties:
+        content_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        current_time_seconds:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        host_user_id:
+          type: string
+          format: uuid
+        id:
+          type: string
+          format: uuid
+        invite_code:
+          type:
+          - string
+          - 'null'
+        is_live:
+          type:
+          - boolean
+          - 'null'
+        is_private:
+          type: boolean
+        room_name:
+          type:
+          - string
+          - 'null'
+        updated_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+    WatchRoomMessage:
+      type: object
+      required:
+      - id
+      - room_id
+      - message
+      properties:
+        id:
+          type: integer
+          format: int64
+        is_system_message:
+          type:
+          - boolean
+          - 'null'
+        message:
+          type: string
+        room_id:
+          type: string
+          format: uuid
+        sent_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        user_id:
+          type:
+          - string
+          - 'null'
+          format: uuid
+    WatchRoomParticipant:
+      type: object
+      required:
+      - id
+      - room_id
+      - user_id
+      properties:
+        id:
+          type: integer
+          format: int64
+        is_host:
+          type:
+          - boolean
+          - 'null'
+        joined_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        last_active_at:
+          type:
+          - string
+          - 'null'
+          format: date-time
+        room_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+    Watchlist:
+      type: object
+      required:
+      - id
+      - user_id
+      - content_id
+      - created_at
+      properties:
+        content_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int64
+        user_id:
+          type: string
+          format: uuid
+    WrapperGenre:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+    WrapperMovie:
+      type: object
+      required:
+      - created_at
+      - id
+      - slug
+      - title
+      - updated_at
+      properties:
+        created_at:
+          type: string
+        description:
+          type:
+          - string
+          - 'null'
+        duration_minutes:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        id:
+          type: string
+          format: uuid
+        mpaa_rating:
+          type:
+          - string
+          - 'null'
+        release_date:
+          type:
+          - string
+          - 'null'
+        slug:
+          type: string
+        title:
+          type: string
+        updated_at:
+          type: string
+    WrapperMovieDetail:
+      type: object
+      required:
+      - id
+      - title
+      - slug
+      - created_at
+      - updated_at
+      - people
+      - genres
+      - reviews
+      properties:
+        created_at:
+          type: string
+          format: date-time
+        description:
+          type:
+          - string
+          - 'null'
+        duration_minutes:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        genres:
+          type: array
+          items:
+            "$ref": "#/components/schemas/WrapperGenre"
+        id:
+          type: string
+          format: uuid
+        mpaa_rating:
+          type:
+          - string
+          - 'null'
+        people:
+          type: array
+          items:
+            "$ref": "#/components/schemas/MovieCrewDetail"
+        release_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        reviews:
+          type: array
+          items:
+            "$ref": "#/components/schemas/WrapperReview"
+        slug:
+          type: string
+        title:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+    WrapperNewMovie:
+      type: object
+      required:
+      - slug
+      - title
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+        duration_minutes:
+          type:
+          - integer
+          - 'null'
+          format: int32
+        mpaa_rating:
+          type:
+          - string
+          - 'null'
+        release_date:
+          type:
+          - string
+          - 'null'
+        slug:
+          type: string
+        title:
+          type: string
+    WrapperNewPerson:
+      type: object
+      required:
+      - first_name
+      - last_name
+      properties:
+        bio:
+          type:
+          - string
+          - 'null'
+        birth_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        first_name:
+          type: string
+        last_name:
+          type: string
+        role:
+          type:
+          - string
+          - 'null'
+    WrapperNewReview:
+      type: object
+      required:
+      - movie_id
+      - user_id
+      - rating
+      - user_name
+      properties:
+        body:
+          type:
+          - string
+          - 'null'
+        movie_id:
+          type: string
+          format: uuid
+        rating:
+          type: integer
+          format: int32
+        title:
+          type:
+          - string
+          - 'null'
+        user_id:
+          type: string
+          format: uuid
+        user_name:
+          type: string
+    WrapperPerson:
+      type: object
+      required:
+      - id
+      - first_name
+      - last_name
+      - created_at
+      properties:
+        bio:
+          type:
+          - string
+          - 'null'
+        birth_date:
+          type:
+          - string
+          - 'null'
+          format: date
+        created_at:
+          type: string
+          format: date-time
+        first_name:
+          type: string
+        id:
+          type: string
+          format: uuid
+        last_name:
+          type: string
+        role:
+          type:
+          - string
+          - 'null'
+    WrapperReview:
+      type: object
+      required:
+      - created_at
+      - id
+      - movie_id
+      - user_id
+      - rating
+      - user_name
+      properties:
+        body:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+        id:
+          type: string
+          format: uuid
+        movie_id:
+          type: string
+          format: uuid
+        rating:
+          type: integer
+          format: int32
+        title:
+          type:
+          - string
+          - 'null'
+        user_id:
+          type: string
+          format: uuid
+        user_name:
+          type: string

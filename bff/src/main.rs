@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use actix_cors::Cors;
 use actix_multipart::form::MultipartFormConfig;
 use actix_web::middleware::Logger;
 use actix_web::{App, HttpServer};
@@ -30,10 +31,7 @@ struct ApiDoc;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    std::env::set_var(
-        "RUST_LOG",
-        "info",
-    );
+    std::env::set_var("RUST_LOG", "info");
     dotenv().ok();
     env_logger::init();
 
@@ -64,6 +62,12 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         let app = App::new()
             .wrap(Logger::new("%a \"%r\" %s %b \"%{User-Agent}i\" %T")) // ✅ proper placement
+            .wrap(
+                Cors::default()
+                    .allow_any_origin()
+                    .allow_any_method()
+                    .allow_any_header(),
+            )
             .app_data(
                 MultipartFormConfig::default()
                     .total_limit(10 * 1024 * 1024 * 1024) // 10 GB
