@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 **created_at** | **string** |  | [default to undefined]
 **first_name** | **string** |  | [default to undefined]
 **id** | **string** |  | [default to undefined]
+**image_url** | **string** |  | [optional] [default to undefined]
 **last_name** | **string** |  | [default to undefined]
 **role** | **string** |  | [optional] [default to undefined]
 
@@ -24,6 +25,7 @@ const instance: WrapperPerson = {
     created_at,
     first_name,
     id,
+    image_url,
     last_name,
     role,
 };

@@ -10,9 +10,10 @@ Name | Type | Description | Notes
 **genre_ids** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
 **mpaa_rating** | **string** |  | [optional] [default to undefined]
 **people_ids** | [**Array&lt;WrapperMovieCrew&gt;**](WrapperMovieCrew.md) |  | [optional] [default to undefined]
+**poster_url** | **string** |  | [optional] [default to undefined]
 **release_date** | **string** |  | [optional] [default to undefined]
-**slug** | **string** |  | [default to undefined]
 **title** | **string** |  | [default to undefined]
+**video_url** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -25,9 +26,10 @@ const instance: WrapperNewMovie = {
     genre_ids,
     mpaa_rating,
     people_ids,
+    poster_url,
     release_date,
-    slug,
     title,
+    video_url,
 };
 ```
 

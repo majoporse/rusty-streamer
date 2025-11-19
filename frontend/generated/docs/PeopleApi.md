@@ -9,7 +9,7 @@ All URIs are relative to *http://localhost*
 |[**getAllPeople**](#getallpeople) | **GET** /people | |
 |[**getPersonById**](#getpersonbyid) | **GET** /people/{person_id} | |
 |[**getPersonByMovieId**](#getpersonbymovieid) | **GET** /people/movie/{movie_id} | |
-|[**getPersonByName**](#getpersonbyname) | **GET** /search/people/name/{name} | |
+|[**getPersonByName**](#getpersonbyname) | **GET** /search/people/name | |
 |[**updatePerson**](#updateperson) | **PUT** /people/{person_id} | |
 
 # **createPerson**

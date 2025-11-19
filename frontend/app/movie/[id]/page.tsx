@@ -1,15 +1,14 @@
 "use client";
 
-import VideoPlayer from "@/components/VideoPlayer";
-import MovieDetail from "@/components/MovieDetail";
-import PeopleList from "@/components/PeopleList";
+import MovieDetail from "@/app/movie/[id]/MovieDetail";
+import PeopleList from "@/app/movie/[id]/PeopleList";
 import { MoviesApi, WrapperMovieDetail, Configuration } from "@/generated";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { AxiosConfig } from "@/app/layout";
 import { TypographyH1, TypographyP } from "@/components/ui/typo";
 import { Separator } from "@radix-ui/react-separator";
-import { Skeleton } from "@/components/ui/skeleton";
+import { VideoPlayer } from "@/components/VideoPlayer";
 
 type MoviePageProps = {
   params: Promise<{
@@ -18,7 +17,6 @@ type MoviePageProps = {
 };
 
 export default function MoviePage({ params }: MoviePageProps) {
-
   const { id: movieId } = React.use(params);
 
   const fetchMovie = async () => {
@@ -38,11 +36,18 @@ export default function MoviePage({ params }: MoviePageProps) {
 
   return (
     <div className="flex flex-col p-6 w-full justify-center items-center">
-      <TypographyH1 str={movie?.title ?? "Untitled"} />
-      <Separator className="my-10" />
+      <p className="scroll-m-20 text-center text-6xl font-extrabold tracking-tight text-balance mb-5">
+        {movie?.title ?? "Untitled"}
+      </p>
       <MovieDetail movie={movie as any} loading={isLoading} />
       <Separator className="my-10" />
-      <VideoPlayer src="https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8" />
+      {movie && (
+        <VideoPlayer
+          src={movie?.video_url!}
+          posterSrc={movie?.poster_url ?? ""}
+          className="w-full rounded-xl"
+        />
+      )}
     </div>
   );
 }

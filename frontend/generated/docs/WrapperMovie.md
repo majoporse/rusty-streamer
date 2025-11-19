@@ -10,10 +10,11 @@ Name | Type | Description | Notes
 **duration_minutes** | **number** |  | [optional] [default to undefined]
 **id** | **string** |  | [default to undefined]
 **mpaa_rating** | **string** |  | [optional] [default to undefined]
+**poster_url** | **string** |  | [optional] [default to undefined]
 **release_date** | **string** |  | [optional] [default to undefined]
-**slug** | **string** |  | [default to undefined]
 **title** | **string** |  | [default to undefined]
 **updated_at** | **string** |  | [default to undefined]
+**video_url** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -26,10 +27,11 @@ const instance: WrapperMovie = {
     duration_minutes,
     id,
     mpaa_rating,
+    poster_url,
     release_date,
-    slug,
     title,
     updated_at,
+    video_url,
 };
 ```
 

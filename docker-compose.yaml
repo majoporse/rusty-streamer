@@ -7,7 +7,12 @@ services:
     restart: always
     volumes:
       - azurite_data:/data
-    command: "azurite --blobHost 0.0.0.0 --loose -l /data"
+    command: >
+      azurite
+      --loose
+      --blobHost 0.0.0.0
+      --location /data
+
     ports:
       - "10000:10000"
       - "10001:10001"

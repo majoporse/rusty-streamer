@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **bio** | **string** |  | [optional] [default to undefined]
 **birth_date** | **string** |  | [optional] [default to undefined]
 **first_name** | **string** |  | [default to undefined]
+**image_url** | **string** |  | [optional] [default to undefined]
 **last_name** | **string** |  | [default to undefined]
 **role** | **string** |  | [optional] [default to undefined]
 
@@ -20,6 +21,7 @@ const instance: WrapperNewPerson = {
     bio,
     birth_date,
     first_name,
+    image_url,
     last_name,
     role,
 };

@@ -1,13 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
-import { useDebounce } from "use-debounce";
-// using simple labels instead of shadcn Label here
 import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,8 +13,6 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 import {
   MoviesApi,
@@ -25,6 +21,8 @@ import {
   WrapperGenre,
   WrapperPerson,
   WrapperMovieCrew,
+  GenresApi,
+  UploadsApi,
 } from "@/generated";
 import { AxiosConfig } from "@/app/layout";
 import {
@@ -41,7 +39,10 @@ import {
   DropzoneContent,
   DropzoneEmptyState,
 } from "@/components/ui/shadcn-io/dropzone";
-import { Label } from "@radix-ui/react-dropdown-menu";
+import { Textarea } from "@/components/ui/textarea";
+import GenresSelector from "./GenresSelector";
+import PeopleSelector from "./PeopleSelector";
+import { uploadAzureSas } from "./azureUpload";
 
 const movieSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -55,6 +56,8 @@ const movieSchema = z.object({
 type FormValues = z.infer<typeof movieSchema> & {
   // we'll track selected genre ids separately
 };
+
+export type PersonCharacter = WrapperPerson & { role: string };
 
 export default function UploadMoviePage() {
   const form = useForm<FormValues>({
@@ -71,9 +74,10 @@ export default function UploadMoviePage() {
   // image preview
   const [imageFile, setImageFile] = useState<File[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [movieFile, setMovieFile] = useState<File[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
-  // create object URL for preview when files change
-  React.useEffect(() => {
+  useEffect(() => {
     if (imageFile && imageFile.length > 0) {
       const file = imageFile[0];
       const url = URL.createObjectURL(file);
@@ -87,46 +91,93 @@ export default function UploadMoviePage() {
     return;
   }, [imageFile]);
 
-  const [selectedPeople, setSelectedPeople] = useState<WrapperPerson[]>([]);
+  const [selectedPeople, setSelectedPeople] = useState<PersonCharacter[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<WrapperGenre[]>([]);
 
   async function onSubmit(values: FormValues) {
-    // Build WrapperNewMovie
     const wrapper: WrapperNewMovie = {
       title: values.title,
-      // coerce optional fields to strings or undefined as the API expects
-      slug: values.slug ?? "",
-      description: values.description ?? "",
-      release_date: values.release_date ?? "",
-      mpaa_rating: values.mpaa_rating ?? "",
-      duration_minutes: values.duration_minutes ?? undefined,
-      genre_ids: selectedGenres.length ? selectedGenres : undefined,
-      people_ids: selectedPeople.map(
-        (pid, idx) => ({ person_id: pid, billing_order: idx + 1 } as any)
-      ),
+      video_url: undefined,
+      poster_url: undefined,
+      description: values.description,
+      release_date: values.release_date,
+      mpaa_rating: values.mpaa_rating,
+      duration_minutes: values.duration_minutes,
+      genre_ids: selectedGenres.map((g) => g.id),
+      people_ids: selectedPeople.map((person, idx) => {
+        return {
+          person_id: person.id,
+          role: person.role,
+          billing_order: idx,
+        } as WrapperMovieCrew;
+      }),
     };
 
     try {
       const api = new MoviesApi(AxiosConfig);
+      const azure_api = new UploadsApi(AxiosConfig);
+
+      // upload image if exists (small, optional progress)
+      if (imageFile.length > 0) {
+        const imgUrl = await azure_api.requestUploadSas({
+          filename: imageFile[0].name,
+        });
+        console.log("upload url", imgUrl.data);
+        setUploadProgress(0);
+        await uploadAzureSas(
+          imageFile[0],
+          imgUrl.data.upload_url,
+          (_loaded, _total, percent) => {
+            setUploadProgress(percent);
+          }
+        );
+        setUploadProgress(null);
+
+        wrapper.poster_url = imgUrl.data.blob_url;
+      }
+
+      // upload video with progress
+      if (movieFile.length > 0) {
+        const url = await azure_api.requestUploadSas({
+          filename: movieFile[0].name,
+        });
+        console.log("upload url", url.data);
+
+        setUploadProgress(0);
+        await uploadAzureSas(
+          movieFile[0],
+          url.data.upload_url,
+          (_loaded, _total, percent) => {
+            setUploadProgress(percent);
+          }
+        );
+        setUploadProgress(null);
+
+        wrapper.video_url = url.data.blob_url;
+      }
+
       const resp = await api.createMovie(wrapper);
       console.log("created", resp.data);
-      // reset form
+
       form.reset();
       setSelectedPeople([]);
+      setSelectedGenres([]);
       setImageFile([]);
+      setMovieFile([]);
       setPreviewUrl(null);
       alert(
         "Movie created (check console). If you need to upload a poster, use the posters endpoint or attach via admin."
       );
     } catch (err) {
       console.error(err);
+      setUploadProgress(null);
       alert("Error creating movie — see console.");
     }
   }
 
   return (
-    <main className="p-6">
-      <Card>
+    <main className="flex justify-center items-center w-full p-5">
+      <Card className="w-full md:max-w-250">
         <CardHeader>
           <h2 className="text-xl font-semibold">Upload New Movie</h2>
         </CardHeader>
@@ -179,10 +230,7 @@ export default function UploadMoviePage() {
                         <FormItem>
                           <FormLabel>Description</FormLabel>
                           <FormControl>
-                            <textarea
-                              {...field}
-                              className="w-full min-h-32 rounded-md border border-input px-3 py-2 bg-transparent"
-                            />
+                            <Textarea {...field} className="max-h-40 " />
                           </FormControl>
                           <FormDescription>
                             Optional description for the movie.
@@ -241,7 +289,7 @@ export default function UploadMoviePage() {
                   </label>
                   <Dropzone
                     accept={{ "image/*": [] }}
-                    maxFiles={10}
+                    maxFiles={1}
                     maxSize={1024 * 1024 * 10}
                     minSize={1024}
                     onDrop={setImageFile}
@@ -271,11 +319,33 @@ export default function UploadMoviePage() {
                 </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4 mt-4 items-stretch w-full">
-                <GenresSelector
-                  selectedGenres={selectedGenres}
-                  setSelectedGenres={setSelectedGenres}
-                />
+              <div className="grid md:grid-cols-2 gap-4 mt-4 w-full">
+                <div>
+                  <GenresSelector
+                    selectedGenres={selectedGenres}
+                    setSelectedGenres={setSelectedGenres}
+                  />
+                  <Dropzone
+                    accept={{ "video/*": [] }}
+                    maxFiles={1}
+                    // maxSize={1024 * 1024 * 10}
+                    minSize={1024}
+                    onDrop={setMovieFile}
+                    onError={console.error}
+                  >
+                    <DropzoneEmptyState />
+                    <DropzoneContent />
+                  </Dropzone>
+                  {uploadProgress !== null && (
+                    <div className="mt-2">
+                      <Progress value={uploadProgress} className="w-full" />
+                      <div className="text-xs text-muted-foreground mt-1">
+                        Uploading... {uploadProgress}%
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 <PeopleSelector
                   selectedPeople={selectedPeople}
                   setSelectedPeople={setSelectedPeople}
@@ -291,245 +361,3 @@ export default function UploadMoviePage() {
     </main>
   );
 }
-
-function GenresSelector({
-  selectedGenres,
-  setSelectedGenres,
-}: {
-  selectedGenres: WrapperGenre[];
-  setSelectedGenres: React.Dispatch<React.SetStateAction<WrapperGenre[]>>;
-}) {
-  const {
-    data: genres = [],
-    isLoading: genresLoading,
-    isError: genresError,
-  } = useQuery<WrapperGenre[]>({
-    queryKey: ["genres"],
-    queryFn: async () => {
-      let api = new MoviesApi(AxiosConfig);
-      return [];
-    },
-  });
-
-  return (
-    <div className="flex flex-col w-full">
-      <div>
-        <label className="block text-sm font-medium mb-1">Genres</label>
-        <Card className="overflow-y-auto p-5 h-40">
-          {genresLoading ? (
-            <Skeleton className="h-full" />
-          ) : genresError ? (
-            <div className="text-sm text-destructive">
-              Failed to load genres
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {genres?.map((g) => (
-                <GenreCard
-                  key={g.id}
-                  genre={g}
-                  selected={selectedGenres.includes(g)}
-                  toggle={(genre) => {
-                    if (selectedGenres.includes(genre))
-                      setSelectedGenres((prev) =>
-                        prev.filter((x) => x !== genre)
-                      );
-                    else setSelectedGenres((prev) => [...prev, genre]);
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </Card>
-      </div>
-
-      <div>
-        <Label className="text-sm">Selected Genres</Label>
-        <Card className="overflow-y-auto p-5 h-40">
-          {selectedGenres.map((genre) => (
-            <GenreCard
-              key={genre.id}
-              genre={genre}
-              selected={true}
-              toggle={(g) => {
-                setSelectedGenres((prev) => prev.filter((x) => x !== g));
-              }}
-            />
-          ))}
-        </Card>
-      </div>
-    </div>
-  );
-}
-
-function PeopleSelector({
-  selectedPeople,
-  setSelectedPeople,
-}: {
-  selectedPeople: WrapperPerson[];
-  setSelectedPeople: React.Dispatch<React.SetStateAction<WrapperPerson[]>>;
-}) {
-  const [q, setQ] = React.useState("");
-  const [debouncedQ] = useDebounce(q, 300);
-
-  const pageSize = 3;
-
-  const {
-    data,
-    isLoading: peopleLoading,
-    isError: peopleError,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["people", debouncedQ],
-    queryFn: async ({ pageParam = 0 }: any) => {
-      let api = new PeopleApi(AxiosConfig);
-      let res = await api.getPersonByName(debouncedQ, pageSize, pageParam);
-      let resData = res.data || [];
-
-      return {
-        items: resData,
-        nextOffset:
-          resData.length === pageSize
-            ? (pageParam as number) + pageSize
-            : undefined,
-      };
-    },
-    getNextPageParam: (last: any) => last.nextOffset,
-    initialPageParam: 0,
-  });
-
-  function toggle(person: WrapperPerson) {
-    if (selectedPeople.includes(person))
-      setSelectedPeople((prev) => prev.filter((x) => x !== person));
-    else setSelectedPeople((prev) => [...prev, person]);
-  }
-
-  return (
-    <div className="flex flex-col">
-      <label className="block text-sm font-medium mb-1">Actors</label>
-      <input
-        type="text"
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="Search actors..."
-        className="mb-2 w-full rounded-md border border-input px-3 py-2 bg-transparent"
-      />
-
-      <Card className="overflow-y-auto p-5 h-40">
-        {/* people selector */}
-        {peopleLoading ? (
-          <Skeleton className="w-full h-full" />
-        ) : peopleError ? (
-          <div className="flex place-items-center text-center w-full h-full text-sm text-destructive">
-            Failed to load people
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {data?.pages
-              .flatMap((page) => page.items)
-              .map((p) => (
-                <PersonCard
-                  key={p.id}
-                  person={p}
-                  selected={selectedPeople.includes(p)}
-                  toggle={toggle}
-                />
-              ))}
-          </div>
-        )}
-      </Card>
-
-      <div className="flex items-center gap-2 mt-2">
-        <Button
-          type="button"
-          className="text-sm text-primary underline"
-          variant="secondary"
-          onClick={() => fetchNextPage?.()}
-          disabled={!hasNextPage || isFetchingNextPage}
-        >
-          {isFetchingNextPage
-            ? "Loading..."
-            : hasNextPage
-            ? "Load more"
-            : "No more"}
-        </Button>
-      </div>
-
-      <div>
-        {/* selected people */}
-        <label className="block text-sm font-medium mb-1">
-          Selected Actors
-        </label>
-        <Card className="p-5 my-2 overflow-auto h-40 grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {selectedPeople.map((person) => (
-            <PersonCard
-              key={person.id}
-              person={person}
-              selected={true}
-              toggle={toggle}
-            />
-          ))}
-        </Card>
-      </div>
-    </div>
-  );
-}
-
-const PersonCard = ({
-  person,
-  selected,
-  toggle,
-}: {
-  person: WrapperPerson;
-  selected: boolean;
-  toggle: (person: WrapperPerson) => void;
-}) => (
-  <Button
-    variant="outline"
-    key={person.id}
-    type="button"
-    onClick={() => toggle(person)}
-    className={`flex place-items-center transition-shadow duration-150 ${
-      selected ? "border-primary ring-2 ring-primary" : "border-neutral-200"
-    }`}
-  >
-    {/* <div className="flex-0 w-10 h-10 bg-neutral-100 rounded-md overflow-hidden">
-      {person.imageUrl ? (
-        <img
-          src={(p as any).photo_url ?? (p as any).image}
-          alt={person.first_name}
-          className="w-full h-full object-cover"
-        />
-      ) : (
-      <div className="w-full h-full bg-neutral-200" />
-      )}
-    </div> */}
-    <div className="truncate">
-      {person.first_name + " " + person.last_name || "Unknown"}
-    </div>
-  </Button>
-);
-
-const GenreCard = ({
-  genre,
-  selected,
-  toggle,
-}: {
-  genre: WrapperGenre;
-  selected: boolean;
-  toggle: (genre: WrapperGenre) => void;
-}) => (
-  <Button
-    variant="outline"
-    key={genre.id}
-    type="button"
-    onClick={() => toggle(genre)}
-    className={`flex place-items-center transition-shadow duration-150 ${
-      selected ? "border-primary ring-2 ring-primary" : "border-neutral-200"
-    }`}
-  >
-    <div className="truncate">{genre.name || "Unknown"}</div>
-  </Button>
-);

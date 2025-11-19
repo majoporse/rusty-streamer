@@ -82,6 +82,34 @@ export interface UpdateWatchRoom {
     'current_time_seconds'?: number | null;
     'is_live'?: boolean | null;
 }
+export interface UploadSasRequest {
+    /**
+     * MIME content type
+     */
+    'content_type'?: string | null;
+    /**
+     * original filename (including extension)
+     */
+    'filename': string;
+    /**
+     * kind of upload, e.g. \"video\" or \"poster\"
+     */
+    'kind'?: string | null;
+}
+export interface UploadSasResponse {
+    /**
+     * canonical blob URL (without SAS) for later reference
+     */
+    'blob_url': string;
+    /**
+     * optional expiration timestamp for the upload URL
+     */
+    'expires_at'?: string | null;
+    /**
+     * full URL suitable for uploading (may include SAS token)
+     */
+    'upload_url': string;
+}
 export interface User {
     'country'?: string | null;
     'created_at': string;
@@ -148,16 +176,16 @@ export interface WrapperMovie {
     'duration_minutes'?: number | null;
     'id': string;
     'mpaa_rating'?: string | null;
+    'poster_url'?: string | null;
     'release_date'?: string | null;
-    'slug': string;
     'title': string;
     'updated_at': string;
+    'video_url'?: string | null;
 }
 export interface WrapperMovieCrew {
     'billing_order'?: number | null;
-    'character_name'?: string | null;
-    'movie_id': string;
     'person_id': string;
+    'role'?: string | null;
 }
 export interface WrapperMovieDetail {
     'created_at': string;
@@ -167,11 +195,15 @@ export interface WrapperMovieDetail {
     'id': string;
     'mpaa_rating'?: string | null;
     'people': Array<MovieCrewDetail>;
+    'poster_url'?: string | null;
     'release_date'?: string | null;
     'reviews': Array<WrapperReview>;
-    'slug': string;
     'title': string;
     'updated_at': string;
+    'video_url'?: string | null;
+}
+export interface WrapperNewGenre {
+    'name': string;
 }
 export interface WrapperNewMovie {
     'description'?: string | null;
@@ -179,14 +211,16 @@ export interface WrapperNewMovie {
     'genre_ids'?: Array<string> | null;
     'mpaa_rating'?: string | null;
     'people_ids'?: Array<WrapperMovieCrew> | null;
+    'poster_url'?: string | null;
     'release_date'?: string | null;
-    'slug': string;
     'title': string;
+    'video_url'?: string | null;
 }
 export interface WrapperNewPerson {
     'bio'?: string | null;
     'birth_date'?: string | null;
     'first_name': string;
+    'image_url'?: string | null;
     'last_name': string;
     'role'?: string | null;
 }
@@ -204,6 +238,7 @@ export interface WrapperPerson {
     'created_at': string;
     'first_name': string;
     'id': string;
+    'image_url'?: string | null;
     'last_name': string;
     'role'?: string | null;
 }
@@ -217,6 +252,383 @@ export interface WrapperReview {
     'user_id': string;
     'user_name': string;
 }
+
+/**
+ * GenresApi - axios parameter creator
+ */
+export const GenresApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {WrapperNewGenre} wrapperNewGenre 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createGenre: async (wrapperNewGenre: WrapperNewGenre, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'wrapperNewGenre' is not null or undefined
+            assertParamExists('createGenre', 'wrapperNewGenre', wrapperNewGenre)
+            const localVarPath = `/genres`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(wrapperNewGenre, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} genreId ID of the genre to delete
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteGenre: async (genreId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'genreId' is not null or undefined
+            assertParamExists('deleteGenre', 'genreId', genreId)
+            const localVarPath = `/genres/{genre_id}`
+                .replace(`{${"genre_id"}}`, encodeURIComponent(String(genreId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} genreId ID of the genre to retrieve
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getGenreById: async (genreId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'genreId' is not null or undefined
+            assertParamExists('getGenreById', 'genreId', genreId)
+            const localVarPath = `/genres/{genre_id}`
+                .replace(`{${"genre_id"}}`, encodeURIComponent(String(genreId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {number} limit Max number of genres to return
+         * @param {number} offset Pagination offset
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listGenres: async (limit: number, offset: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'limit' is not null or undefined
+            assertParamExists('listGenres', 'limit', limit)
+            // verify required parameter 'offset' is not null or undefined
+            assertParamExists('listGenres', 'offset', offset)
+            const localVarPath = `/genres`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} genreId ID of the genre to update
+         * @param {WrapperNewGenre} wrapperNewGenre 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateGenre: async (genreId: string, wrapperNewGenre: WrapperNewGenre, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'genreId' is not null or undefined
+            assertParamExists('updateGenre', 'genreId', genreId)
+            // verify required parameter 'wrapperNewGenre' is not null or undefined
+            assertParamExists('updateGenre', 'wrapperNewGenre', wrapperNewGenre)
+            const localVarPath = `/genres/{genre_id}`
+                .replace(`{${"genre_id"}}`, encodeURIComponent(String(genreId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(wrapperNewGenre, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * GenresApi - functional programming interface
+ */
+export const GenresApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = GenresApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {WrapperNewGenre} wrapperNewGenre 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createGenre(wrapperNewGenre: WrapperNewGenre, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WrapperGenre>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createGenre(wrapperNewGenre, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['GenresApi.createGenre']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} genreId ID of the genre to delete
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteGenre(genreId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<number>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteGenre(genreId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['GenresApi.deleteGenre']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} genreId ID of the genre to retrieve
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getGenreById(genreId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WrapperGenre>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getGenreById(genreId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['GenresApi.getGenreById']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {number} limit Max number of genres to return
+         * @param {number} offset Pagination offset
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listGenres(limit: number, offset: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<WrapperGenre>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listGenres(limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['GenresApi.listGenres']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} genreId ID of the genre to update
+         * @param {WrapperNewGenre} wrapperNewGenre 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateGenre(genreId: string, wrapperNewGenre: WrapperNewGenre, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WrapperGenre>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateGenre(genreId, wrapperNewGenre, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['GenresApi.updateGenre']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * GenresApi - factory interface
+ */
+export const GenresApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = GenresApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {WrapperNewGenre} wrapperNewGenre 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createGenre(wrapperNewGenre: WrapperNewGenre, options?: RawAxiosRequestConfig): AxiosPromise<WrapperGenre> {
+            return localVarFp.createGenre(wrapperNewGenre, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} genreId ID of the genre to delete
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteGenre(genreId: string, options?: RawAxiosRequestConfig): AxiosPromise<number> {
+            return localVarFp.deleteGenre(genreId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} genreId ID of the genre to retrieve
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getGenreById(genreId: string, options?: RawAxiosRequestConfig): AxiosPromise<WrapperGenre> {
+            return localVarFp.getGenreById(genreId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {number} limit Max number of genres to return
+         * @param {number} offset Pagination offset
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listGenres(limit: number, offset: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<WrapperGenre>> {
+            return localVarFp.listGenres(limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} genreId ID of the genre to update
+         * @param {WrapperNewGenre} wrapperNewGenre 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateGenre(genreId: string, wrapperNewGenre: WrapperNewGenre, options?: RawAxiosRequestConfig): AxiosPromise<WrapperGenre> {
+            return localVarFp.updateGenre(genreId, wrapperNewGenre, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * GenresApi - object-oriented interface
+ */
+export class GenresApi extends BaseAPI {
+    /**
+     * 
+     * @param {WrapperNewGenre} wrapperNewGenre 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createGenre(wrapperNewGenre: WrapperNewGenre, options?: RawAxiosRequestConfig) {
+        return GenresApiFp(this.configuration).createGenre(wrapperNewGenre, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} genreId ID of the genre to delete
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteGenre(genreId: string, options?: RawAxiosRequestConfig) {
+        return GenresApiFp(this.configuration).deleteGenre(genreId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} genreId ID of the genre to retrieve
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getGenreById(genreId: string, options?: RawAxiosRequestConfig) {
+        return GenresApiFp(this.configuration).getGenreById(genreId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} limit Max number of genres to return
+     * @param {number} offset Pagination offset
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listGenres(limit: number, offset: number, options?: RawAxiosRequestConfig) {
+        return GenresApiFp(this.configuration).listGenres(limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} genreId ID of the genre to update
+     * @param {WrapperNewGenre} wrapperNewGenre 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateGenre(genreId: string, wrapperNewGenre: WrapperNewGenre, options?: RawAxiosRequestConfig) {
+        return GenresApiFp(this.configuration).updateGenre(genreId, wrapperNewGenre, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
 
 /**
  * MoviesApi - axios parameter creator
@@ -1020,8 +1432,7 @@ export const PeopleApiAxiosParamCreator = function (configuration?: Configuratio
             assertParamExists('getPersonByName', 'limit', limit)
             // verify required parameter 'offset' is not null or undefined
             assertParamExists('getPersonByName', 'offset', offset)
-            const localVarPath = `/search/people/name/{name}`
-                .replace(`{${"name"}}`, encodeURIComponent(String(name)));
+            const localVarPath = `/search/people/name`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1032,6 +1443,10 @@ export const PeopleApiAxiosParamCreator = function (configuration?: Configuratio
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (name !== undefined) {
+                localVarQueryParameter['name'] = name;
+            }
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -1710,6 +2125,105 @@ export class ReviewsApi extends BaseAPI {
      */
     public updateReview(reviewId: number, wrapperNewReview: WrapperNewReview, options?: RawAxiosRequestConfig) {
         return ReviewsApiFp(this.configuration).updateReview(reviewId, wrapperNewReview, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * UploadsApi - axios parameter creator
+ */
+export const UploadsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @param {UploadSasRequest} uploadSasRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        requestUploadSas: async (uploadSasRequest: UploadSasRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'uploadSasRequest' is not null or undefined
+            assertParamExists('requestUploadSas', 'uploadSasRequest', uploadSasRequest)
+            const localVarPath = `/uploads/request-sas`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(uploadSasRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * UploadsApi - functional programming interface
+ */
+export const UploadsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = UploadsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @param {UploadSasRequest} uploadSasRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async requestUploadSas(uploadSasRequest: UploadSasRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UploadSasResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.requestUploadSas(uploadSasRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UploadsApi.requestUploadSas']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * UploadsApi - factory interface
+ */
+export const UploadsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = UploadsApiFp(configuration)
+    return {
+        /**
+         * 
+         * @param {UploadSasRequest} uploadSasRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        requestUploadSas(uploadSasRequest: UploadSasRequest, options?: RawAxiosRequestConfig): AxiosPromise<UploadSasResponse> {
+            return localVarFp.requestUploadSas(uploadSasRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * UploadsApi - object-oriented interface
+ */
+export class UploadsApi extends BaseAPI {
+    /**
+     * 
+     * @param {UploadSasRequest} uploadSasRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public requestUploadSas(uploadSasRequest: UploadSasRequest, options?: RawAxiosRequestConfig) {
+        return UploadsApiFp(this.configuration).requestUploadSas(uploadSasRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

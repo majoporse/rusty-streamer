@@ -3,8 +3,8 @@
 import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { WrapperMovieDetail } from "@/generated";
-import Example, { StarRating } from "./StarRating";
-import { TypographyH2, TypographyP } from "./ui/typo";
+import Example, { StarRating } from "../../../components/StarRating";
+import { TypographyH2, TypographyP } from "../../../components/ui/typo";
 import {
   Card,
   CardContent,
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@radix-ui/react-separator";
 import PeopleList from "./PeopleList";
-import { Rating, RatingButton } from "./ui/shadcn-io/rating";
+import { Rating, RatingButton } from "../../../components/ui/shadcn-io/rating";
 import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 
 export default function MovieDetail({
@@ -24,7 +24,7 @@ export default function MovieDetail({
   movie?: WrapperMovieDetail | undefined;
   loading?: boolean;
 }) {
-  const poster = movie?.slug ?? "/placeholder-poster.png";
+  const poster = movie?.poster_url ?? "/placeholder-poster.png";
 
   return (
     <section
@@ -40,7 +40,7 @@ export default function MovieDetail({
           <Skeleton className="w-full h-full" />
         ) : (
           <img
-            src="https://creativereview.imgix.net/uploads/2024/12/AlienRomulus-scaled.jpg?auto=compress,format&crop=faces,entropy,edges&fit=crop&q=60&w=1728&h=2560"
+            src={poster}
             alt={movie?.title ?? "Movie poster"}
             className="
           rounded-xl

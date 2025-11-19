@@ -4,6 +4,7 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/GenresApi.md
 docs/MovieCrewDetail.md
 docs/MoviesApi.md
 docs/NewUser.md
@@ -17,6 +18,9 @@ docs/ReviewsApi.md
 docs/UpdateUser.md
 docs/UpdateWatchHistory.md
 docs/UpdateWatchRoom.md
+docs/UploadSasRequest.md
+docs/UploadSasResponse.md
+docs/UploadsApi.md
 docs/User.md
 docs/UsersApi.md
 docs/WatchHistory.md
@@ -33,6 +37,7 @@ docs/WrapperGenre.md
 docs/WrapperMovie.md
 docs/WrapperMovieCrew.md
 docs/WrapperMovieDetail.md
+docs/WrapperNewGenre.md
 docs/WrapperNewMovie.md
 docs/WrapperNewPerson.md
 docs/WrapperNewReview.md

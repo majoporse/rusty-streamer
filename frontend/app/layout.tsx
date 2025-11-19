@@ -49,13 +49,13 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              <main className="w-full h-full p-6">
-                <SidebarTrigger />
+              <main className="flex p-2 w-full">
+                <SidebarTrigger/>
                 <ModeToggle />
                 {children}
               </main>
             </ThemeProvider>
-           </ReactQueryProvider>
+          </ReactQueryProvider>
         </SidebarProvider>
       </body>
     </html>
