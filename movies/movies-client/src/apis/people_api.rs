@@ -258,13 +258,14 @@ pub async fn get_person_by_movie_id(configuration: &configuration::Configuration
 
 pub async fn get_person_by_name(configuration: &configuration::Configuration, name: &str, limit: i64, offset: i64) -> Result<Vec<models::Person>, Error<GetPersonByNameError>> {
     // add a prefix to parameters to efficiently prevent name collisions
-    let p_path_name = name;
+    let p_query_name = name;
     let p_query_limit = limit;
     let p_query_offset = offset;
 
-    let uri_str = format!("{}/search/people/name/{name}", configuration.base_path, name=crate::apis::urlencode(p_path_name));
+    let uri_str = format!("{}/search/people/name", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
+    req_builder = req_builder.query(&[("name", &p_query_name.to_string())]);
     req_builder = req_builder.query(&[("limit", &p_query_limit.to_string())]);
     req_builder = req_builder.query(&[("offset", &p_query_offset.to_string())]);
     if let Some(ref user_agent) = configuration.user_agent {

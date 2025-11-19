@@ -5,12 +5,12 @@ README.md
 docs/Genre.md
 docs/GenresApi.md
 docs/Movie.md
-docs/MovieCrew.md
 docs/MovieCrewDetail.md
 docs/MovieDetail.md
 docs/MoviesApi.md
 docs/NewGenre.md
 docs/NewMovie.md
+docs/NewMovieCrew.md
 docs/NewPerson.md
 docs/NewReview.md
 docs/PeopleApi.md
@@ -28,11 +28,11 @@ src/lib.rs
 src/models/genre.rs
 src/models/mod.rs
 src/models/movie.rs
-src/models/movie_crew.rs
 src/models/movie_crew_detail.rs
 src/models/movie_detail.rs
 src/models/new_genre.rs
 src/models/new_movie.rs
+src/models/new_movie_crew.rs
 src/models/new_person.rs
 src/models/new_review.rs
 src/models/person.rs

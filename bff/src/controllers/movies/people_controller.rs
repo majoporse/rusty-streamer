@@ -5,7 +5,8 @@ use crate::{
 };
 use actix_web::{delete, get, post, put, web, HttpResponse};
 use movies_client::apis::people_api;
-use utoipa::OpenApi;
+use serde::{Deserialize, Serialize};
+use utoipa::{OpenApi, ToSchema};
 use uuid::Uuid;
 
 static TAG: &str = "People";
@@ -142,10 +143,15 @@ pub async fn get_person_by_movie_id(movie_id: web::Path<Uuid>) -> Result<HttpRes
         Err(err) => Err(handle_client_error(err, &format!("Fetching people for movie {}", movie_id))),
     }
 }
-
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct SearchPeopleByNameParams {
+    pub name: String,
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
 #[utoipa::path(
     params(
-        ("name" = String, Path, description = "Name of the person to search for"),
+        ("name" = String, Query, description = "Name of the person to search for"),
         ("limit" = i64, Query, description = "Max number of people to return", example = 100),
         ("offset" = i64, Query, description = "Pagination offset", example = 0)
     ),
@@ -155,15 +161,13 @@ pub async fn get_person_by_movie_id(movie_id: web::Path<Uuid>) -> Result<HttpRes
     ),
     tag = TAG
 )]
-#[get("/search/people/name/{name}")]
+#[get("/search/people/name")]
 pub async fn get_person_by_name(
-    name: web::Path<String>,
-    pagination: web::Query<Pagination>,
+    params: web::Query<SearchPeopleByNameParams>,
 ) -> Result<web::Json<Vec<WrapperPerson>>, actix_web::Error> {
     let config = client_config();
-    let name = name.into_inner();
-
-    match people_api::get_person_by_name(&config, &name, pagination.limit.unwrap_or(100), pagination.offset.unwrap_or(0)).await {
+    let name = params.name.clone();
+    match people_api::get_person_by_name(&config, &name, params.limit.unwrap_or(100), params.offset.unwrap_or(0)).await {
         Ok(person) => Ok(web::Json(person.into_iter().map(|p| p.into()).collect())),
         Err(err) => Err(handle_client_error(err, &format!("Fetching people by name {}", name))),
     }

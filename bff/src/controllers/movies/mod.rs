@@ -2,10 +2,12 @@ use movies_client::apis::configuration::Configuration;
 use reqwest_middleware::ClientBuilder;
 use shared::http_logging_middleware::LoggingMiddleware;
 
-pub mod people_controller;
+pub mod genre_controller;
 pub mod movies_controller;
-pub mod reviews_controller;
 pub mod pagination;
+pub mod people_controller;
+pub mod reviews_controller;
+pub mod upload_controller;
 
 fn client_config() -> Configuration {
     let mut config = Configuration::default();

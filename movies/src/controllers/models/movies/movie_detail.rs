@@ -13,7 +13,8 @@ use crate::services::dtos::movie::movie_details_dto::MovieDetailsDto;
 pub struct MovieDetail {
     pub id: Uuid,
     pub title: String,
-    pub slug: String,
+    pub poster_url: Option<String>,
+    pub video_url: Option<String>,
     pub description: Option<String>,
     pub release_date: Option<NaiveDate>,
     pub duration_minutes: Option<i32>,
@@ -30,7 +31,8 @@ impl From<MovieDetailsDto> for MovieDetail {
         Self {
             id: dto.id,
             title: dto.title,
-            slug: dto.slug,
+            poster_url: dto.poster_url,
+            video_url: dto.video_url,
             description: dto.description,
             release_date: dto.release_date,
             duration_minutes: dto.duration_minutes,

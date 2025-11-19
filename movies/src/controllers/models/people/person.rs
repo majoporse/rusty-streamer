@@ -14,6 +14,7 @@ pub struct Person {
     pub bio: Option<String>,
     pub role: Option<String>,
     pub created_at: NaiveDateTime,
+    pub image_url: Option<String>,
 }
 
 impl From<PersonDto> for Person {
@@ -26,6 +27,7 @@ impl From<PersonDto> for Person {
             bio: dto.bio,
             role: dto.role,
             created_at: dto.created_at,
+            image_url: dto.image_url,
         }
     }
 }
@@ -40,6 +42,7 @@ impl From<Person> for PersonDto {
             bio: model.bio,
             role: model.role,
             created_at: model.created_at,
+            image_url: model.image_url,
         }
     }
 }

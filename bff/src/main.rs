@@ -45,6 +45,8 @@ async fn main() -> std::io::Result<()> {
     apidoc.merge(controllers::movies::movies_controller::ApiDoc::openapi());
     apidoc.merge(controllers::movies::people_controller::ApiDoc::openapi());
     apidoc.merge(controllers::movies::reviews_controller::ApiDoc::openapi());
+    apidoc.merge(controllers::movies::genre_controller::ApiDoc::openapi());
+    apidoc.merge(controllers::movies::upload_controller::ApiDoc::openapi());
 
     apidoc.merge(controllers::users::users_controller::ApiDoc::openapi());
     apidoc.merge(controllers::users::watch_history_controller::ApiDoc::openapi());
@@ -79,6 +81,9 @@ async fn main() -> std::io::Result<()> {
             .configure(controllers::movies::movies_controller::scoped_config)
             .configure(controllers::movies::people_controller::scoped_config)
             .configure(controllers::movies::reviews_controller::scoped_config)
+            .configure(controllers::movies::genre_controller::scoped_config)
+            .configure(controllers::movies::upload_controller::scoped_config)
+
             .configure(controllers::users::users_controller::scoped_config)
             .configure(controllers::users::watch_history_controller::scoped_config)
             .configure(controllers::users::watch_list_controller::scoped_config)

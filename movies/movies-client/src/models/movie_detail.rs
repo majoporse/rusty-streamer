@@ -27,20 +27,22 @@ pub struct MovieDetail {
     pub mpaa_rating: Option<Option<String>>,
     #[serde(rename = "people")]
     pub people: Vec<models::MovieCrewDetail>,
+    #[serde(rename = "poster_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub poster_url: Option<Option<String>>,
     #[serde(rename = "release_date", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub release_date: Option<Option<String>>,
     #[serde(rename = "reviews")]
     pub reviews: Vec<models::Review>,
-    #[serde(rename = "slug")]
-    pub slug: String,
     #[serde(rename = "title")]
     pub title: String,
     #[serde(rename = "updated_at")]
     pub updated_at: String,
+    #[serde(rename = "video_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub video_url: Option<Option<String>>,
 }
 
 impl MovieDetail {
-    pub fn new(created_at: String, genres: Vec<models::Genre>, id: uuid::Uuid, people: Vec<models::MovieCrewDetail>, reviews: Vec<models::Review>, slug: String, title: String, updated_at: String) -> MovieDetail {
+    pub fn new(created_at: String, genres: Vec<models::Genre>, id: uuid::Uuid, people: Vec<models::MovieCrewDetail>, reviews: Vec<models::Review>, title: String, updated_at: String) -> MovieDetail {
         MovieDetail {
             created_at,
             description: None,
@@ -49,11 +51,12 @@ impl MovieDetail {
             id,
             mpaa_rating: None,
             people,
+            poster_url: None,
             release_date: None,
             reviews,
-            slug,
             title,
             updated_at,
+            video_url: None,
         }
     }
 }

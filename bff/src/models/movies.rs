@@ -1,10 +1,11 @@
 use std::str::FromStr;
 
+use azure_core::time::OffsetDateTime;
+use chrono::{NaiveDate, NaiveDateTime};
 use movies_client::models as client_models;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
-use chrono::{NaiveDate, NaiveDateTime};
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct WrapperPerson {
@@ -15,6 +16,7 @@ pub struct WrapperPerson {
     pub bio: Option<String>,
     pub role: Option<String>,
     pub created_at: NaiveDateTime,
+    pub image_url: Option<String>,
 }
 
 impl From<client_models::Person> for WrapperPerson {
@@ -22,11 +24,15 @@ impl From<client_models::Person> for WrapperPerson {
         WrapperPerson {
             role: v.role.flatten(),
             bio: v.bio.flatten(),
-            birth_date: v.birth_date.flatten().map(|d| NaiveDate::from_str(&*d).unwrap()),
+            birth_date: v
+                .birth_date
+                .flatten()
+                .map(|d| NaiveDate::from_str(&*d).unwrap()),
             created_at: NaiveDateTime::from_str(&v.created_at).unwrap(),
             first_name: v.first_name,
             id: v.id,
             last_name: v.last_name,
+            image_url: v.image_url.flatten(),
         }
     }
 }
@@ -41,6 +47,7 @@ impl From<WrapperPerson> for client_models::Person {
             first_name: w.first_name,
             id: w.id,
             last_name: w.last_name,
+            image_url: Some(w.image_url),
         }
     }
 }
@@ -52,6 +59,7 @@ pub struct WrapperNewPerson {
     pub birth_date: Option<NaiveDate>,
     pub bio: Option<String>,
     pub role: Option<String>,
+    pub image_url: Option<String>,
 }
 
 impl From<client_models::NewPerson> for WrapperNewPerson {
@@ -59,9 +67,13 @@ impl From<client_models::NewPerson> for WrapperNewPerson {
         WrapperNewPerson {
             role: v.role.flatten(),
             bio: v.bio.flatten(),
-            birth_date: v.birth_date.flatten().map(|d| NaiveDate::from_str(&d).unwrap()),
+            birth_date: v
+                .birth_date
+                .flatten()
+                .map(|d| NaiveDate::from_str(&d).unwrap()),
             first_name: v.first_name,
             last_name: v.last_name,
+            image_url: v.image_url.flatten(),
         }
     }
 }
@@ -74,6 +86,7 @@ impl From<WrapperNewPerson> for client_models::NewPerson {
             birth_date: Some(w.birth_date.map(|d| d.to_string())),
             first_name: w.first_name,
             last_name: w.last_name,
+            image_url: Some(w.image_url),
         }
     }
 }
@@ -86,7 +99,8 @@ pub struct WrapperMovie {
     pub id: Uuid,
     pub mpaa_rating: Option<Option<String>>,
     pub release_date: Option<Option<String>>,
-    pub slug: String,
+    pub video_url: Option<Option<String>>,
+    pub poster_url: Option<Option<String>>,
     pub title: String,
     pub updated_at: String,
 }
@@ -100,7 +114,8 @@ impl From<client_models::Movie> for WrapperMovie {
             id: v.id,
             mpaa_rating: v.mpaa_rating,
             release_date: v.release_date,
-            slug: v.slug,
+            video_url: v.video_url,
+            poster_url: v.poster_url,
             title: v.title,
             updated_at: v.updated_at,
         }
@@ -116,7 +131,8 @@ impl From<WrapperMovie> for client_models::Movie {
             id: w.id,
             mpaa_rating: w.mpaa_rating,
             release_date: w.release_date,
-            slug: w.slug,
+            video_url: w.video_url,
+            poster_url: w.poster_url,
             title: w.title,
             updated_at: w.updated_at,
         }
@@ -129,7 +145,8 @@ pub struct WrapperNewMovie {
     pub duration_minutes: Option<Option<i32>>,
     pub mpaa_rating: Option<Option<String>>,
     pub release_date: Option<Option<String>>,
-    pub slug: String,
+    pub video_url: Option<Option<String>>,
+    pub poster_url: Option<Option<String>>,
     pub title: String,
     pub genre_ids: Option<Option<Vec<Uuid>>>,
     pub people_ids: Option<Option<Vec<WrapperMovieCrew>>>,
@@ -142,7 +159,8 @@ impl From<client_models::NewMovie> for WrapperNewMovie {
             duration_minutes: v.duration_minutes,
             mpaa_rating: v.mpaa_rating,
             release_date: v.release_date,
-            slug: v.slug,
+            video_url: v.video_url,
+            poster_url: v.poster_url,
             title: v.title,
             genre_ids: v.genre_ids,
             people_ids: v.people_ids.map(|opt_vec| {
@@ -159,11 +177,16 @@ impl From<WrapperNewMovie> for client_models::NewMovie {
             duration_minutes: w.duration_minutes,
             mpaa_rating: w.mpaa_rating,
             release_date: w.release_date,
-            slug: w.slug,
+            video_url: w.video_url,
+            poster_url: w.poster_url,
             title: w.title,
             genre_ids: w.genre_ids,
             people_ids: w.people_ids.map(|opt_vec| {
-                opt_vec.map(|vec| vec.into_iter().map(client_models::MovieCrew::from).collect())
+                opt_vec.map(|vec| {
+                    vec.into_iter()
+                        .map(client_models::NewMovieCrew::from)
+                        .collect()
+                })
             }),
         }
     }
@@ -171,30 +194,54 @@ impl From<WrapperNewMovie> for client_models::NewMovie {
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct WrapperMovieCrew {
-    pub movie_id: Uuid,
     pub person_id: Uuid,
-    pub character_name: Option<String>,
+    pub role: Option<String>,
     pub billing_order: Option<i32>,
 }
 
-impl From<client_models::MovieCrew> for WrapperMovieCrew {
-    fn from(v: client_models::MovieCrew) -> Self {
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct WrapperNewMovieCrew {
+    pub person_id: Uuid,
+    pub role: Option<String>,
+    pub billing_order: Option<i32>,
+}
+
+impl From<client_models::NewMovieCrew> for WrapperMovieCrew {
+    fn from(v: client_models::NewMovieCrew) -> Self {
         WrapperMovieCrew {
-            movie_id: v.movie_id,
             person_id: v.person_id,
-            character_name: v.character_name.flatten(),
+            role: v.role.flatten(),
             billing_order: v.billing_order.flatten(),
         }
     }
 }
 
-impl From<WrapperMovieCrew> for client_models::MovieCrew {
+impl From<WrapperMovieCrew> for client_models::NewMovieCrew {
     fn from(w: WrapperMovieCrew) -> Self {
-        client_models::MovieCrew {
-            movie_id: w.movie_id,
+        client_models::NewMovieCrew {
             person_id: w.person_id,
-            character_name: Some(w.character_name),
+            role: Some(w.role),
             billing_order: Some(w.billing_order),
+        }
+    }
+}
+
+impl From<WrapperNewMovieCrew> for client_models::NewMovieCrew {
+    fn from(w: WrapperNewMovieCrew) -> Self {
+        client_models::NewMovieCrew {
+            person_id: w.person_id,
+            role: Some(w.role),
+            billing_order: Some(w.billing_order),
+        }
+    }
+}
+
+impl From<client_models::NewMovieCrew> for WrapperNewMovieCrew {
+    fn from(v: client_models::NewMovieCrew) -> Self {
+        WrapperNewMovieCrew {
+            person_id: v.person_id,
+            role: v.role.flatten(),
+            billing_order: v.billing_order.flatten(),
         }
     }
 }
@@ -281,7 +328,8 @@ impl From<WrapperNewReview> for client_models::NewReview {
 pub struct WrapperMovieDetail {
     pub id: Uuid,
     pub title: String,
-    pub slug: String,
+    pub video_url: Option<String>,
+    pub poster_url: Option<String>,
     pub description: Option<String>,
     pub release_date: Option<NaiveDate>,
     pub duration_minutes: Option<i32>,
@@ -298,9 +346,13 @@ impl From<client_models::MovieDetail> for WrapperMovieDetail {
         WrapperMovieDetail {
             id: v.id,
             title: v.title,
-            slug: v.slug,
+            video_url: v.video_url.flatten(),
+            poster_url: v.poster_url.flatten(),
             description: v.description.flatten(),
-            release_date: v.release_date.flatten().map(|d| NaiveDate::from_str(&d).unwrap()),
+            release_date: v
+                .release_date
+                .flatten()
+                .map(|d| NaiveDate::from_str(&d).unwrap()),
             duration_minutes: v.duration_minutes.flatten(),
             mpaa_rating: v.mpaa_rating.flatten(),
             created_at: NaiveDateTime::from_str(&v.created_at).unwrap(),
@@ -327,6 +379,22 @@ impl From<client_models::Genre> for WrapperGenre {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct WrapperNewGenre {
+    pub name: String,
+}
+
+impl From<client_models::NewGenre> for WrapperNewGenre {
+    fn from(v: client_models::NewGenre) -> Self {
+        WrapperNewGenre { name: v.name }
+    }
+}
+
+impl From<WrapperNewGenre> for client_models::NewGenre {
+    fn from(w: WrapperNewGenre) -> Self {
+        client_models::NewGenre { name: w.name }
+    }
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct MovieCrewDetail {
@@ -349,3 +417,23 @@ impl From<client_models::MovieCrewDetail> for MovieCrewDetail {
     }
 }
 
+// Models for upload SAS endpoint
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct UploadSasRequest {
+    /// original filename (including extension)
+    pub filename: String,
+    /// MIME content type
+    pub content_type: Option<String>,
+    /// kind of upload, e.g. "video" or "poster"
+    pub kind: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct UploadSasResponse {
+    /// full URL suitable for uploading (may include SAS token)
+    pub upload_url: String,
+    /// canonical blob URL (without SAS) for later reference
+    pub blob_url: String,
+    /// optional expiration timestamp for the upload URL
+    pub expires_at: Option<String>,
+}

@@ -23,6 +23,8 @@ pub struct Person {
     pub first_name: String,
     #[serde(rename = "id")]
     pub id: uuid::Uuid,
+    #[serde(rename = "image_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub image_url: Option<Option<String>>,
     #[serde(rename = "last_name")]
     pub last_name: String,
     #[serde(rename = "role", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
@@ -37,6 +39,7 @@ impl Person {
             created_at,
             first_name,
             id,
+            image_url: None,
             last_name,
             role: None,
         }

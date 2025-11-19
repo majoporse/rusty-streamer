@@ -1,9 +1,10 @@
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use crate::controllers::error;
 use crate::controllers::pagination::Pagination;
 use crate::services::people_service::PeopleService;
 use actix_web::{delete, get, post, put, web};
-use utoipa::OpenApi;
+use utoipa::{OpenApi, ToSchema};
 use crate::controllers::models::people::person::Person;
 use crate::controllers::models::people::new_person::NewPerson;
 
@@ -146,9 +147,15 @@ pub async fn get_person_by_movie_id(
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct PersonNameQuery {
+    pub name: String,
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
 #[utoipa::path(
     params(
-        ("name" = String, Path, description = "Name of the person to search for"),
+        ("name" = String, Query, description = "Name of the person to search for"),
         ("limit" = i64, Query, description = "Max number of people to return", example = 100),
         ("offset" = i64, Query, description = "Pagination offset", example = 0)
     ),
@@ -158,14 +165,13 @@ pub async fn get_person_by_movie_id(
     ),
     tag = TAG
 )]
-#[get("/search/people/name/{name}")]
+#[get("/search/people/name")]
 pub async fn get_person_by_name(
     people_service: web::Data<PeopleService>,
-    name: web::Path<String>,
-    pagination: web::Query<Pagination>,
+    params: web::Query<PersonNameQuery>,
 ) -> Result<web::Json<Vec<Person>>, actix_web::Error> {
 
-    match people_service.get_people_by_name(&name.into_inner(), pagination.limit.unwrap_or(100), pagination.offset.unwrap_or(0)).await {
+    match people_service.get_people_by_name(&params.name, params.limit.unwrap_or(100), params.offset.unwrap_or(0)).await {
         Ok(persons) => Ok(web::Json(persons.into_iter().map(|p| Person::from(p)).collect())),
         Err(e) => Err(error::handle_db_error(&e, "get_person_by_name")),
     }

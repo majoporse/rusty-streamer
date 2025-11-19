@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 **bio** | Option<**String**> |  | [optional]
 **birth_date** | Option<[**String**](string.md)> |  | [optional]
 **first_name** | **String** |  | 
+**image_url** | Option<**String**> |  | [optional]
 **last_name** | **String** |  | 
 **role** | Option<**String**> |  | [optional]
 

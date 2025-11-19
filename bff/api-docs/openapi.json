@@ -9,6 +9,199 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/genres": {
+      "get": {
+        "tags": [
+          "Genres"
+        ],
+        "operationId": "list_genres",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max number of genres to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 100
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Pagination offset",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 0
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List all genres",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WrapperGenre"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Genres"
+        ],
+        "operationId": "create_genre",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WrapperNewGenre"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Create a new genre",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WrapperGenre"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/genres/{genre_id}": {
+      "get": {
+        "tags": [
+          "Genres"
+        ],
+        "operationId": "get_genre_by_id",
+        "parameters": [
+          {
+            "name": "genre_id",
+            "in": "path",
+            "description": "ID of the genre to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get genre by ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WrapperGenre"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Genres"
+        ],
+        "operationId": "update_genre",
+        "parameters": [
+          {
+            "name": "genre_id",
+            "in": "path",
+            "description": "ID of the genre to update",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WrapperNewGenre"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Update genre by ID",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WrapperGenre"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Genres"
+        ],
+        "operationId": "delete_genre",
+        "parameters": [
+          {
+            "name": "genre_id",
+            "in": "path",
+            "description": "ID of the genre to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Delete genre by ID",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/movies": {
       "get": {
         "tags": [
@@ -792,7 +985,7 @@
         }
       }
     },
-    "/search/people/name/{name}": {
+    "/search/people/name": {
       "get": {
         "tags": [
           "People"
@@ -801,7 +994,7 @@
         "parameters": [
           {
             "name": "name",
-            "in": "path",
+            "in": "query",
             "description": "Name of the person to search for",
             "required": true,
             "schema": {
@@ -841,6 +1034,39 @@
                   "items": {
                     "$ref": "#/components/schemas/WrapperPerson"
                   }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/uploads/request-sas": {
+      "post": {
+        "tags": [
+          "Uploads"
+        ],
+        "operationId": "request_upload_sas",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadSasRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "SAS token for upload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadSasResponse"
                 }
               }
             }
@@ -2281,6 +2507,56 @@
           }
         }
       },
+      "UploadSasRequest": {
+        "type": "object",
+        "required": [
+          "filename"
+        ],
+        "properties": {
+          "content_type": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "MIME content type"
+          },
+          "filename": {
+            "type": "string",
+            "description": "original filename (including extension)"
+          },
+          "kind": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "kind of upload, e.g. \"video\" or \"poster\""
+          }
+        }
+      },
+      "UploadSasResponse": {
+        "type": "object",
+        "required": [
+          "upload_url",
+          "blob_url"
+        ],
+        "properties": {
+          "blob_url": {
+            "type": "string",
+            "description": "canonical blob URL (without SAS) for later reference"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "optional expiration timestamp for the upload URL"
+          },
+          "upload_url": {
+            "type": "string",
+            "description": "full URL suitable for uploading (may include SAS token)"
+          }
+        }
+      },
       "User": {
         "type": "object",
         "required": [
@@ -2588,7 +2864,6 @@
         "required": [
           "created_at",
           "id",
-          "slug",
           "title",
           "updated_at"
         ],
@@ -2619,27 +2894,35 @@
               "null"
             ]
           },
+          "poster_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "release_date": {
             "type": [
               "string",
               "null"
             ]
           },
-          "slug": {
-            "type": "string"
-          },
           "title": {
             "type": "string"
           },
           "updated_at": {
             "type": "string"
+          },
+          "video_url": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
       "WrapperMovieCrew": {
         "type": "object",
         "required": [
-          "movie_id",
           "person_id"
         ],
         "properties": {
@@ -2650,19 +2933,15 @@
             ],
             "format": "int32"
           },
-          "character_name": {
+          "person_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
             "type": [
               "string",
               "null"
             ]
-          },
-          "movie_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "person_id": {
-            "type": "string",
-            "format": "uuid"
           }
         }
       },
@@ -2671,7 +2950,6 @@
         "required": [
           "id",
           "title",
-          "slug",
           "created_at",
           "updated_at",
           "people",
@@ -2718,6 +2996,12 @@
               "$ref": "#/components/schemas/MovieCrewDetail"
             }
           },
+          "poster_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "release_date": {
             "type": [
               "string",
@@ -2731,22 +3015,35 @@
               "$ref": "#/components/schemas/WrapperReview"
             }
           },
-          "slug": {
-            "type": "string"
-          },
           "title": {
             "type": "string"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "video_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "WrapperNewGenre": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
           }
         }
       },
       "WrapperNewMovie": {
         "type": "object",
         "required": [
-          "slug",
           "title"
         ],
         "properties": {
@@ -2788,17 +3085,26 @@
               "$ref": "#/components/schemas/WrapperMovieCrew"
             }
           },
+          "poster_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "release_date": {
             "type": [
               "string",
               "null"
             ]
           },
-          "slug": {
-            "type": "string"
-          },
           "title": {
             "type": "string"
+          },
+          "video_url": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -2824,6 +3130,12 @@
           },
           "first_name": {
             "type": "string"
+          },
+          "image_url": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "last_name": {
             "type": "string"
@@ -2906,6 +3218,12 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "image_url": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "last_name": {
             "type": "string"

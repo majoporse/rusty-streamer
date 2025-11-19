@@ -19,6 +19,8 @@ pub struct NewPerson {
     pub birth_date: Option<Option<String>>,
     #[serde(rename = "first_name")]
     pub first_name: String,
+    #[serde(rename = "image_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub image_url: Option<Option<String>>,
     #[serde(rename = "last_name")]
     pub last_name: String,
     #[serde(rename = "role", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
@@ -31,6 +33,7 @@ impl NewPerson {
             bio: None,
             birth_date: None,
             first_name,
+            image_url: None,
             last_name,
             role: None,
         }

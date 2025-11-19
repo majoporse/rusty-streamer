@@ -17,6 +17,7 @@ pub struct Person {
     pub birth_date: Option<NaiveDate>,
     pub bio: Option<String>,
     pub role: Option<String>,
+    pub image_url: Option<String>,
     pub created_at: NaiveDateTime,
 }
 
@@ -29,4 +30,5 @@ pub struct NewPerson {
     pub birth_date: Option<NaiveDate>,
     pub bio: Option<String>,
     pub role: Option<String>,
+    pub image_url: Option<String>,
 }

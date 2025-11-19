@@ -48,4 +48,7 @@ redis = { version = "0.32.7", features = ["aio", "tokio-comp"] }
 actix-ws = "0.3.0"
 futures-util = "0.3.31"
 actix-cors = "0.7.1"
+azure_storage = "0.21.0"
+azure_storage_blobs = "0.21.0"
+azure_core = "0.30.1"
 

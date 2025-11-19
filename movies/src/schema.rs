@@ -8,11 +8,10 @@ diesel::table! {
 }
 
 diesel::table! {
-    movie_crew (movie_id, person_id, role) {
+    movie_crew (movie_id, person_id) {
         movie_id -> Uuid,
         person_id -> Uuid,
-        role -> Text,
-        character_name -> Nullable<Text>,
+        role -> Nullable<Text>,
         billing_order -> Nullable<Int4>,
     }
 }
@@ -28,11 +27,12 @@ diesel::table! {
     movies (id) {
         id -> Uuid,
         title -> Text,
-        slug -> Text,
         description -> Nullable<Text>,
         release_date -> Nullable<Date>,
         duration_minutes -> Nullable<Int4>,
         mpaa_rating -> Nullable<Text>,
+        video_url -> Nullable<Text>,
+        poster_url -> Nullable<Text>,
         created_at -> Timestamptz,
         updated_at -> Timestamptz,
     }
@@ -46,6 +46,7 @@ diesel::table! {
         birth_date -> Nullable<Date>,
         bio -> Nullable<Text>,
         role -> Nullable<Text>,
+        image_url -> Nullable<Text>,
         created_at -> Timestamptz,
     }
 }

@@ -18,11 +18,12 @@ $$ LANGUAGE plpgsql;
 CREATE TABLE movies (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title TEXT NOT NULL,
-    slug TEXT NOT NULL,
     description TEXT,
     release_date DATE,
     duration_minutes INT,
     mpaa_rating TEXT,
+    video_url TEXT,
+    poster_url TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -43,6 +44,7 @@ CREATE TABLE people (
     birth_date DATE,
     bio TEXT,
     role TEXT,
+    image_url TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -52,10 +54,9 @@ CREATE TABLE people (
 CREATE TABLE movie_crew (
     movie_id UUID NOT NULL REFERENCES movies(id) ON UPDATE CASCADE ON DELETE CASCADE,
     person_id UUID NOT NULL REFERENCES people(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    role TEXT NOT NULL,
-    character_name TEXT,
+    role TEXT,
     billing_order INT,
-    PRIMARY KEY (movie_id, person_id, role)
+    PRIMARY KEY (movie_id, person_id)
 );
 
 -- ======================================

@@ -10,9 +10,10 @@ use crate::services::dtos::movie::movie_dto::MovieDto;
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema, )]
 pub struct Movie {
     pub id: Uuid,
-    pub title: String,
-    pub slug: String,
     pub description: Option<String>,
+    pub video_url: Option<String>,
+    pub poster_url: Option<String>,
+    pub title: String,
     pub release_date: Option<NaiveDate>,
     pub duration_minutes: Option<i32>,
     pub mpaa_rating: Option<String>,
@@ -25,7 +26,8 @@ impl From<MovieDto> for Movie {
         Self {
             id: dto.id,
             title: dto.title,
-            slug: dto.slug,
+            poster_url: dto.poster_url,
+            video_url: dto.video_url,
             description: dto.description,
             release_date: dto.release_date,
             duration_minutes: dto.duration_minutes,
@@ -41,7 +43,8 @@ impl From<Movie> for MovieDto {
         Self {
             id: model.id,
             title: model.title,
-            slug: model.slug,
+            poster_url: model.poster_url,
+            video_url: model.video_url,
             description: model.description,
             release_date: model.release_date,
             duration_minutes: model.duration_minutes,

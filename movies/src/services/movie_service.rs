@@ -136,7 +136,7 @@ impl MovieService {
                 &mut conn,
                 people_ids
                     .into_iter()
-                    .map(|e| NewMovieCrew::from(e))
+                    .map(|e| NewMovieCrew::new(e, movie.id))
                     .collect(),
             )
             .await?;

@@ -1,21 +1,23 @@
+
+use uuid::Uuid;
 use serde::Deserialize;
 use serde::Serialize;
-use uuid::Uuid;
 
-use crate::controllers::models::movie_crew::movie_crew::MovieCrew;
+use crate::controllers::models::movie_crew::new_movie_crew::NewMovieCrew;
+
+
+
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct MovieCrewDto {
-    pub movie_id: Uuid,
+pub struct NewMovieCrewDto {
     pub person_id: Uuid,
     pub role: Option<String>,
     pub billing_order: Option<i32>,
 }
 
-impl From<MovieCrew> for MovieCrewDto {
-    fn from(model: MovieCrew) -> Self {
+impl From<NewMovieCrew> for NewMovieCrewDto {
+    fn from(model: NewMovieCrew) -> Self {
         Self {
-            movie_id: model.movie_id,
             person_id: model.person_id,
             role: model.role,
             billing_order: model.billing_order,

@@ -111,7 +111,7 @@ pub async fn get_movie_details_by_id(
         .map(|(person, crew)| MovieCrewDetail {
             movie_id,
             person_id: person.id,
-            character_name: crew.character_name,
+            character_name: crew.role,
             billing_order: crew.billing_order,
             person,
         })
@@ -142,7 +142,8 @@ pub async fn update_movie(
     let movie_item = diesel::update(movies::table.filter(movies::id.eq(movie_id)))
         .set((
             movies::title.eq(updated_movie.title),
-            movies::slug.eq(updated_movie.slug),
+            movies::poster_url.eq(updated_movie.poster_url),
+            movies::video_url.eq(updated_movie.video_url),
             movies::description.eq(updated_movie.description),
             movies::release_date.eq(updated_movie.release_date),
             movies::duration_minutes.eq(updated_movie.duration_minutes),

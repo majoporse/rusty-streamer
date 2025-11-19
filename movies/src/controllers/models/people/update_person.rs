@@ -13,6 +13,7 @@ pub struct NewPerson {
     pub birth_date: Option<NaiveDate>,
     pub bio: Option<String>,
     pub role: Option<String>,
+    pub image_url: Option<String>,
 }
 
 
@@ -24,6 +25,7 @@ impl From<NewPerson> for DataNewPerson {
             birth_date: np.birth_date,
             bio: np.bio,
             role: np.role,
+            image_url: np.image_url,
         }
     }
 }
@@ -36,6 +38,7 @@ impl From<DataNewPerson> for NewPerson {
             birth_date: np.birth_date,
             bio: np.bio,
             role: np.role,
+            image_url: np.image_url,
         }
     }
 }

@@ -23,28 +23,31 @@ pub struct Movie {
     pub id: uuid::Uuid,
     #[serde(rename = "mpaa_rating", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub mpaa_rating: Option<Option<String>>,
+    #[serde(rename = "poster_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub poster_url: Option<Option<String>>,
     #[serde(rename = "release_date", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub release_date: Option<Option<String>>,
-    #[serde(rename = "slug")]
-    pub slug: String,
     #[serde(rename = "title")]
     pub title: String,
     #[serde(rename = "updated_at")]
     pub updated_at: String,
+    #[serde(rename = "video_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub video_url: Option<Option<String>>,
 }
 
 impl Movie {
-    pub fn new(created_at: String, id: uuid::Uuid, slug: String, title: String, updated_at: String) -> Movie {
+    pub fn new(created_at: String, id: uuid::Uuid, title: String, updated_at: String) -> Movie {
         Movie {
             created_at,
             description: None,
             duration_minutes: None,
             id,
             mpaa_rating: None,
+            poster_url: None,
             release_date: None,
-            slug,
             title,
             updated_at,
+            video_url: None,
         }
     }
 }

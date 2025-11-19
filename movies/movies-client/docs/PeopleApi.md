@@ -9,7 +9,7 @@ Method | HTTP request | Description
 [**get_all_people**](PeopleApi.md#get_all_people) | **GET** /people | 
 [**get_person_by_id**](PeopleApi.md#get_person_by_id) | **GET** /people/{person_id} | 
 [**get_person_by_movie_id**](PeopleApi.md#get_person_by_movie_id) | **GET** /search/people/movie/{movie_id} | 
-[**get_person_by_name**](PeopleApi.md#get_person_by_name) | **GET** /search/people/name/{name} | 
+[**get_person_by_name**](PeopleApi.md#get_person_by_name) | **GET** /search/people/name | 
 [**update_person**](PeopleApi.md#update_person) | **PUT** /people/{person_id} | 
 
 

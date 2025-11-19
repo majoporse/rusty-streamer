@@ -974,7 +974,7 @@
         }
       }
     },
-    "/search/people/name/{name}": {
+    "/search/people/name": {
       "get": {
         "tags": [
           "People"
@@ -983,7 +983,7 @@
         "parameters": [
           {
             "name": "name",
-            "in": "path",
+            "in": "query",
             "description": "Name of the person to search for",
             "required": true,
             "schema": {
@@ -1177,7 +1177,6 @@
         "required": [
           "id",
           "title",
-          "slug",
           "created_at",
           "updated_at"
         ],
@@ -1209,6 +1208,12 @@
               "null"
             ]
           },
+          "poster_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "release_date": {
             "type": [
               "string",
@@ -1216,45 +1221,18 @@
             ],
             "format": "date"
           },
-          "slug": {
-            "type": "string"
-          },
           "title": {
             "type": "string"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time"
-          }
-        }
-      },
-      "MovieCrew": {
-        "type": "object",
-        "required": [
-          "movie_id",
-          "person_id"
-        ],
-        "properties": {
-          "billing_order": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
           },
-          "character_name": {
+          "video_url": {
             "type": [
               "string",
               "null"
             ]
-          },
-          "movie_id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "person_id": {
-            "type": "string",
-            "format": "uuid"
           }
         }
       },
@@ -1297,7 +1275,6 @@
         "required": [
           "id",
           "title",
-          "slug",
           "created_at",
           "updated_at",
           "people",
@@ -1344,6 +1321,12 @@
               "$ref": "#/components/schemas/MovieCrewDetail"
             }
           },
+          "poster_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "release_date": {
             "type": [
               "string",
@@ -1357,15 +1340,18 @@
               "$ref": "#/components/schemas/Review"
             }
           },
-          "slug": {
-            "type": "string"
-          },
           "title": {
             "type": "string"
           },
           "updated_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "video_url": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -1383,8 +1369,7 @@
       "NewMovie": {
         "type": "object",
         "required": [
-          "title",
-          "slug"
+          "title"
         ],
         "properties": {
           "description": {
@@ -1422,8 +1407,14 @@
               "null"
             ],
             "items": {
-              "$ref": "#/components/schemas/MovieCrew"
+              "$ref": "#/components/schemas/NewMovieCrew"
             }
+          },
+          "poster_url": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "release_date": {
             "type": [
@@ -1432,11 +1423,39 @@
             ],
             "format": "date"
           },
-          "slug": {
-            "type": "string"
-          },
           "title": {
             "type": "string"
+          },
+          "video_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "NewMovieCrew": {
+        "type": "object",
+        "required": [
+          "person_id"
+        ],
+        "properties": {
+          "billing_order": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "person_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -1462,6 +1481,12 @@
           },
           "first_name": {
             "type": "string"
+          },
+          "image_url": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "last_name": {
             "type": "string"
@@ -1544,6 +1569,12 @@
           "id": {
             "type": "string",
             "format": "uuid"
+          },
+          "image_url": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "last_name": {
             "type": "string"

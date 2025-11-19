@@ -9,7 +9,8 @@ use crate::data::models::movie::Movie;
 pub struct MovieDto {
     pub id: Uuid,
     pub title: String,
-    pub slug: String,
+    pub poster_url: Option<String>,
+    pub video_url: Option<String>,
     pub description: Option<String>,
     pub release_date: Option<NaiveDate>,
     pub duration_minutes: Option<i32>,
@@ -23,7 +24,8 @@ impl From<Movie> for MovieDto {
         Self {
             id: m.id,
             title: m.title,
-            slug: m.slug,
+            poster_url: m.poster_url,
+            video_url: m.video_url,
             description: m.description,
             release_date: m.release_date,
             duration_minutes: m.duration_minutes,

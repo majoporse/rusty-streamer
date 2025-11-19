@@ -11,11 +11,12 @@ use uuid::Uuid;
 pub struct Movie {
     pub id: Uuid,
     pub title: String,
-    pub slug: String,
     pub description: Option<String>,
     pub release_date: Option<NaiveDate>,
     pub duration_minutes: Option<i32>,
     pub mpaa_rating: Option<String>,
+    pub video_url: Option<String>,
+    pub poster_url: Option<String>,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
@@ -25,7 +26,8 @@ pub struct Movie {
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct NewMovie {
     pub title: String,
-    pub slug: String,
+    pub poster_url: Option<String>,
+    pub video_url: Option<String>,
     pub description: Option<String>,
     pub release_date: Option<NaiveDate>,
     pub duration_minutes: Option<i32>,
@@ -36,7 +38,8 @@ pub struct NewMovie {
 pub struct MovieDetails {
     pub id: Uuid,
     pub title: String,
-    pub slug: String,
+    pub poster_url: Option<String>,
+    pub video_url: Option<String>,
     pub description: Option<String>,
     pub release_date: Option<NaiveDate>,
     pub duration_minutes: Option<i32>,
@@ -53,7 +56,8 @@ impl From<Movie> for MovieDetails {
         MovieDetails {
             id: movie.id,
             title: movie.title,
-            slug: movie.slug,
+            poster_url: movie.poster_url,
+            video_url: movie.video_url,
             description: movie.description,
             release_date: movie.release_date,
             duration_minutes: movie.duration_minutes,

@@ -1,6 +1,7 @@
 use crate::data::models::person::Person;
 use crate::data::models::{movie, person};
 use crate::schema;
+use crate::services::dtos::movie_crew::new_movie_crew_dto::NewMovieCrewDto;
 use diesel::prelude::{Associations, Identifiable, Insertable, Queryable, QueryableByName};
 use diesel::Selectable;
 use serde::{Deserialize, Serialize};
@@ -25,7 +26,7 @@ use uuid::Uuid;
 pub struct MovieCrew {
     pub movie_id: Uuid,
     pub person_id: Uuid,
-    pub character_name: Option<String>,
+    pub role: Option<String>,
     pub billing_order: Option<i32>,
 }
 
@@ -35,8 +36,19 @@ pub struct MovieCrew {
 pub struct NewMovieCrew {
     pub movie_id: Uuid,
     pub person_id: Uuid,
-    pub character_name: Option<String>,
+    pub role: Option<String>,
     pub billing_order: Option<i32>,
+}
+
+impl NewMovieCrew {
+    pub fn new(dto: NewMovieCrewDto, movie_id: Uuid) -> Self {
+        Self {
+            movie_id,
+            person_id: dto.person_id,
+            role: dto.role,
+            billing_order: dto.billing_order,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

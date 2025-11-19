@@ -22,26 +22,29 @@ pub struct NewMovie {
     #[serde(rename = "mpaa_rating", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub mpaa_rating: Option<Option<String>>,
     #[serde(rename = "people_ids", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub people_ids: Option<Option<Vec<models::MovieCrew>>>,
+    pub people_ids: Option<Option<Vec<models::NewMovieCrew>>>,
+    #[serde(rename = "poster_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub poster_url: Option<Option<String>>,
     #[serde(rename = "release_date", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub release_date: Option<Option<String>>,
-    #[serde(rename = "slug")]
-    pub slug: String,
     #[serde(rename = "title")]
     pub title: String,
+    #[serde(rename = "video_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub video_url: Option<Option<String>>,
 }
 
 impl NewMovie {
-    pub fn new(slug: String, title: String) -> NewMovie {
+    pub fn new(title: String) -> NewMovie {
         NewMovie {
             description: None,
             duration_minutes: None,
             genre_ids: None,
             mpaa_rating: None,
             people_ids: None,
+            poster_url: None,
             release_date: None,
-            slug,
             title,
+            video_url: None,
         }
     }
 }
