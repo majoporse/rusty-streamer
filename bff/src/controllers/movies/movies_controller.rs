@@ -7,7 +7,8 @@ use crate::{
 };
 use actix_web::{delete, get, post, put, web};
 use movies_client::apis::{configuration::Configuration, movies_api};
-use utoipa::OpenApi;
+use serde::{Deserialize, Serialize};
+use utoipa::{OpenApi, ToSchema};
 use uuid::Uuid;
 
 static TAG: &str = "Movies";
@@ -137,9 +138,16 @@ pub async fn get_movie_details_by_id(
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+struct TitleSearchQuery {
+    pub title_name: String,
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
+
 #[utoipa::path(
     params(
-        ("title_name" = String, Path, description = "Title query string to search for movies", example = "Inception"),
+        ("title_name" = String, Query, description = "Title query string to search for movies", example = "Inception"),
         ("limit" = i64, Query, description = "Max number of movies to return", example = 100),
         ("offset" = i64, Query, description = "Pagination offset", example = 0)
     ),
@@ -149,18 +157,17 @@ pub async fn get_movie_details_by_id(
     ),
     tag = TAG
 )]
-#[get("/search/movies/title/{title_name}")]
+#[get("/search/movies/title")]
 pub async fn search_movies_by_title(
-    title_name: web::Path<String>,
-    pagination: web::Query<Pagination>,
+    query: web::Query<TitleSearchQuery>,
 ) -> Result<web::Json<Vec<WrapperMovie>>, actix_web::Error> {
     let config = client_config();
 
     match movies_api::search_movies_by_title(
         &config,
-        &title_name.clone(),
-        pagination.limit.unwrap_or(100),
-        pagination.offset.unwrap_or(0),
+        &query.title_name,
+        query.limit.unwrap_or(100),
+        query.offset.unwrap_or(0),
     )
     .await
     {
@@ -190,7 +197,7 @@ pub struct ActorSearchQuery {
     ),
     tag = TAG
 )]
-#[get("/search/movies/person/{person_name}")]
+#[get("/search/movies/person")]
 pub async fn search_movies_by_actor(
     person_name: web::Path<String>,
     pagination: web::Query<Pagination>,

@@ -9,8 +9,8 @@ All URIs are relative to *http://localhost*
 |[**getAllMovies**](#getallmovies) | **GET** /movies | |
 |[**getMovieById**](#getmoviebyid) | **GET** /movies/{movie_id} | |
 |[**getMovieDetailsById**](#getmoviedetailsbyid) | **GET** /movies/{movie_id}/details | |
-|[**searchMoviesByActor**](#searchmoviesbyactor) | **GET** /search/movies/person/{person_name} | |
-|[**searchMoviesByTitle**](#searchmoviesbytitle) | **GET** /search/movies/title/{title_name} | |
+|[**searchMoviesByActor**](#searchmoviesbyactor) | **GET** /search/movies/person | |
+|[**searchMoviesByTitle**](#searchmoviesbytitle) | **GET** /search/movies/title | |
 |[**updateMovie**](#updatemovie) | **PUT** /movies/{movie_id} | |
 
 # **createMovie**
@@ -293,13 +293,11 @@ const apiInstance = new MoviesApi(configuration);
 let actorName: string; //Actor name to search for movies (default to undefined)
 let limit: number; //Max number of movies to return (default to undefined)
 let offset: number; //Pagination offset (default to undefined)
-let personName: string; // (default to undefined)
 
 const { status, data } = await apiInstance.searchMoviesByActor(
     actorName,
     limit,
-    offset,
-    personName
+    offset
 );
 ```
 
@@ -310,7 +308,6 @@ const { status, data } = await apiInstance.searchMoviesByActor(
 | **actorName** | [**string**] | Actor name to search for movies | defaults to undefined|
 | **limit** | [**number**] | Max number of movies to return | defaults to undefined|
 | **offset** | [**number**] | Pagination offset | defaults to undefined|
-| **personName** | [**string**] |  | defaults to undefined|
 
 
 ### Return type

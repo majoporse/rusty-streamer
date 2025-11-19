@@ -1,25 +1,44 @@
 "use client";
 import { Card } from "@/components/ui/card";
 import { MoviesApi, WrapperMovie, Configuration } from "@/generated";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { AxiosConfig } from "./layout";
 import { TypographyH1 } from "@/components/ui/typo";
 import { Separator } from "@radix-ui/react-separator";
+import { useDebounce } from "use-debounce";
+import { useState } from "react";
 
 export default function Home() {
-  let fetch = async () => {
-    const api = new MoviesApi(AxiosConfig);
-    return (await api.getAllMovies(10, 0)).data;
-  };
+  const [q, setQ] = useState("");
+  const [debouncedQ] = useDebounce(q, 300);
+  const pageSize = 2;
 
   const {
-    data: movies,
-    isLoading,
-    isError,
-  } = useQuery<WrapperMovie[]>({
-    queryKey: ["movies"],
-    queryFn: fetch,
+    data,
+    isLoading: peopleLoading,
+    isError: peopleError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["people", debouncedQ],
+    queryFn: async ({ pageParam = 0 }: any) => {
+      let api = new MoviesApi(AxiosConfig);
+      let res = await api.searchMoviesByTitle(debouncedQ, pageSize, pageParam);
+      let resData = res.data || [];
+
+      return {
+        items: resData,
+        nextOffset:
+          resData.length === pageSize
+            ? (pageParam as number) + pageSize
+            : undefined,
+      };
+    },
+    getNextPageParam: (last: any) => last.nextOffset,
+    initialPageParam: 0,
   });
+
 
   return (
     <main className="flex flex-col items-center p-6 w-full">
@@ -28,11 +47,11 @@ export default function Home() {
         <Separator className="my-10" />
 
         <div className="p-6 grid grid-cols-2 md:grid-cols-3 gap-4">
-          {isLoading ? <p>Loading movies...</p> : null}
-          {isError ? (
+          {peopleLoading ? <p>Loading movies...</p> : null}
+          {peopleError ? (
             <p className="text-red-500">Failed to load movies.</p>
           ) : null}
-          {movies?.map((movie) => (
+          {data?.pages.flatMap(page => page.items).map((movie) =>
             <a
               key={movie.id}
               href={`/movie/${movie.id}`}
@@ -56,7 +75,7 @@ export default function Home() {
                 </h3>
               </div>
             </a>
-          ))}
+          )}
         </div>
       </div>
     </main>

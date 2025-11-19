@@ -857,7 +857,7 @@
         }
       }
     },
-    "/search/movies/person/{person_name}": {
+    "/search/movies/person": {
       "get": {
         "tags": [
           "Movies"
@@ -895,14 +895,6 @@
               "format": "int64"
             },
             "example": 0
-          },
-          {
-            "name": "person_name",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -925,7 +917,7 @@
         }
       }
     },
-    "/search/movies/title/{title_name}": {
+    "/search/movies/title": {
       "get": {
         "tags": [
           "Movies"
@@ -934,7 +926,7 @@
         "parameters": [
           {
             "name": "title_name",
-            "in": "path",
+            "in": "query",
             "description": "Title query string to search for movies",
             "required": true,
             "schema": {

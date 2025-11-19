@@ -9,8 +9,8 @@ Method | HTTP request | Description
 [**get_all_movies**](MoviesApi.md#get_all_movies) | **GET** /movies | 
 [**get_movie_by_id**](MoviesApi.md#get_movie_by_id) | **GET** /movies/{movie_id} | 
 [**get_movie_details_by_id**](MoviesApi.md#get_movie_details_by_id) | **GET** /movies/{movie_id}/details | 
-[**search_movies_by_actor**](MoviesApi.md#search_movies_by_actor) | **GET** /search/movies/people/{actor_name} | 
-[**search_movies_by_title**](MoviesApi.md#search_movies_by_title) | **GET** /search/movies/title/{title_name} | 
+[**search_movies_by_actor**](MoviesApi.md#search_movies_by_actor) | **GET** /search/movies/people | 
+[**search_movies_by_title**](MoviesApi.md#search_movies_by_title) | **GET** /search/movies/title | 
 [**update_movie**](MoviesApi.md#update_movie) | **PUT** /movies/{movie_id} | 
 
 

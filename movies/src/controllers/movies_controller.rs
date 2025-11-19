@@ -3,7 +3,8 @@ use crate::controllers::models::movies::new_movie::NewMovie;
 use crate::controllers::pagination::Pagination;
 use crate::{controllers::error, services::movie_service::MovieService};
 use actix_web::{delete, get, post, put, web, Result};
-use utoipa::OpenApi;
+use serde::{Deserialize, Serialize};
+use utoipa::{OpenApi, ToSchema};
 use uuid::Uuid;
 
 static TAG: &str = "Movies";
@@ -122,9 +123,15 @@ pub async fn update_movie(
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+struct ActorSearchQuery {
+    pub actor_name: String,
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
 #[utoipa::path(
     params(
-        ("actor_name" = String, Path, description = "Actor name to search for movies", example = "Leonardo DiCaprio"),
+        ("actor_name" = String, Query, description = "Actor name to search for movies", example = "Leonardo DiCaprio"),
         ("limit" = i64, Query, description = "Max number of movies to return", example = 100),
         ("offset" = i64, Query, description = "Pagination offset", example = 0)
     ),
@@ -134,16 +141,15 @@ pub async fn update_movie(
     ),
     tag = TAG
 )]
-#[get("/search/movies/people/{actor_name}")]
+#[get("/search/movies/people")]
 pub async fn search_movies_by_actor(
     movie_service: web::Data<MovieService>,
-    actor_name: web::Path<String>,
-    pagination: web::Query<Pagination>,
+    query: web::Query<ActorSearchQuery>,
 ) -> Result<web::Json<Vec<Movie>>, actix_web::Error> {
     match movie_service.search_by_actor(
-        &actor_name,
-        pagination.limit.unwrap_or(100),
-        pagination.offset.unwrap_or(0),
+        &query.actor_name,
+        query.limit.unwrap_or(100),
+        query.offset.unwrap_or(0),
     ).await {
         Ok(movies) => Ok(web::Json(
             movies.into_iter().map(|m| Movie::from(m)).collect(),
@@ -152,10 +158,16 @@ pub async fn search_movies_by_actor(
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+struct TitleSearchQuery {
+    pub title_name: String,
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
 
 #[utoipa::path(
     params(
-        ("title_name" = String, Path, description = "Title query string to search for movies", example = "Inception"),
+        ("title_name" = String, Query, description = "Title query string to search for movies", example = "Inception"),
         ("limit" = i64, Query, description = "Max number of movies to return", example = 100),
         ("offset" = i64, Query, description = "Pagination offset", example = 0)
     ),
@@ -165,16 +177,15 @@ pub async fn search_movies_by_actor(
     ),
     tag = TAG
 )]
-#[get("/search/movies/title/{title_name}")]
+#[get("/search/movies/title")]
 pub async fn search_movies_by_title(
     movie_service: web::Data<MovieService>,
-    title_name: web::Path<String>,
-    pagination: web::Query<Pagination>,
+    query: web::Query<TitleSearchQuery>,
 ) -> Result<web::Json<Vec<Movie>>, actix_web::Error> {
     match movie_service.search_by_title(
-        &title_name,
-        pagination.limit.unwrap_or(100),
-        pagination.offset.unwrap_or(0),
+        &query.title_name,
+        query.limit.unwrap_or(100),
+        query.offset.unwrap_or(0),
     ).await {
         Ok(movies) => Ok(web::Json(
             movies.into_iter().map(|m| Movie::from(m)).collect(),

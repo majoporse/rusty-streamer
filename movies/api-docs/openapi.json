@@ -816,7 +816,7 @@
         }
       }
     },
-    "/search/movies/people/{actor_name}": {
+    "/search/movies/people": {
       "get": {
         "tags": [
           "Movies"
@@ -825,7 +825,7 @@
         "parameters": [
           {
             "name": "actor_name",
-            "in": "path",
+            "in": "query",
             "description": "Actor name to search for movies",
             "required": true,
             "schema": {
@@ -876,7 +876,7 @@
         }
       }
     },
-    "/search/movies/title/{title_name}": {
+    "/search/movies/title": {
       "get": {
         "tags": [
           "Movies"
@@ -885,7 +885,7 @@
         "parameters": [
           {
             "name": "title_name",
-            "in": "path",
+            "in": "query",
             "description": "Title query string to search for movies",
             "required": true,
             "schema": {

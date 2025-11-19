@@ -266,13 +266,14 @@ pub async fn get_movie_details_by_id(configuration: &configuration::Configuratio
 
 pub async fn search_movies_by_actor(configuration: &configuration::Configuration, actor_name: &str, limit: i64, offset: i64) -> Result<Vec<models::Movie>, Error<SearchMoviesByActorError>> {
     // add a prefix to parameters to efficiently prevent name collisions
-    let p_path_actor_name = actor_name;
+    let p_query_actor_name = actor_name;
     let p_query_limit = limit;
     let p_query_offset = offset;
 
-    let uri_str = format!("{}/search/movies/people/{actor_name}", configuration.base_path, actor_name=crate::apis::urlencode(p_path_actor_name));
+    let uri_str = format!("{}/search/movies/people", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
+    req_builder = req_builder.query(&[("actor_name", &p_query_actor_name.to_string())]);
     req_builder = req_builder.query(&[("limit", &p_query_limit.to_string())]);
     req_builder = req_builder.query(&[("offset", &p_query_offset.to_string())]);
     if let Some(ref user_agent) = configuration.user_agent {
@@ -306,13 +307,14 @@ pub async fn search_movies_by_actor(configuration: &configuration::Configuration
 
 pub async fn search_movies_by_title(configuration: &configuration::Configuration, title_name: &str, limit: i64, offset: i64) -> Result<Vec<models::Movie>, Error<SearchMoviesByTitleError>> {
     // add a prefix to parameters to efficiently prevent name collisions
-    let p_path_title_name = title_name;
+    let p_query_title_name = title_name;
     let p_query_limit = limit;
     let p_query_offset = offset;
 
-    let uri_str = format!("{}/search/movies/title/{title_name}", configuration.base_path, title_name=crate::apis::urlencode(p_path_title_name));
+    let uri_str = format!("{}/search/movies/title", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
+    req_builder = req_builder.query(&[("title_name", &p_query_title_name.to_string())]);
     req_builder = req_builder.query(&[("limit", &p_query_limit.to_string())]);
     req_builder = req_builder.query(&[("offset", &p_query_offset.to_string())]);
     if let Some(ref user_agent) = configuration.user_agent {

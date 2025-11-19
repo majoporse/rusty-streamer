@@ -36,8 +36,8 @@ Class | Method | HTTP request | Description
 *MoviesApi* | [**get_all_movies**](docs/MoviesApi.md#get_all_movies) | **GET** /movies | 
 *MoviesApi* | [**get_movie_by_id**](docs/MoviesApi.md#get_movie_by_id) | **GET** /movies/{movie_id} | 
 *MoviesApi* | [**get_movie_details_by_id**](docs/MoviesApi.md#get_movie_details_by_id) | **GET** /movies/{movie_id}/details | 
-*MoviesApi* | [**search_movies_by_actor**](docs/MoviesApi.md#search_movies_by_actor) | **GET** /search/movies/people/{actor_name} | 
-*MoviesApi* | [**search_movies_by_title**](docs/MoviesApi.md#search_movies_by_title) | **GET** /search/movies/title/{title_name} | 
+*MoviesApi* | [**search_movies_by_actor**](docs/MoviesApi.md#search_movies_by_actor) | **GET** /search/movies/people | 
+*MoviesApi* | [**search_movies_by_title**](docs/MoviesApi.md#search_movies_by_title) | **GET** /search/movies/title | 
 *MoviesApi* | [**update_movie**](docs/MoviesApi.md#update_movie) | **PUT** /movies/{movie_id} | 
 *PeopleApi* | [**create_person**](docs/PeopleApi.md#create_person) | **POST** /people | 
 *PeopleApi* | [**delete_person**](docs/PeopleApi.md#delete_person) | **DELETE** /people/{person_id} | 

@@ -817,21 +817,17 @@ export const MoviesApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {string} actorName Actor name to search for movies
          * @param {number} limit Max number of movies to return
          * @param {number} offset Pagination offset
-         * @param {string} personName 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchMoviesByActor: async (actorName: string, limit: number, offset: number, personName: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        searchMoviesByActor: async (actorName: string, limit: number, offset: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'actorName' is not null or undefined
             assertParamExists('searchMoviesByActor', 'actorName', actorName)
             // verify required parameter 'limit' is not null or undefined
             assertParamExists('searchMoviesByActor', 'limit', limit)
             // verify required parameter 'offset' is not null or undefined
             assertParamExists('searchMoviesByActor', 'offset', offset)
-            // verify required parameter 'personName' is not null or undefined
-            assertParamExists('searchMoviesByActor', 'personName', personName)
-            const localVarPath = `/search/movies/person/{person_name}`
-                .replace(`{${"person_name"}}`, encodeURIComponent(String(personName)));
+            const localVarPath = `/search/movies/person`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -881,8 +877,7 @@ export const MoviesApiAxiosParamCreator = function (configuration?: Configuratio
             assertParamExists('searchMoviesByTitle', 'limit', limit)
             // verify required parameter 'offset' is not null or undefined
             assertParamExists('searchMoviesByTitle', 'offset', offset)
-            const localVarPath = `/search/movies/title/{title_name}`
-                .replace(`{${"title_name"}}`, encodeURIComponent(String(titleName)));
+            const localVarPath = `/search/movies/title`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -893,6 +888,10 @@ export const MoviesApiAxiosParamCreator = function (configuration?: Configuratio
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            if (titleName !== undefined) {
+                localVarQueryParameter['title_name'] = titleName;
+            }
 
             if (limit !== undefined) {
                 localVarQueryParameter['limit'] = limit;
@@ -1027,12 +1026,11 @@ export const MoviesApiFp = function(configuration?: Configuration) {
          * @param {string} actorName Actor name to search for movies
          * @param {number} limit Max number of movies to return
          * @param {number} offset Pagination offset
-         * @param {string} personName 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async searchMoviesByActor(actorName: string, limit: number, offset: number, personName: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<WrapperMovie>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.searchMoviesByActor(actorName, limit, offset, personName, options);
+        async searchMoviesByActor(actorName: string, limit: number, offset: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<WrapperMovie>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.searchMoviesByActor(actorName, limit, offset, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['MoviesApi.searchMoviesByActor']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -1124,12 +1122,11 @@ export const MoviesApiFactory = function (configuration?: Configuration, basePat
          * @param {string} actorName Actor name to search for movies
          * @param {number} limit Max number of movies to return
          * @param {number} offset Pagination offset
-         * @param {string} personName 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        searchMoviesByActor(actorName: string, limit: number, offset: number, personName: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<WrapperMovie>> {
-            return localVarFp.searchMoviesByActor(actorName, limit, offset, personName, options).then((request) => request(axios, basePath));
+        searchMoviesByActor(actorName: string, limit: number, offset: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<WrapperMovie>> {
+            return localVarFp.searchMoviesByActor(actorName, limit, offset, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1215,12 +1212,11 @@ export class MoviesApi extends BaseAPI {
      * @param {string} actorName Actor name to search for movies
      * @param {number} limit Max number of movies to return
      * @param {number} offset Pagination offset
-     * @param {string} personName 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public searchMoviesByActor(actorName: string, limit: number, offset: number, personName: string, options?: RawAxiosRequestConfig) {
-        return MoviesApiFp(this.configuration).searchMoviesByActor(actorName, limit, offset, personName, options).then((request) => request(this.axios, this.basePath));
+    public searchMoviesByActor(actorName: string, limit: number, offset: number, options?: RawAxiosRequestConfig) {
+        return MoviesApiFp(this.configuration).searchMoviesByActor(actorName, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
