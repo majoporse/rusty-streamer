@@ -1,4 +1,10 @@
-import { Box, Calendar, Home, House, Inbox, Search, Settings, Upload, User } from "lucide-react";
+import {
+  Box,
+  Home,
+  Search,
+  Upload,
+  User,
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -38,10 +44,14 @@ const items = [
     url: "/upload",
     icon: Upload,
   },
+  {
+    title: "Login",
+    url: "/login",
+    icon: User,
+  },
 ];
 
 export function AppSidebar() {
-
   return (
     <Sidebar>
       <SidebarContent>

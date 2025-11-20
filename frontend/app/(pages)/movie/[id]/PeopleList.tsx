@@ -2,8 +2,8 @@
 
 import React from "react";
 import { WrapperMovieDetail } from "@/generated";
-import { Card, CardContent, CardHeader } from "../../../components/ui/card";
-import { TypographyH3 } from "../../../components/ui/typo";
+import { Card } from "../../../../components/ui/card";
+import { TypographyH3 } from "../../../../components/ui/typo";
 import { Separator } from "@radix-ui/react-separator";
 import PersonCard from "./PersonCard";
 
@@ -29,10 +29,7 @@ export default function PeopleList({
       ) : (
         <div className="grid grid-cols-2 gap-4">
           {people.map((p) => (
-            <PersonCard
-              key={p.person.id}
-              person={p}
-            />
+            <PersonCard key={p.person.id} person={p} />
           ))}
         </div>
       )}

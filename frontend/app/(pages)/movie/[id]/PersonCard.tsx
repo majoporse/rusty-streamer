@@ -2,9 +2,10 @@
 
 import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardFooter } from "@/components/ui/card";
-import { MovieCrewDetail, WrapperPerson } from "@/generated";
-import { TypographyH3, TypographyH4, TypographyP } from "@/components/ui/typo";
+import { Card } from "@/components/ui/card";
+import { MovieCrewDetail } from "@/generated";
+import { TypographyH4 } from "@/components/ui/typo";
+import Image from "next/image";
 
 export default function PersonCard({
   person: crew,
@@ -30,10 +31,11 @@ export default function PersonCard({
   return (
     <Card className="relative text-left w-full p-0 overflow-hidden rounded-md">
       <div className="relative w-full h-44">
-        <img
+        <Image
           src={imgSrc}
           alt={crew?.person.first_name || "Person Image"}
-          className="absolute inset-0 w-full h-full object-cover"
+          fill
+          className="object-cover"
         />
 
         <div

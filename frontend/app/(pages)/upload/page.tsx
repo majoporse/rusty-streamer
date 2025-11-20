@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import React, { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
@@ -16,15 +16,12 @@ import {
 
 import {
   MoviesApi,
-  PeopleApi,
   WrapperNewMovie,
   WrapperGenre,
   WrapperPerson,
   WrapperMovieCrew,
-  GenresApi,
   UploadsApi,
 } from "@/generated";
-import { AxiosConfig } from "@/app/layout";
 import {
   Form,
   FormControl,
@@ -43,6 +40,8 @@ import { Textarea } from "@/components/ui/textarea";
 import GenresSelector from "./GenresSelector";
 import PeopleSelector from "./PeopleSelector";
 import { uploadAzureSas } from "./azureUpload";
+import { AxiosConfig } from "@/lib/utils";
+import Image from "next/image";
 
 const movieSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -53,9 +52,7 @@ const movieSchema = z.object({
   duration_minutes: z.number().int().positive().optional(),
 });
 
-type FormValues = z.infer<typeof movieSchema> & {
-  // we'll track selected genre ids separately
-};
+type FormValues = z.infer<typeof movieSchema>;
 
 export type PersonCharacter = WrapperPerson & { role: string };
 
@@ -73,23 +70,19 @@ export default function UploadMoviePage() {
 
   // image preview
   const [imageFile, setImageFile] = useState<File[]>([]);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [movieFile, setMovieFile] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (imageFile && imageFile.length > 0) {
-      const file = imageFile[0];
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-      return () => {
-        URL.revokeObjectURL(url);
-      };
-    }
-
-    setPreviewUrl(null);
-    return;
+  const previewUrl = useMemo(() => {
+    if (!imageFile.length) return null;
+    return URL.createObjectURL(imageFile[0]);
   }, [imageFile]);
+
+  useEffect(() => {
+    return () => {
+      previewUrl && URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const [selectedPeople, setSelectedPeople] = useState<PersonCharacter[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<WrapperGenre[]>([]);
@@ -117,7 +110,6 @@ export default function UploadMoviePage() {
       const api = new MoviesApi(AxiosConfig);
       const azure_api = new UploadsApi(AxiosConfig);
 
-      // upload image if exists (small, optional progress)
       if (imageFile.length > 0) {
         const imgUrl = await azure_api.requestUploadSas({
           filename: imageFile[0].name,
@@ -136,12 +128,10 @@ export default function UploadMoviePage() {
         wrapper.poster_url = imgUrl.data.blob_url;
       }
 
-      // upload video with progress
       if (movieFile.length > 0) {
         const url = await azure_api.requestUploadSas({
           filename: movieFile[0].name,
         });
-        console.log("upload url", url.data);
 
         setUploadProgress(0);
         await uploadAzureSas(
@@ -164,7 +154,6 @@ export default function UploadMoviePage() {
       setSelectedGenres([]);
       setImageFile([]);
       setMovieFile([]);
-      setPreviewUrl(null);
       alert(
         "Movie created (check console). If you need to upload a poster, use the posters endpoint or attach via admin."
       );
@@ -299,11 +288,12 @@ export default function UploadMoviePage() {
                     <DropzoneContent />
                   </Dropzone>
 
-                  <div className="w-full h-full my-2 overflow-hidden">
+                  <div className="relative w-full h-64 my-2 overflow-hidden rounded-md">
                     {previewUrl ? (
-                      <img
+                      <Image
                         src={previewUrl}
                         alt="preview"
+                        fill
                         className="rounded-md w-full h-full object-cover"
                       />
                     ) : imageFile.length > 0 ? (

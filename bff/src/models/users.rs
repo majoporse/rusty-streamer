@@ -1,8 +1,8 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
+use users_client::models as client_models;
 use utoipa::ToSchema;
 use uuid::Uuid;
-use users_client::models as client_models;
 
 #[derive(ToSchema, Serialize, Deserialize, Debug, Clone)]
 pub struct WatchRoom {
@@ -109,7 +109,6 @@ impl From<UpdateWatchRoom> for client_models::UpdateWatchRoom {
     }
 }
 
-
 #[derive(ToSchema, Serialize, Deserialize, Debug, Clone)]
 pub struct WatchRoomParticipant {
     pub id: i64,
@@ -126,7 +125,6 @@ pub struct NewWatchRoomParticipant {
     pub user_id: Uuid,
     pub is_host: Option<Option<bool>>,
 }
-
 
 #[derive(ToSchema, Serialize, Deserialize, Debug, Clone)]
 pub struct WatchRoomMessage {
@@ -146,7 +144,6 @@ pub struct NewWatchRoomMessage {
     pub is_system_message: Option<Option<bool>>,
 }
 
-
 #[derive(ToSchema, Serialize, Deserialize, Debug, Clone)]
 pub struct Watchlist {
     pub id: i64,
@@ -160,7 +157,7 @@ pub struct NewWatchlist {
     pub user_id: Uuid,
     pub content_id: Uuid,
 }
-
+// TODO ADD MOVIE NAME FOR CACHE
 #[derive(ToSchema, Serialize, Deserialize, Debug, Clone)]
 pub struct WatchHistory {
     pub id: i64,
@@ -184,7 +181,6 @@ pub struct UpdateWatchHistory {
     pub progress_seconds: Option<Option<i32>>,
     pub completed: Option<Option<bool>>,
 }
-
 
 #[derive(ToSchema, Serialize, Deserialize, Debug, Clone)]
 pub struct User {

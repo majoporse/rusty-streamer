@@ -3,75 +3,19 @@
 import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { WrapperMovieDetail } from "@/generated";
-import Example, { StarRating } from "../../../components/StarRating";
-import { TypographyH2, TypographyP } from "../../../components/ui/typo";
+import Example from "../../../../components/StarRating";
+import { TypographyH2, TypographyP } from "../../../../components/ui/typo";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@radix-ui/react-separator";
-import PeopleList from "./PeopleList";
-import { Rating, RatingButton } from "../../../components/ui/shadcn-io/rating";
-import { AspectRatio } from "@radix-ui/react-aspect-ratio";
 
-export default function MovieDetail({
-  movie,
-  loading,
-}: {
-  movie?: WrapperMovieDetail | undefined;
-  loading?: boolean;
-}) {
-  const poster = movie?.poster_url ?? "/placeholder-poster.png";
 
-  return (
-    <section
-      className="
-        grid gap-6 
-        grid-cols-1 md:grid-cols-2
-        w-full md:max-w-[1000px] 
-        m-4
-        h-auto md:h-200"
-    >
-      <div className="w-full h-auto md:h-full md:max-h-200 overflow-hidden">
-        {loading ? (
-          <Skeleton className="w-full h-full" />
-        ) : (
-          <img
-            src={poster}
-            alt={movie?.title ?? "Movie poster"}
-            className="
-          rounded-xl
-          h-full w-auto
-          object-cover
-          mx-auto
-        "
-          />
-        )}
-      </div>
 
-      <div
-        className="
-      grid gap-4
-      grid-rows-2
-      min-h-0 md:max-h-200
-    "
-      >
-        <div className="min-h-0">
-          <MovieTextDetail movie={movie} loading={loading} />
-        </div>
-
-        <div className="min-h-0">
-          <PeopleList movie={movie} loading={loading} />
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function MovieTextDetail({
+export default function MovieText({
   movie,
   loading,
 }: {
@@ -79,13 +23,7 @@ function MovieTextDetail({
   loading?: boolean;
 }) {
   return (
-    <Card
-      className="md:col-span-2"
-      style={{
-        height: "20rem",
-        padding: "1rem",
-      }}
-    >
+    <Card className="p-5 gap-0 h-full">
       {loading ? (
         <LoadingTextSkeleton />
       ) : (

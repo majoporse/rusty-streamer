@@ -24,19 +24,36 @@ export const VideoPlayer: FC<VideoPlayerProps> = ({
   useEffect(() => {
     if (!playerRef.current && videoRef.current) {
       const videoElement = document.createElement("video");
-      videoElement.classList.add("video-js", "vjs-big-play-centered");
+      videoElement.classList.add(
+        "video-js",
+        "vjs-16-9",
+        "rounded-2xl",
+        "overflow-hidden",
+      );
 
       videoRef.current.appendChild(videoElement);
 
       playerRef.current = videojs(videoElement, {
         controls: true,
         fluid: true,
+        reactive: true,
         preload: "auto",
         poster: posterSrc,
         ...options,
       });
+
+      // // Make control bar wrap when space is constrained to avoid overflow
+      // const el = playerRef.current.el();
+      // const controlBar = el.querySelector(
+      //   ".vjs-control-bar"
+      // ) as HTMLElement | null;
+      // if (controlBar) {
+      //   controlBar.style.flexWrap = "wrap";
+      //   controlBar.style.gap = "0.5rem";
+      //   controlBar.style.alignItems = "center";
+      // }
     }
-  }, []);
+  }, [options, posterSrc]);
 
   // Update video source when available
   useEffect(() => {
@@ -62,9 +79,7 @@ export const VideoPlayer: FC<VideoPlayerProps> = ({
     <div
       data-vjs-player
       {...props}
-      className={`w-full rounded-2xl overflow-hidden shadow-md bg-muted ${
-        props.className || ""
-      }`}
+      className={`w-full ${props.className ?? ""}`}
     >
       <div ref={videoRef} />
     </div>

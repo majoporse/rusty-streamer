@@ -2,9 +2,9 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GenresApi, WrapperGenre } from "@/generated";
 import { useQuery } from "@tanstack/react-query";
-import { AxiosConfig } from "../layout";
 import GenreCard from "./GenreCard";
 import { Label } from "@/components/ui/label";
+import { AxiosConfig } from "@/lib/utils";
 
 export default function GenresSelector({
   selectedGenres,
@@ -20,8 +20,8 @@ export default function GenresSelector({
   } = useQuery<WrapperGenre[]>({
     queryKey: ["genres"],
     queryFn: async () => {
-      let api = new GenresApi(AxiosConfig);
-      let res = await api.listGenres(100, 0);
+      const api = new GenresApi(AxiosConfig);
+      const res = await api.listGenres(100, 0);
       return res.data || [];
     },
   });

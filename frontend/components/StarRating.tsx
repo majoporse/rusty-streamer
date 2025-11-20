@@ -27,6 +27,7 @@ export function StarRating({
           onMouseEnter={() => setHover(star)}
           onMouseLeave={() => setHover(null)}
           onClick={() => onChange?.(star)}
+          type="button"
           className="p-0 m-0 bg-transparent border-none cursor-pointer"
         >
           <Star

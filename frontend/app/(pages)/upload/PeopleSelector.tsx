@@ -3,12 +3,12 @@ import { PersonCharacter } from "./page";
 import { useDebounce } from "use-debounce";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { PeopleApi, WrapperPerson } from "@/generated";
-import { AxiosConfig } from "../layout";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import PersonCard from "./PersonCard";
 import { Input } from "@/components/ui/input";
+import { AxiosConfig } from "@/lib/utils";
 
 export default function PeopleSelector({
   selectedPeople,
@@ -32,9 +32,9 @@ export default function PeopleSelector({
   } = useInfiniteQuery({
     queryKey: ["people", debouncedQ],
     queryFn: async ({ pageParam = 0 }: any) => {
-      let api = new PeopleApi(AxiosConfig);
-      let res = await api.getPersonByName(debouncedQ, pageSize, pageParam);
-      let resData = res.data || [];
+      const api = new PeopleApi(AxiosConfig);
+      const res = await api.getPersonByName(debouncedQ, pageSize, pageParam);
+      const resData = res.data || [];
 
       return {
         items: resData,
