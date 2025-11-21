@@ -1,5 +1,5 @@
 /* tslint:disable */
- 
+/* eslint-disable */
 /**
  * Backend For Frontend API
  * API documentation for the BFF service.
@@ -31,10 +31,8 @@ export interface MovieCrewDetail {
     'person_id': string;
 }
 export interface NewUser {
-    'country'?: string | null;
-    'display_name'?: string | null;
+    'bio'?: string | null;
     'email': string;
-    'language_preference'?: string | null;
     'password_hash': string;
     'profile_picture_url'?: string | null;
     'username': string;
@@ -59,7 +57,7 @@ export interface NewWatchRoomMessage {
     'user_id'?: string | null;
 }
 export interface NewWatchRoomParticipant {
-    'is_host'?: boolean | null;
+    'is_admin': boolean;
     'room_id': string;
     'user_id': string;
 }
@@ -68,11 +66,10 @@ export interface NewWatchlist {
     'user_id': string;
 }
 export interface UpdateUser {
-    'country'?: string | null;
-    'display_name'?: string | null;
-    'language_preference'?: string | null;
+    'bio'?: string | null;
+    'email'?: string | null;
     'profile_picture_url'?: string | null;
-    'status'?: string | null;
+    'username'?: string | null;
 }
 export interface UpdateWatchHistory {
     'completed'?: boolean | null;
@@ -111,17 +108,15 @@ export interface UploadSasResponse {
     'upload_url': string;
 }
 export interface User {
-    'country'?: string | null;
+    'bio'?: string | null;
     'created_at': string;
-    'display_name': string;
     'email': string;
     'id': string;
-    'language_preference'?: string | null;
     'last_login_at'?: string | null;
     'password_hash': string;
     'profile_picture_url'?: string | null;
     'status'?: string | null;
-    'updated_at'?: string | null;
+    'updated_at': string;
     'username': string;
 }
 export interface WatchHistory {
@@ -142,19 +137,19 @@ export interface WatchRoom {
     'is_live'?: boolean | null;
     'is_private': boolean;
     'room_name'?: string | null;
-    'updated_at'?: string | null;
+    'updated_at': string;
 }
 export interface WatchRoomMessage {
     'id': number;
     'is_system_message'?: boolean | null;
     'message': string;
     'room_id': string;
-    'sent_at'?: string | null;
+    'sent_at': string;
     'user_id'?: string | null;
 }
 export interface WatchRoomParticipant {
     'id': number;
-    'is_host'?: boolean | null;
+    'is_admin': boolean;
     'joined_at'?: string | null;
     'last_active_at'?: string | null;
     'room_id': string;
@@ -1900,6 +1895,100 @@ export const ReviewsApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @param {number} movieId ID of the movie to get reviews for
+         * @param {number} limit Max number of reviews to return
+         * @param {number} offset Pagination offset
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getReviewsByMovieId: async (movieId: number, limit: number, offset: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'movieId' is not null or undefined
+            assertParamExists('getReviewsByMovieId', 'movieId', movieId)
+            // verify required parameter 'limit' is not null or undefined
+            assertParamExists('getReviewsByMovieId', 'limit', limit)
+            // verify required parameter 'offset' is not null or undefined
+            assertParamExists('getReviewsByMovieId', 'offset', offset)
+            const localVarPath = `/reviews/movie/{movie_id}`
+                .replace(`{${"movie_id"}}`, encodeURIComponent(String(movieId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @param {string} userId ID of the user to get reviews for
+         * @param {number} limit Max number of reviews to return
+         * @param {number} offset Pagination offset
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getReviewsByUserId: async (userId: string, limit: number, offset: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'userId' is not null or undefined
+            assertParamExists('getReviewsByUserId', 'userId', userId)
+            // verify required parameter 'limit' is not null or undefined
+            assertParamExists('getReviewsByUserId', 'limit', limit)
+            // verify required parameter 'offset' is not null or undefined
+            assertParamExists('getReviewsByUserId', 'offset', offset)
+            const localVarPath = `/reviews/user/{user_id}`
+                .replace(`{${"user_id"}}`, encodeURIComponent(String(userId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @param {number} reviewId ID of the review to update
          * @param {WrapperNewReview} wrapperNewReview 
          * @param {*} [options] Override http request option.
@@ -1997,6 +2086,34 @@ export const ReviewsApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @param {number} movieId ID of the movie to get reviews for
+         * @param {number} limit Max number of reviews to return
+         * @param {number} offset Pagination offset
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getReviewsByMovieId(movieId: number, limit: number, offset: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<WrapperReview>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getReviewsByMovieId(movieId, limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ReviewsApi.getReviewsByMovieId']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @param {string} userId ID of the user to get reviews for
+         * @param {number} limit Max number of reviews to return
+         * @param {number} offset Pagination offset
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getReviewsByUserId(userId: string, limit: number, offset: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<WrapperReview>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getReviewsByUserId(userId, limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ReviewsApi.getReviewsByUserId']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @param {number} reviewId ID of the review to update
          * @param {WrapperNewReview} wrapperNewReview 
          * @param {*} [options] Override http request option.
@@ -2056,6 +2173,28 @@ export const ReviewsApiFactory = function (configuration?: Configuration, basePa
         },
         /**
          * 
+         * @param {number} movieId ID of the movie to get reviews for
+         * @param {number} limit Max number of reviews to return
+         * @param {number} offset Pagination offset
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getReviewsByMovieId(movieId: number, limit: number, offset: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<WrapperReview>> {
+            return localVarFp.getReviewsByMovieId(movieId, limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @param {string} userId ID of the user to get reviews for
+         * @param {number} limit Max number of reviews to return
+         * @param {number} offset Pagination offset
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getReviewsByUserId(userId: string, limit: number, offset: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<WrapperReview>> {
+            return localVarFp.getReviewsByUserId(userId, limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @param {number} reviewId ID of the review to update
          * @param {WrapperNewReview} wrapperNewReview 
          * @param {*} [options] Override http request option.
@@ -2110,6 +2249,30 @@ export class ReviewsApi extends BaseAPI {
      */
     public getReviewById(reviewId: number, options?: RawAxiosRequestConfig) {
         return ReviewsApiFp(this.configuration).getReviewById(reviewId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {number} movieId ID of the movie to get reviews for
+     * @param {number} limit Max number of reviews to return
+     * @param {number} offset Pagination offset
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getReviewsByMovieId(movieId: number, limit: number, offset: number, options?: RawAxiosRequestConfig) {
+        return ReviewsApiFp(this.configuration).getReviewsByMovieId(movieId, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @param {string} userId ID of the user to get reviews for
+     * @param {number} limit Max number of reviews to return
+     * @param {number} offset Pagination offset
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getReviewsByUserId(userId: string, limit: number, offset: number, options?: RawAxiosRequestConfig) {
+        return ReviewsApiFp(this.configuration).getReviewsByUserId(userId, limit, offset, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

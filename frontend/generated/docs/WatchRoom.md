@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 **is_live** | **boolean** |  | [optional] [default to undefined]
 **is_private** | **boolean** |  | [default to undefined]
 **room_name** | **string** |  | [optional] [default to undefined]
-**updated_at** | **string** |  | [optional] [default to undefined]
+**updated_at** | **string** |  | [default to undefined]
 
 ## Example
 

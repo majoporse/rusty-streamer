@@ -13,12 +13,10 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    display_name VARCHAR(100),
     profile_picture_url TEXT,
-    country VARCHAR(5),
-    language_preference VARCHAR(5),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    bio TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
     last_login_at TIMESTAMP WITH TIME ZONE,
     status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'suspended', 'deleted'))
 );
@@ -43,7 +41,7 @@ CREATE TABLE watchlist (
     id BIGSERIAL PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     content_id UUID NOT NULL,
-    added_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
     UNIQUE (user_id, content_id)
 );
 
@@ -55,12 +53,12 @@ CREATE TABLE watch_rooms (
     host_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     content_id UUID NOT NULL,
     room_name VARCHAR(100),
-    is_private BOOLEAN DEFAULT FALSE,
+    is_private BOOLEAN DEFAULT FALSE NOT NULL,
     invite_code VARCHAR(10) UNIQUE,
     current_time_seconds INTEGER DEFAULT 0,
     is_live BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
 );
 
 -- ======================
@@ -72,7 +70,7 @@ CREATE TABLE watch_room_participants (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     joined_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     last_active_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    is_host BOOLEAN DEFAULT FALSE,
+    is_admin BOOLEAN DEFAULT FALSE NOT NULL,
     UNIQUE (room_id, user_id)
 );
 
@@ -84,7 +82,7 @@ CREATE TABLE watch_room_messages (
     room_id UUID NOT NULL REFERENCES watch_rooms(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id) ON DELETE SET NULL,
     message TEXT NOT NULL,
-    sent_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    sent_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
     is_system_message BOOLEAN DEFAULT FALSE
 );
 

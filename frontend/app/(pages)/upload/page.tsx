@@ -39,7 +39,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import GenresSelector from "./GenresSelector";
 import PeopleSelector from "./PeopleSelector";
-import { uploadAzureSas } from "./azureUpload";
+import { uploadAzureSas } from "../../../lib/azureUpload";
 import { AxiosConfig } from "@/lib/utils";
 import Image from "next/image";
 

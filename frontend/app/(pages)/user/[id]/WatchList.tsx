@@ -9,7 +9,7 @@ import WatchHistoryLog from "./WatchHistoryLog";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosConfig } from "@/lib/utils";
 
-export default function WatchList({
+export default function WatchHistoryList({
   user: user,
   loading,
 }: {
@@ -34,8 +34,6 @@ export default function WatchList({
 
   return (
     <Card className="p-5 gap-0 h-full">
-      <TypographyH3 str="watchhistorys" />
-      <Separator className="my-2" />
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
           {[...Array(5)].map((_, index) => (

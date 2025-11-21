@@ -8,6 +8,8 @@ All URIs are relative to *http://localhost*
 |[**deleteReview**](#deletereview) | **DELETE** /reviews/{review_id} | |
 |[**getAllReviews**](#getallreviews) | **GET** /reviews | |
 |[**getReviewById**](#getreviewbyid) | **GET** /reviews/{review_id} | |
+|[**getReviewsByMovieId**](#getreviewsbymovieid) | **GET** /reviews/movie/{movie_id} | |
+|[**getReviewsByUserId**](#getreviewsbyuserid) | **GET** /reviews/user/{user_id} | |
 |[**updateReview**](#updatereview) | **PUT** /reviews/{review_id} | |
 
 # **createReview**
@@ -216,6 +218,120 @@ No authorization required
 |-------------|-------------|------------------|
 |**200** | Get review by ID |  -  |
 |**404** | Not Found |  -  |
+|**500** | Internal Server Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getReviewsByMovieId**
+> Array<WrapperReview> getReviewsByMovieId()
+
+
+### Example
+
+```typescript
+import {
+    ReviewsApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new ReviewsApi(configuration);
+
+let movieId: number; //ID of the movie to get reviews for (default to undefined)
+let limit: number; //Max number of reviews to return (default to undefined)
+let offset: number; //Pagination offset (default to undefined)
+
+const { status, data } = await apiInstance.getReviewsByMovieId(
+    movieId,
+    limit,
+    offset
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **movieId** | [**number**] | ID of the movie to get reviews for | defaults to undefined|
+| **limit** | [**number**] | Max number of reviews to return | defaults to undefined|
+| **offset** | [**number**] | Pagination offset | defaults to undefined|
+
+
+### Return type
+
+**Array<WrapperReview>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Get reviews by movie ID |  -  |
+|**500** | Internal Server Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getReviewsByUserId**
+> Array<WrapperReview> getReviewsByUserId()
+
+
+### Example
+
+```typescript
+import {
+    ReviewsApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new ReviewsApi(configuration);
+
+let userId: string; //ID of the user to get reviews for (default to undefined)
+let limit: number; //Max number of reviews to return (default to undefined)
+let offset: number; //Pagination offset (default to undefined)
+
+const { status, data } = await apiInstance.getReviewsByUserId(
+    userId,
+    limit,
+    offset
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **userId** | [**string**] | ID of the user to get reviews for | defaults to undefined|
+| **limit** | [**number**] | Max number of reviews to return | defaults to undefined|
+| **offset** | [**number**] | Pagination offset | defaults to undefined|
+
+
+### Return type
+
+**Array<WrapperReview>**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Get reviews by user ID |  -  |
 |**500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

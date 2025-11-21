@@ -15,7 +15,7 @@ pub struct WatchRoomParticipant {
     pub user_id: Uuid,
     pub joined_at: Option<NaiveDateTime>,
     pub last_active_at: Option<NaiveDateTime>,
-    pub is_host: Option<bool>,
+    pub is_admin: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, ToSchema)]
@@ -24,5 +24,5 @@ pub struct WatchRoomParticipant {
 pub struct NewWatchRoomParticipant {
     pub room_id: Uuid,
     pub user_id: Uuid,
-    pub is_host: Option<bool>,
+    pub is_admin: bool,
 }

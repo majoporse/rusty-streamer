@@ -149,7 +149,7 @@ pub async fn update_review(
 
 #[utoipa::path(
     params(
-        ("user_id" = i32, Path, description = "ID of the user to get reviews for"),
+        ("user_id" = Uuid, Path, description = "ID of the user to get reviews for"),
         ("limit" = i64, Query, description = "Max number of reviews to return", example = 100),
         ("offset" = i64, Query, description = "Pagination offset", example = 0)
     ),
@@ -229,6 +229,8 @@ pub async fn get_reviews_by_movie_id(
     create_review,
     delete_review,
     update_review,
+    get_reviews_by_user_id,
+    get_reviews_by_movie_id
 ))]
 pub struct ApiDoc;
 
@@ -238,4 +240,6 @@ pub fn scoped_config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) 
     cfg.service(create_review);
     cfg.service(delete_review);
     cfg.service(update_review);
+    cfg.service(get_reviews_by_user_id);
+    cfg.service(get_reviews_by_movie_id);
 }

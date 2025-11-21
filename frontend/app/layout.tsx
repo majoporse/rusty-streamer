@@ -1,7 +1,5 @@
 import "./globals.css";
-import {
-  SidebarProvider,
-} from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import ReactQueryProvider from "@/components/ReactQueryProvider";
 import { ModeToggle } from "@/components/ToggleTheme";
 import { ThemeProvider } from "next-themes";

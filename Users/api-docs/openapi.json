@@ -1155,13 +1155,7 @@
           "password_hash"
         ],
         "properties": {
-          "country": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "display_name": {
+          "bio": {
             "type": [
               "string",
               "null"
@@ -1169,12 +1163,6 @@
           },
           "email": {
             "type": "string"
-          },
-          "language_preference": {
-            "type": [
-              "string",
-              "null"
-            ]
           },
           "password_hash": {
             "type": "string"
@@ -1288,14 +1276,12 @@
         "type": "object",
         "required": [
           "room_id",
-          "user_id"
+          "user_id",
+          "is_admin"
         ],
         "properties": {
-          "is_host": {
-            "type": [
-              "boolean",
-              "null"
-            ]
+          "is_admin": {
+            "type": "boolean"
           },
           "room_id": {
             "type": "string",
@@ -1327,19 +1313,13 @@
       "UpdateUser": {
         "type": "object",
         "properties": {
-          "country": {
+          "bio": {
             "type": [
               "string",
               "null"
             ]
           },
-          "display_name": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "language_preference": {
+          "email": {
             "type": [
               "string",
               "null"
@@ -1351,7 +1331,7 @@
               "null"
             ]
           },
-          "status": {
+          "username": {
             "type": [
               "string",
               "null"
@@ -1402,11 +1382,11 @@
           "username",
           "email",
           "password_hash",
-          "display_name",
-          "created_at"
+          "created_at",
+          "updated_at"
         ],
         "properties": {
-          "country": {
+          "bio": {
             "type": [
               "string",
               "null"
@@ -1416,21 +1396,12 @@
             "type": "string",
             "format": "date-time"
           },
-          "display_name": {
-            "type": "string"
-          },
           "email": {
             "type": "string"
           },
           "id": {
             "type": "string",
             "format": "uuid"
-          },
-          "language_preference": {
-            "type": [
-              "string",
-              "null"
-            ]
           },
           "last_login_at": {
             "type": [
@@ -1455,10 +1426,7 @@
             ]
           },
           "updated_at": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "format": "date-time"
           },
           "username": {
@@ -1515,7 +1483,8 @@
           "host_user_id",
           "content_id",
           "is_private",
-          "created_at"
+          "created_at",
+          "updated_at"
         ],
         "properties": {
           "content_id": {
@@ -1563,10 +1532,7 @@
             ]
           },
           "updated_at": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "format": "date-time"
           }
         }
@@ -1576,7 +1542,8 @@
         "required": [
           "id",
           "room_id",
-          "message"
+          "message",
+          "sent_at"
         ],
         "properties": {
           "id": {
@@ -1597,10 +1564,7 @@
             "format": "uuid"
           },
           "sent_at": {
-            "type": [
-              "string",
-              "null"
-            ],
+            "type": "string",
             "format": "date-time"
           },
           "user_id": {
@@ -1617,18 +1581,16 @@
         "required": [
           "id",
           "room_id",
-          "user_id"
+          "user_id",
+          "is_admin"
         ],
         "properties": {
           "id": {
             "type": "integer",
             "format": "int64"
           },
-          "is_host": {
-            "type": [
-              "boolean",
-              "null"
-            ]
+          "is_admin": {
+            "type": "boolean"
           },
           "joined_at": {
             "type": [

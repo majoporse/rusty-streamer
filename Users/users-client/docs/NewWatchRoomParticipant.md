@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**is_host** | Option<**bool**> |  | [optional]
+**is_admin** | **bool** |  | 
 **room_id** | [**uuid::Uuid**](uuid::Uuid.md) |  | 
 **user_id** | [**uuid::Uuid**](uuid::Uuid.md) |  | 
 

@@ -15,7 +15,7 @@ pub struct WatchRoom {
     pub current_time_seconds: Option<Option<i32>>,
     pub is_live: Option<Option<bool>>,
     pub created_at: NaiveDateTime,
-    pub updated_at: Option<Option<NaiveDateTime>>,
+    pub updated_at: NaiveDateTime,
 }
 
 impl From<client_models::WatchRoom> for WatchRoom {
@@ -30,7 +30,7 @@ impl From<client_models::WatchRoom> for WatchRoom {
             current_time_seconds: v.current_time_seconds,
             is_live: v.is_live,
             created_at: v.created_at.parse().unwrap(),
-            updated_at: v.updated_at.map(|dt| dt.map(|d| d.parse().unwrap())),
+            updated_at: v.updated_at.parse().unwrap(),
         }
     }
 }
@@ -47,7 +47,7 @@ impl From<WatchRoom> for client_models::WatchRoom {
             current_time_seconds: w.current_time_seconds,
             is_live: w.is_live,
             created_at: w.created_at.to_string(),
-            updated_at: w.updated_at.map(|e| e.map(|ee| ee.to_string())),
+            updated_at: w.updated_at.to_string(),
         }
     }
 }
@@ -116,14 +116,14 @@ pub struct WatchRoomParticipant {
     pub user_id: Uuid,
     pub joined_at: Option<Option<NaiveDateTime>>,
     pub last_active_at: Option<Option<NaiveDateTime>>,
-    pub is_host: Option<Option<bool>>,
+    pub is_admin: bool,
 }
 
 #[derive(ToSchema, Serialize, Deserialize, Debug, Clone)]
 pub struct NewWatchRoomParticipant {
     pub room_id: Uuid,
     pub user_id: Uuid,
-    pub is_host: Option<Option<bool>>,
+    pub is_admin: bool,
 }
 
 #[derive(ToSchema, Serialize, Deserialize, Debug, Clone)]
@@ -132,7 +132,7 @@ pub struct WatchRoomMessage {
     pub room_id: Uuid,
     pub user_id: Option<Option<Uuid>>,
     pub message: String,
-    pub sent_at: Option<Option<NaiveDateTime>>,
+    pub sent_at: NaiveDateTime,
     pub is_system_message: Option<Option<bool>>,
 }
 
@@ -188,12 +188,10 @@ pub struct User {
     pub username: String,
     pub email: String,
     pub password_hash: String,
-    pub display_name: String,
     pub profile_picture_url: Option<Option<String>>,
-    pub country: Option<Option<String>>,
-    pub language_preference: Option<Option<String>>,
+    pub bio: Option<Option<String>>,
     pub created_at: NaiveDateTime,
-    pub updated_at: Option<Option<NaiveDateTime>>,
+    pub updated_at: NaiveDateTime,
     pub last_login_at: Option<Option<NaiveDateTime>>,
     pub status: Option<Option<String>>,
 }
@@ -203,19 +201,16 @@ pub struct NewUser {
     pub username: String,
     pub email: String,
     pub password_hash: String,
-    pub display_name: Option<Option<String>>,
     pub profile_picture_url: Option<Option<String>>,
-    pub country: Option<Option<String>>,
-    pub language_preference: Option<Option<String>>,
+    pub bio: Option<Option<String>>,
 }
 
 #[derive(ToSchema, Serialize, Deserialize, Debug, Clone)]
 pub struct UpdateUser {
-    pub display_name: Option<Option<String>>,
+    pub username: Option<Option<String>>,
+    pub email: Option<Option<String>>,
     pub profile_picture_url: Option<Option<String>>,
-    pub language_preference: Option<Option<String>>,
-    pub country: Option<Option<String>>,
-    pub status: Option<Option<String>>,
+    pub bio: Option<Option<String>>,
 }
 
 /// WatchRoomParticipant
@@ -227,7 +222,7 @@ impl From<client_models::WatchRoomParticipant> for WatchRoomParticipant {
             user_id: v.user_id,
             joined_at: v.joined_at.map(|dt| dt.map(|d| d.parse().unwrap())),
             last_active_at: v.last_active_at.map(|dt| dt.map(|d| d.parse().unwrap())),
-            is_host: v.is_host,
+            is_admin: v.is_admin,
         }
     }
 }
@@ -240,7 +235,7 @@ impl From<WatchRoomParticipant> for client_models::WatchRoomParticipant {
             user_id: w.user_id,
             joined_at: w.joined_at.map(|dt| dt.map(|d| d.to_string())),
             last_active_at: w.last_active_at.map(|dt| dt.map(|d| d.to_string())),
-            is_host: w.is_host,
+            is_admin: w.is_admin,
         }
     }
 }
@@ -251,7 +246,7 @@ impl From<client_models::NewWatchRoomParticipant> for NewWatchRoomParticipant {
         NewWatchRoomParticipant {
             room_id: v.room_id,
             user_id: v.user_id,
-            is_host: v.is_host,
+            is_admin: v.is_admin,
         }
     }
 }
@@ -261,7 +256,7 @@ impl From<NewWatchRoomParticipant> for client_models::NewWatchRoomParticipant {
         client_models::NewWatchRoomParticipant {
             room_id: w.room_id,
             user_id: w.user_id,
-            is_host: w.is_host,
+            is_admin: w.is_admin,
         }
     }
 }
@@ -274,7 +269,7 @@ impl From<client_models::WatchRoomMessage> for WatchRoomMessage {
             room_id: v.room_id,
             user_id: v.user_id,
             message: v.message,
-            sent_at: v.sent_at.map(|dt| dt.map(|d| d.parse().unwrap())),
+            sent_at: v.sent_at.parse().unwrap(),
             is_system_message: v.is_system_message,
         }
     }
@@ -287,7 +282,7 @@ impl From<WatchRoomMessage> for client_models::WatchRoomMessage {
             room_id: w.room_id,
             user_id: w.user_id,
             message: w.message,
-            sent_at: w.sent_at.map(|dt| dt.map(|d| d.to_string())),
+            sent_at: w.sent_at.to_string(),
             is_system_message: w.is_system_message,
         }
     }
@@ -435,13 +430,11 @@ impl From<client_models::User> for User {
             username: v.username,
             email: v.email,
             password_hash: v.password_hash,
-            display_name: v.display_name,
             profile_picture_url: v.profile_picture_url,
-            country: v.country,
-            language_preference: v.language_preference,
             created_at: v.created_at.parse().unwrap(),
-            updated_at: v.updated_at.map(|e| e.map(|ee| ee.parse().unwrap())),
+            updated_at: v.updated_at.parse().unwrap(),
             last_login_at: v.last_login_at.map(|dt| dt.map(|d| d.parse().unwrap())),
+            bio: v.bio.map(|dt| dt.map(|d| d.parse().unwrap())),
             status: v.status,
         }
     }
@@ -454,14 +447,12 @@ impl From<User> for client_models::User {
             username: w.username,
             email: w.email,
             password_hash: w.password_hash,
-            display_name: w.display_name,
             profile_picture_url: w.profile_picture_url,
-            country: w.country,
-            language_preference: w.language_preference,
             created_at: w.created_at.to_string(),
-            updated_at: w.updated_at.map(|e| e.map(|ee| ee.to_string())),
+            updated_at: w.updated_at.to_string(),
             last_login_at: w.last_login_at.map(|dt| dt.map(|d| d.to_string())),
             status: w.status,
+            bio: w.bio,
         }
     }
 }
@@ -473,10 +464,8 @@ impl From<client_models::NewUser> for NewUser {
             username: v.username,
             email: v.email,
             password_hash: v.password_hash,
-            display_name: v.display_name,
             profile_picture_url: v.profile_picture_url,
-            country: v.country,
-            language_preference: v.language_preference,
+            bio: v.bio,
         }
     }
 }
@@ -487,10 +476,8 @@ impl From<NewUser> for client_models::NewUser {
             username: w.username,
             email: w.email,
             password_hash: w.password_hash,
-            display_name: w.display_name,
             profile_picture_url: w.profile_picture_url,
-            country: w.country,
-            language_preference: w.language_preference,
+            bio: w.bio,
         }
     }
 }
@@ -499,11 +486,10 @@ impl From<NewUser> for client_models::NewUser {
 impl From<client_models::UpdateUser> for UpdateUser {
     fn from(v: client_models::UpdateUser) -> Self {
         UpdateUser {
-            display_name: v.display_name,
+            username: v.username,
+            email: v.email,
             profile_picture_url: v.profile_picture_url,
-            language_preference: v.language_preference,
-            country: v.country,
-            status: v.status,
+            bio: v.bio,
         }
     }
 }
@@ -511,11 +497,10 @@ impl From<client_models::UpdateUser> for UpdateUser {
 impl From<UpdateUser> for client_models::UpdateUser {
     fn from(w: UpdateUser) -> Self {
         client_models::UpdateUser {
-            display_name: w.display_name,
+            username: w.username,
+            email: w.email,
             profile_picture_url: w.profile_picture_url,
-            language_preference: w.language_preference,
-            country: w.country,
-            status: w.status,
+            bio: w.bio,
         }
     }
 }

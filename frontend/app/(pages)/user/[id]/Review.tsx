@@ -1,38 +1,25 @@
-
 import { Card } from "@/components/ui/card";
 import { Rating } from "@/components/ui/shadcn-io/rating";
 import { Skeleton } from "@/components/ui/skeleton";
-import { UsersApi, WrapperReview } from "@/generated";
+import { User, UsersApi, WrapperReview } from "@/generated";
 import { useQuery } from "@tanstack/react-query";
 import { AxiosConfig } from "@/lib/utils";
 import Image from "next/image";
+import { TypographyBlockquote } from "@/components/ui/typo";
 
 export default function Review({
-  review: review,
+  review,
+  user,
   loading,
 }: {
   review?: WrapperReview | undefined;
+  user?: User | undefined;
   loading?: boolean;
 }) {
-
-
-  const {
-    data: person,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["person", review?.user_id],
-    queryFn: async () => {
-      if (!review) return null;
-      const api = new UsersApi(AxiosConfig);
-      const res = await api.getUserById(review.user_id);
-      return res.data;
-    },
-  });
-
   const imgSrc =
-    person?.profile_picture_url ??
+    user?.profile_picture_url ??
     "https://hips.hearstapps.com/hmg-prod/images/christopher-nolan-attends-the-oppenheimer-premiere-at-news-photo-1704643272.jpg?crop=0.669xw:1.00xh;0.187xw,0&resize=640:*";
+
   if (loading) {
     return (
       <Card className="text-center">
@@ -42,6 +29,7 @@ export default function Review({
       </Card>
     );
   }
+
   return (
     <Card className="w-full p-4 rounded-md">
       <div className="flex items-start gap-4">
@@ -67,10 +55,12 @@ export default function Review({
           </div>
 
           {review?.body && (
-            <div className="mt-3 text-sm text-neutral-700">{review.body}</div>
+            <blockquote className="h-40 overflow-auto">
+              {review.body}
+            </blockquote>
           )}
         </div>
-
+{/* maybe remove image? */}
         <div className="w-16 h-16 shrink-0 relative">
           <Image
             src={imgSrc}

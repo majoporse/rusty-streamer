@@ -13,14 +13,10 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct NewUser {
-    #[serde(rename = "country", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub country: Option<Option<String>>,
-    #[serde(rename = "display_name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub display_name: Option<Option<String>>,
+    #[serde(rename = "bio", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub bio: Option<Option<String>>,
     #[serde(rename = "email")]
     pub email: String,
-    #[serde(rename = "language_preference", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub language_preference: Option<Option<String>>,
     #[serde(rename = "password_hash")]
     pub password_hash: String,
     #[serde(rename = "profile_picture_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
@@ -32,10 +28,8 @@ pub struct NewUser {
 impl NewUser {
     pub fn new(email: String, password_hash: String, username: String) -> NewUser {
         NewUser {
-            country: None,
-            display_name: None,
+            bio: None,
             email,
-            language_preference: None,
             password_hash,
             profile_picture_url: None,
             username,

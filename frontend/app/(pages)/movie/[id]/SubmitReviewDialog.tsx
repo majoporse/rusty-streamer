@@ -37,7 +37,11 @@ const movieSchema = z.object({
 
 type FormValues = z.infer<typeof movieSchema>;
 
-export default function SubmitReviewButton({movie}: {movie: WrapperMovieDetail}) {
+export default function SubmitReviewButton({
+  movie,
+}: {
+  movie: WrapperMovieDetail;
+}) {
   const [stars, setStars] = useState(0);
 
   const form = useForm<FormValues>({
@@ -51,13 +55,15 @@ export default function SubmitReviewButton({movie}: {movie: WrapperMovieDetail})
   async function onSubmit(data: FormValues) {
     console.log("Submitting review:", data);
     const api = new ReviewsApi(AxiosConfig);
+    const userId = "1507d84a-2d1b-414f-88e0-1201b184bd68"; // TODO: get from route params
     const res = await api.createReview({
       title: data.title,
       body: data.body,
       movie_id: movie.id,
       rating: stars,
-      user_id: "todo",
-      user_name: "todo",
+      // TODO: replace with actual user ID from auth context
+      user_id: userId,
+      user_name: "TODO User",
     });
     console.log("Review submitted:", res.data);
     form.reset();
@@ -117,7 +123,11 @@ export default function SubmitReviewButton({movie}: {movie: WrapperMovieDetail})
 
             <div className="mb-4">
               <Label className="mb-2">Rating</Label>
-              <StarRating value={stars} max={5} onChange={(value) => setStars(value)} />
+              <StarRating
+                value={stars}
+                max={5}
+                onChange={(value) => setStars(value)}
+              />
             </div>
 
             <DialogFooter>

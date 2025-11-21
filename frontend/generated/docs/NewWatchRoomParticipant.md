@@ -5,7 +5,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**is_host** | **boolean** |  | [optional] [default to undefined]
+**is_admin** | **boolean** |  | [default to undefined]
 **room_id** | **string** |  | [default to undefined]
 **user_id** | **string** |  | [default to undefined]
 
@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 import { NewWatchRoomParticipant } from './api';
 
 const instance: NewWatchRoomParticipant = {
-    is_host,
+    is_admin,
     room_id,
     user_id,
 };

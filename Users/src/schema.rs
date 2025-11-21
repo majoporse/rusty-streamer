@@ -9,15 +9,10 @@ diesel::table! {
         email -> Varchar,
         #[max_length = 255]
         password_hash -> Varchar,
-        #[max_length = 100]
-        display_name -> Varchar,
         profile_picture_url -> Nullable<Text>,
-        #[max_length = 5]
-        country -> Nullable<Varchar>,
-        #[max_length = 5]
-        language_preference -> Nullable<Varchar>,
+        bio -> Nullable<Text>,
         created_at -> Timestamptz,
-        updated_at -> Nullable<Timestamptz>,
+        updated_at -> Timestamptz,
         last_login_at -> Nullable<Timestamptz>,
         #[max_length = 20]
         status -> Nullable<Varchar>,
@@ -41,7 +36,7 @@ diesel::table! {
         room_id -> Uuid,
         user_id -> Nullable<Uuid>,
         message -> Text,
-        sent_at -> Nullable<Timestamptz>,
+        sent_at -> Timestamptz,
         is_system_message -> Nullable<Bool>,
     }
 }
@@ -53,7 +48,7 @@ diesel::table! {
         user_id -> Uuid,
         joined_at -> Nullable<Timestamptz>,
         last_active_at -> Nullable<Timestamptz>,
-        is_host -> Nullable<Bool>,
+        is_admin -> Bool,
     }
 }
 
@@ -70,7 +65,7 @@ diesel::table! {
         current_time_seconds -> Nullable<Int4>,
         is_live -> Nullable<Bool>,
         created_at -> Timestamptz,
-        updated_at -> Nullable<Timestamptz>,
+        updated_at -> Timestamptz,
     }
 }
 

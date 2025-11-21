@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **is_system_message** | **boolean** |  | [optional] [default to undefined]
 **message** | **string** |  | [default to undefined]
 **room_id** | **string** |  | [default to undefined]
-**sent_at** | **string** |  | [optional] [default to undefined]
+**sent_at** | **string** |  | [default to undefined]
 **user_id** | **string** |  | [optional] [default to undefined]
 
 ## Example

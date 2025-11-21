@@ -4,10 +4,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**country** | Option<**String**> |  | [optional]
-**display_name** | Option<**String**> |  | [optional]
+**bio** | Option<**String**> |  | [optional]
 **email** | **String** |  | 
-**language_preference** | Option<**String**> |  | [optional]
 **password_hash** | **String** |  | 
 **profile_picture_url** | Option<**String**> |  | [optional]
 **username** | **String** |  | 

@@ -5,10 +5,8 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**country** | **string** |  | [optional] [default to undefined]
-**display_name** | **string** |  | [optional] [default to undefined]
+**bio** | **string** |  | [optional] [default to undefined]
 **email** | **string** |  | [default to undefined]
-**language_preference** | **string** |  | [optional] [default to undefined]
 **password_hash** | **string** |  | [default to undefined]
 **profile_picture_url** | **string** |  | [optional] [default to undefined]
 **username** | **string** |  | [default to undefined]
@@ -19,10 +17,8 @@ Name | Type | Description | Notes
 import { NewUser } from './api';
 
 const instance: NewUser = {
-    country,
-    display_name,
+    bio,
     email,
-    language_preference,
     password_hash,
     profile_picture_url,
     username,

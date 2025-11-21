@@ -5,11 +5,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**country** | **string** |  | [optional] [default to undefined]
-**display_name** | **string** |  | [optional] [default to undefined]
-**language_preference** | **string** |  | [optional] [default to undefined]
+**bio** | **string** |  | [optional] [default to undefined]
+**email** | **string** |  | [optional] [default to undefined]
 **profile_picture_url** | **string** |  | [optional] [default to undefined]
-**status** | **string** |  | [optional] [default to undefined]
+**username** | **string** |  | [optional] [default to undefined]
 
 ## Example
 
@@ -17,11 +16,10 @@ Name | Type | Description | Notes
 import { UpdateUser } from './api';
 
 const instance: UpdateUser = {
-    country,
-    display_name,
-    language_preference,
+    bio,
+    email,
     profile_picture_url,
-    status,
+    username,
 };
 ```
 

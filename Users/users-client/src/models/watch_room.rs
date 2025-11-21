@@ -31,12 +31,12 @@ pub struct WatchRoom {
     pub is_private: bool,
     #[serde(rename = "room_name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub room_name: Option<Option<String>>,
-    #[serde(rename = "updated_at", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub updated_at: Option<Option<String>>,
+    #[serde(rename = "updated_at")]
+    pub updated_at: String,
 }
 
 impl WatchRoom {
-    pub fn new(content_id: uuid::Uuid, created_at: String, host_user_id: uuid::Uuid, id: uuid::Uuid, is_private: bool) -> WatchRoom {
+    pub fn new(content_id: uuid::Uuid, created_at: String, host_user_id: uuid::Uuid, id: uuid::Uuid, is_private: bool, updated_at: String) -> WatchRoom {
         WatchRoom {
             content_id,
             created_at,
@@ -47,7 +47,7 @@ impl WatchRoom {
             is_live: None,
             is_private,
             room_name: None,
-            updated_at: None,
+            updated_at,
         }
     }
 }

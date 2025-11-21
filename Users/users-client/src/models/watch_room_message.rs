@@ -21,20 +21,20 @@ pub struct WatchRoomMessage {
     pub message: String,
     #[serde(rename = "room_id")]
     pub room_id: uuid::Uuid,
-    #[serde(rename = "sent_at", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub sent_at: Option<Option<String>>,
+    #[serde(rename = "sent_at")]
+    pub sent_at: String,
     #[serde(rename = "user_id", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub user_id: Option<Option<uuid::Uuid>>,
 }
 
 impl WatchRoomMessage {
-    pub fn new(id: i64, message: String, room_id: uuid::Uuid) -> WatchRoomMessage {
+    pub fn new(id: i64, message: String, room_id: uuid::Uuid, sent_at: String) -> WatchRoomMessage {
         WatchRoomMessage {
             id,
             is_system_message: None,
             message,
             room_id,
-            sent_at: None,
+            sent_at,
             user_id: None,
         }
     }

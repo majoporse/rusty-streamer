@@ -1,5 +1,5 @@
 /* tslint:disable */
- 
+/* eslint-disable */
 /**
  * Backend For Frontend API
  * API documentation for the BFF service.

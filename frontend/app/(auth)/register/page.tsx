@@ -15,17 +15,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TypographyH3 } from "@/components/ui/typo";
+import { NewUser, UsersApi } from "@/generated";
+import { AxiosConfig } from "@/lib/utils";
 
 const registerSchema = z
   .object({
-    email: z.string().email("Enter a valid email"),
+    email: z.email("Enter a valid email"),
+    username: z.string(),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Please confirm your password"),
   })
@@ -41,14 +39,28 @@ export default function RegisterPage() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { email: "", password: "", confirmPassword: "" },
+    defaultValues: {
+      email: "",
+      username: "",
+      password: "",
+      confirmPassword: "",
+    },
   });
 
   async function onSubmit(data: FormValues) {
-    // TODO: call registration API
-    console.log("Register submit", data);
-    // After registration redirect to login
-    router.push("/auth/login");
+    let api = new UsersApi(AxiosConfig);
+    try {
+      let user = await api.createUser({
+        email: data.email,
+        password_hash: data.password, // todo real password
+        username: data.username,
+      } as NewUser);
+      console.log("User registered:", user);
+
+      // router.push("/");
+    } catch (error) {
+      console.error("Registration error:", error);
+    }
   }
 
   return (
@@ -61,6 +73,19 @@ export default function RegisterPage() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input placeholder="your username" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"

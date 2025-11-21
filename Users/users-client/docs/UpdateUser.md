@@ -4,11 +4,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**country** | Option<**String**> |  | [optional]
-**display_name** | Option<**String**> |  | [optional]
-**language_preference** | Option<**String**> |  | [optional]
+**bio** | Option<**String**> |  | [optional]
+**email** | Option<**String**> |  | [optional]
 **profile_picture_url** | Option<**String**> |  | [optional]
-**status** | Option<**String**> |  | [optional]
+**username** | Option<**String**> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

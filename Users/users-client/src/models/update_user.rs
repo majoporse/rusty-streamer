@@ -13,26 +13,23 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct UpdateUser {
-    #[serde(rename = "country", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub country: Option<Option<String>>,
-    #[serde(rename = "display_name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub display_name: Option<Option<String>>,
-    #[serde(rename = "language_preference", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub language_preference: Option<Option<String>>,
+    #[serde(rename = "bio", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub bio: Option<Option<String>>,
+    #[serde(rename = "email", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub email: Option<Option<String>>,
     #[serde(rename = "profile_picture_url", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub profile_picture_url: Option<Option<String>>,
-    #[serde(rename = "status", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub status: Option<Option<String>>,
+    #[serde(rename = "username", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub username: Option<Option<String>>,
 }
 
 impl UpdateUser {
     pub fn new() -> UpdateUser {
         UpdateUser {
-            country: None,
-            display_name: None,
-            language_preference: None,
+            bio: None,
+            email: None,
             profile_picture_url: None,
-            status: None,
+            username: None,
         }
     }
 }

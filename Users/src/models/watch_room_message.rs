@@ -14,7 +14,7 @@ pub struct WatchRoomMessage {
     pub room_id: Uuid,
     pub user_id: Option<Uuid>,
     pub message: String,
-    pub sent_at: Option<NaiveDateTime>,
+    pub sent_at: NaiveDateTime,
     pub is_system_message: Option<bool>,
 }
 

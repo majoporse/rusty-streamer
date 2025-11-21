@@ -13,18 +13,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct User {
-    #[serde(rename = "country", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub country: Option<Option<String>>,
+    #[serde(rename = "bio", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub bio: Option<Option<String>>,
     #[serde(rename = "created_at")]
     pub created_at: String,
-    #[serde(rename = "display_name")]
-    pub display_name: String,
     #[serde(rename = "email")]
     pub email: String,
     #[serde(rename = "id")]
     pub id: uuid::Uuid,
-    #[serde(rename = "language_preference", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub language_preference: Option<Option<String>>,
     #[serde(rename = "last_login_at", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub last_login_at: Option<Option<String>>,
     #[serde(rename = "password_hash")]
@@ -33,26 +29,24 @@ pub struct User {
     pub profile_picture_url: Option<Option<String>>,
     #[serde(rename = "status", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub status: Option<Option<String>>,
-    #[serde(rename = "updated_at", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub updated_at: Option<Option<String>>,
+    #[serde(rename = "updated_at")]
+    pub updated_at: String,
     #[serde(rename = "username")]
     pub username: String,
 }
 
 impl User {
-    pub fn new(created_at: String, display_name: String, email: String, id: uuid::Uuid, password_hash: String, username: String) -> User {
+    pub fn new(created_at: String, email: String, id: uuid::Uuid, password_hash: String, updated_at: String, username: String) -> User {
         User {
-            country: None,
+            bio: None,
             created_at,
-            display_name,
             email,
             id,
-            language_preference: None,
             last_login_at: None,
             password_hash,
             profile_picture_url: None,
             status: None,
-            updated_at: None,
+            updated_at,
             username,
         }
     }

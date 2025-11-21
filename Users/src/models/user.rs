@@ -1,9 +1,12 @@
-use diesel::{Insertable, Selectable, prelude::{Identifiable, Queryable}};
-use serde::{Serialize, Deserialize};
 use chrono::NaiveDateTime;
-use uuid::Uuid;
-use utoipa::ToSchema;
 use diesel::query_builder::AsChangeset;
+use diesel::{
+    prelude::{Identifiable, Queryable},
+    Insertable, Selectable,
+};
+use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+use uuid::Uuid;
 
 use crate::schema;
 
@@ -15,12 +18,10 @@ pub struct User {
     pub username: String,
     pub email: String,
     pub password_hash: String,
-    pub display_name: String,
     pub profile_picture_url: Option<String>,
-    pub country: Option<String>,
-    pub language_preference: Option<String>,
+    pub bio: Option<String>,
     pub created_at: NaiveDateTime,
-    pub updated_at: Option<NaiveDateTime>,
+    pub updated_at: NaiveDateTime,
     pub last_login_at: Option<NaiveDateTime>,
     pub status: Option<String>,
 }
@@ -32,19 +33,16 @@ pub struct NewUser {
     pub username: String,
     pub email: String,
     pub password_hash: String,
-    pub display_name: Option<String>,
     pub profile_picture_url: Option<String>,
-    pub country: Option<String>,
-    pub language_preference: Option<String>,
+    pub bio: Option<String>,
 }
 
 #[derive(AsChangeset)]
 #[diesel(table_name = schema::users)]
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct UpdateUser {
-    pub display_name: Option<String>,
+    pub username: Option<String>,
+    pub email: Option<String>,
     pub profile_picture_url: Option<String>,
-    pub language_preference: Option<String>,
-    pub country: Option<String>,
-    pub status: Option<String>,
+    pub bio: Option<String>,
 }

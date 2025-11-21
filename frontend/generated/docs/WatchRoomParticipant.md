@@ -6,7 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **id** | **number** |  | [default to undefined]
-**is_host** | **boolean** |  | [optional] [default to undefined]
+**is_admin** | **boolean** |  | [default to undefined]
 **joined_at** | **string** |  | [optional] [default to undefined]
 **last_active_at** | **string** |  | [optional] [default to undefined]
 **room_id** | **string** |  | [default to undefined]
@@ -19,7 +19,7 @@ import { WatchRoomParticipant } from './api';
 
 const instance: WatchRoomParticipant = {
     id,
-    is_host,
+    is_admin,
     joined_at,
     last_active_at,
     room_id,

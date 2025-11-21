@@ -13,7 +13,7 @@ Name | Type | Description | Notes
 **is_live** | Option<**bool**> |  | [optional]
 **is_private** | **bool** |  | 
 **room_name** | Option<**String**> |  | [optional]
-**updated_at** | Option<**String**> |  | [optional]
+**updated_at** | **String** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

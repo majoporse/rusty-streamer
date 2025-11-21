@@ -13,8 +13,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct NewWatchRoomParticipant {
-    #[serde(rename = "is_host", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub is_host: Option<Option<bool>>,
+    #[serde(rename = "is_admin")]
+    pub is_admin: bool,
     #[serde(rename = "room_id")]
     pub room_id: uuid::Uuid,
     #[serde(rename = "user_id")]
@@ -22,9 +22,9 @@ pub struct NewWatchRoomParticipant {
 }
 
 impl NewWatchRoomParticipant {
-    pub fn new(room_id: uuid::Uuid, user_id: uuid::Uuid) -> NewWatchRoomParticipant {
+    pub fn new(is_admin: bool, room_id: uuid::Uuid, user_id: uuid::Uuid) -> NewWatchRoomParticipant {
         NewWatchRoomParticipant {
-            is_host: None,
+            is_admin,
             room_id,
             user_id,
         }

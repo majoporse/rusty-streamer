@@ -15,8 +15,8 @@ use serde::{Deserialize, Serialize};
 pub struct WatchRoomParticipant {
     #[serde(rename = "id")]
     pub id: i64,
-    #[serde(rename = "is_host", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
-    pub is_host: Option<Option<bool>>,
+    #[serde(rename = "is_admin")]
+    pub is_admin: bool,
     #[serde(rename = "joined_at", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub joined_at: Option<Option<String>>,
     #[serde(rename = "last_active_at", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
@@ -28,10 +28,10 @@ pub struct WatchRoomParticipant {
 }
 
 impl WatchRoomParticipant {
-    pub fn new(id: i64, room_id: uuid::Uuid, user_id: uuid::Uuid) -> WatchRoomParticipant {
+    pub fn new(id: i64, is_admin: bool, room_id: uuid::Uuid, user_id: uuid::Uuid) -> WatchRoomParticipant {
         WatchRoomParticipant {
             id,
-            is_host: None,
+            is_admin,
             joined_at: None,
             last_active_at: None,
             room_id,

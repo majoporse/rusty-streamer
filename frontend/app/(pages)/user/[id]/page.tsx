@@ -7,7 +7,8 @@ import { AxiosConfig } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import Image from "next/image";
 import ReviewList from "./ReviewList";
-import WatchList from "./WatchList";
+import WatchHistoryList from "./WatchList";
+import { Separator } from "@radix-ui/react-separator";
 
 export default function UserPage() {
   const userId = "1507d84a-2d1b-414f-88e0-1201b184bd68"; // TODO: get from route params
@@ -55,7 +56,7 @@ export default function UserPage() {
             {imageSrc && (
               <Image
                 src={imageSrc}
-                alt={user?.display_name || "User profile picture"}
+                alt={user?.profile_picture_url || "User profile picture"}
                 fill
                 unoptimized
                 className="rounded-3xl object-cover"
@@ -66,18 +67,20 @@ export default function UserPage() {
           {/* user bio */}
           <Card className="p-5">
             <CardHeader>Bio</CardHeader>
-            <CardContent>{user?.status}</CardContent>
+            <CardContent>{user?.bio}</CardContent>
           </Card>
         </div>
 
         <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <TypographyH1 str="Reviews" />
-            {/* <ReviewList reviews={reviews} loading={reviewsLoading} /> */}
+            <Separator className="my-5" />
+            <ReviewList user={user} loading={reviewsLoading} />
           </div>
           <div>
-            <TypographyH1 str="Watchlist" />
-            <WatchList user={user} />
+            <TypographyH1 str="Watch History" />
+            <Separator className="my-5" />
+            <WatchHistoryList user={user} />
           </div>
         </div>
       </div>

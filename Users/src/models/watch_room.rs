@@ -19,7 +19,7 @@ pub struct WatchRoom {
     pub current_time_seconds: Option<i32>,
     pub is_live: Option<bool>,
     pub created_at: NaiveDateTime,
-    pub updated_at: Option<NaiveDateTime>,
+    pub updated_at: NaiveDateTime,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Insertable, ToSchema)]
