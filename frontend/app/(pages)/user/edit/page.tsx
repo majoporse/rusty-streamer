@@ -28,11 +28,17 @@ import z from "zod";
 
 const registerSchema = z
   .object({
-    email: z.email("Enter a valid email"),
+    email: z.email("Enter a valid email").optional(),
     bio: z.string().optional(),
     display_name: z.string().optional(),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Please confirm your password"),
+    password: z
+      .string()
+      .min(6, "Password must be at least 6 characters")
+      .optional(),
+    confirmPassword: z
+      .string()
+      .min(6, "Please confirm your password")
+      .optional(),
   })
   .refine((vals) => vals.password === vals.confirmPassword, {
     message: "Passwords do not match",
@@ -47,7 +53,6 @@ export default function UserEdit() {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { email: "", password: "", confirmPassword: "" },
   });
 
   async function onSubmit(data: FormValues) {
@@ -122,15 +127,15 @@ export default function UserEdit() {
                 >
                   <DropzoneEmptyState />
                   {/* <DropzoneContent> */}
-                    {filePreview && (
-                      <div className="h-20 w-full">
-                        <img
-                          alt="Preview"
-                          className="absolute top-0 left-0 h-full w-full object-cover"
-                          src={filePreview}
-                        />
-                      </div>
-                    )}
+                  {filePreview && (
+                    <div className="h-20 w-full">
+                      <img
+                        alt="Preview"
+                        className="absolute top-0 left-0 h-full w-full object-cover"
+                        src={filePreview}
+                      />
+                    </div>
+                  )}
                   {/* </DropzoneContent> */}
                 </Dropzone>
 
