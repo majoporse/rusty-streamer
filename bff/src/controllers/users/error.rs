@@ -18,7 +18,10 @@ where
     }
 }
 
-pub fn handle_client_error_actix<T>(err: users_client::apis::Error<T>, context: &str) -> actix_web::Error
+pub fn handle_client_error_actix<T>(
+    err: users_client::apis::Error<T>,
+    context: &str,
+) -> actix_web::Error
 where
     T: std::fmt::Debug,
 {

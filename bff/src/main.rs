@@ -1,14 +1,10 @@
 use std::path::PathBuf;
 
 use actix_cors::Cors;
-use actix_jwt_auth_middleware::use_jwt::UseJWTOnApp;
 use actix_jwt_auth_middleware::{Authority, FromRequest, TokenSigner};
 use actix_multipart::form::MultipartFormConfig;
-use actix_state_guards::{UseStateGuardOnApp, UseStateGuardOnScope};
-use actix_web::error::InternalError;
-use actix_web::http::StatusCode;
 use actix_web::middleware::Logger;
-use actix_web::{web, App, HttpServer};
+use actix_web::{App, HttpServer};
 use dotenvy::dotenv;
 use jwt_compact::alg::{Hs256, Hs256Key};
 use log::info;
@@ -16,7 +12,7 @@ use opentelemetry::{global, KeyValue};
 use opentelemetry_otlp::{Protocol, WithExportConfig as _};
 use opentelemetry_sdk::Resource;
 use serde::{Deserialize, Serialize};
-use utoipa::openapi::security::{ApiKey, ApiKeyValue, HttpAuthScheme, HttpBuilder, SecurityScheme};
+use utoipa::openapi::security::{ApiKey, ApiKeyValue, SecurityScheme};
 use utoipa::{Modify, OpenApi};
 use utoipa_actix_web::AppExt;
 use utoipa_rapidoc::RapiDoc;

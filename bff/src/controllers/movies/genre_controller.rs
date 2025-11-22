@@ -1,6 +1,6 @@
 use crate::{
     controllers::{
-        error::{self, handle_client_error},
+        error::handle_client_error,
         movies::{client_config, pagination::Pagination},
     },
     models::movies::{WrapperGenre, WrapperNewGenre},

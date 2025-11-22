@@ -1,20 +1,13 @@
-use std::str::FromStr;
 use std::time;
 
-use crate::controllers::error::handle_client_error;
-use crate::controllers::movies::client_config;
 use crate::models::movies::{UploadSasRequest, UploadSasResponse};
 
-use actix_web::error::ErrorInternalServerError;
 use actix_web::{post, web};
 use azure_core::time::OffsetDateTime;
-use azure_storage::prelude::{AccountSasPermissions, BlobSasPermissions, SasToken};
-use azure_storage::{ConnectionString, StorageCredentials};
-use azure_storage_blobs::blob;
-use azure_storage_blobs::prelude::{BlobServiceClient, ClientBuilder};
-use chrono::NaiveDateTime;
+use azure_storage::prelude::{BlobSasPermissions, SasToken};
+use azure_storage::ConnectionString;
+use azure_storage_blobs::prelude::ClientBuilder;
 use utoipa::OpenApi;
-use uuid::Uuid;
 
 static TAG: &str = "Uploads";
 

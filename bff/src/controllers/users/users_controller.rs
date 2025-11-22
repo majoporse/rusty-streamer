@@ -1,4 +1,3 @@
-use crate::UserAuth;
 use crate::controllers::users::auth::CustomClaims;
 use crate::controllers::users::client_config;
 use crate::controllers::users::error::handle_client_error;
@@ -9,7 +8,6 @@ use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use utoipa::OpenApi;
 
 use users_client::apis::users_api;
-use utoipa::openapi::info;
 use uuid::Uuid;
 
 static TAG: &str = "Users";

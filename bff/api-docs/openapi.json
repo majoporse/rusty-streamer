@@ -681,6 +681,22 @@
         }
       }
     },
+    "/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "refresh",
+        "responses": {
+          "200": {
+            "description": "Refresh tokens"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/reviews": {
       "get": {
         "tags": [
