@@ -202,6 +202,32 @@
         }
       }
     },
+    "/login/{user_id}": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Login user and set auth cookies"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/movies": {
       "get": {
         "tags": [
@@ -2337,6 +2363,22 @@
   },
   "components": {
     "schemas": {
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "password"
+        ],
+        "properties": {
+          "password": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "MovieCrewDetail": {
         "type": "object",
         "required": [
@@ -3356,6 +3398,13 @@
             "type": "string"
           }
         }
+      }
+    },
+    "securitySchemes": {
+      "api_jwt_token": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "access_token"
       }
     }
   }

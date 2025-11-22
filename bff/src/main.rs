@@ -1,15 +1,23 @@
 use std::path::PathBuf;
 
 use actix_cors::Cors;
+use actix_jwt_auth_middleware::use_jwt::UseJWTOnApp;
+use actix_jwt_auth_middleware::{Authority, FromRequest, TokenSigner};
 use actix_multipart::form::MultipartFormConfig;
+use actix_state_guards::{UseStateGuardOnApp, UseStateGuardOnScope};
+use actix_web::error::InternalError;
+use actix_web::http::StatusCode;
 use actix_web::middleware::Logger;
-use actix_web::{App, HttpServer};
+use actix_web::{web, App, HttpServer};
 use dotenvy::dotenv;
+use jwt_compact::alg::{Hs256, Hs256Key};
 use log::info;
 use opentelemetry::{global, KeyValue};
 use opentelemetry_otlp::{Protocol, WithExportConfig as _};
 use opentelemetry_sdk::Resource;
-use utoipa::OpenApi;
+use serde::{Deserialize, Serialize};
+use utoipa::openapi::security::{ApiKey, ApiKeyValue, HttpAuthScheme, HttpBuilder, SecurityScheme};
+use utoipa::{Modify, OpenApi};
 use utoipa_actix_web::AppExt;
 use utoipa_rapidoc::RapiDoc;
 use utoipa_redoc::{Redoc, Servable};
@@ -20,8 +28,34 @@ use shared::log_middleware::OtlpMetricsLogger;
 
 pub mod controllers;
 pub mod models;
+#[derive(Serialize, Deserialize, Debug, Clone, FromRequest)]
+struct UserAuth {
+    role: Role,
+    id: u32,
+}
 
+#[derive(Serialize, Deserialize, Debug, Clone, FromRequest, PartialEq)]
+enum Role {
+    Basic,
+    Admin,
+}
+
+struct SecurityAddon;
+
+impl Modify for SecurityAddon {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+         openapi.components = Some(
+             utoipa::openapi::ComponentsBuilder::new()
+                .security_scheme(
+                     "api_jwt_token",
+                     SecurityScheme::ApiKey(ApiKey::Cookie(ApiKeyValue::new("access_token"))),
+                 )
+                .build()
+         )
+     }
+}
 #[derive(OpenApi)]
+#[openapi(modifiers(&SecurityAddon))]
 #[openapi(info(
     title = "Backend For Frontend API",
     version = "1.0.0",
@@ -55,17 +89,35 @@ async fn main() -> std::io::Result<()> {
     apidoc.merge(controllers::users::watch_room_participants_controller::ApiDoc::openapi());
     apidoc.merge(controllers::users::watch_room_controller::ApiDoc::openapi());
 
+    apidoc.merge(controllers::users::auth::ApiDoc::openapi());
+
     save_openapi_spec(&apidoc).await?;
     log::info!("setup openapi");
 
     setup_otel().await?;
     log::info!("otel setup");
 
+    let key = Hs256Key::new(b"super_secret_key_donut_steel");
+
+    let authority = Authority::<UserAuth, Hs256, _, _>::new()
+        .refresh_authorizer(|| async move { Ok(()) })
+        .token_signer(Some(
+            TokenSigner::new()
+                .signing_key(key.clone())
+                .algorithm(Hs256)
+                .build()
+                .expect(""),
+        ))
+        .verifying_key(key)
+        .build()
+        .expect("");
+
     HttpServer::new(move || {
         let app = App::new()
             .wrap(Logger::new("%a \"%r\" %s %b \"%{User-Agent}i\" %T")) // ✅ proper placement
             .wrap(
                 Cors::default()
+                    .supports_credentials()
                     .allow_any_origin()
                     .allow_any_method()
                     .allow_any_header(),
@@ -76,6 +128,20 @@ async fn main() -> std::io::Result<()> {
                     .memory_limit(10 * 1024 * 1024), // 10 MB
             )
             .wrap(OtlpMetricsLogger::new())
+            // .use_jwt(authority.clone(), web::scope("/users"))
+            // .use_state_guard(
+            //     |user: User| async move {
+            //         if user.role == Role::Admin {
+            //             Ok(())
+            //         } else {
+            //             Err(InternalError::new(
+            //                 "You are not an Admin",
+            //                 StatusCode::UNAUTHORIZED,
+            //             ))
+            //         }
+            //     },
+            //     web::scope("/users"),
+            // )
             .into_utoipa_app()
             // services
             .configure(controllers::movies::movies_controller::scoped_config)
@@ -83,13 +149,13 @@ async fn main() -> std::io::Result<()> {
             .configure(controllers::movies::reviews_controller::scoped_config)
             .configure(controllers::movies::genre_controller::scoped_config)
             .configure(controllers::movies::upload_controller::scoped_config)
-
             .configure(controllers::users::users_controller::scoped_config)
             .configure(controllers::users::watch_history_controller::scoped_config)
             .configure(controllers::users::watch_list_controller::scoped_config)
             .configure(controllers::users::watch_room_messages_controller::scoped_config)
             .configure(controllers::users::watch_room_participants_controller::scoped_config)
             .configure(controllers::users::watch_room_controller::scoped_config)
+            .configure(controllers::users::auth::auth_config)
             // OpenAPI docs
             .openapi(apidoc.clone())
             .openapi_service(|api| Redoc::with_url("/redoc", api))

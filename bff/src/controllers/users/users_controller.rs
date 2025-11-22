@@ -1,3 +1,5 @@
+use crate::UserAuth;
+use crate::controllers::users::auth::CustomClaims;
 use crate::controllers::users::client_config;
 use crate::controllers::users::error::handle_client_error;
 use crate::controllers::users::pagination::Pagination;
@@ -7,6 +9,7 @@ use actix_web::{delete, get, post, put, web, HttpResponse, Responder};
 use utoipa::OpenApi;
 
 use users_client::apis::users_api;
+use utoipa::openapi::info;
 use uuid::Uuid;
 
 static TAG: &str = "Users";
@@ -19,7 +22,7 @@ static TAG: &str = "Users";
     tag = TAG
 )]
 #[get("/users")]
-pub async fn get_all_users(pagination: web::Query<Pagination>) -> impl Responder {
+pub async fn get_all_users(claims: CustomClaims, pagination: web::Query<Pagination>) -> impl Responder {
     let config = client_config();
 
     match users_api::get_all_users(
@@ -69,7 +72,7 @@ pub async fn get_user_by_id(user_id: web::Path<String>) -> impl Responder {
     tag = TAG
 )]
 #[post("/users")]
-pub async fn create_user(new_user: web::Json<NewUser>) -> impl Responder {
+pub async fn create_user( new_user: web::Json<NewUser>) -> impl Responder {
     let config = client_config();
 
     let new_user = new_user.into_inner();

@@ -8,6 +8,8 @@ pub mod watch_list_controller;
 pub mod watch_room_controller;
 pub mod watch_room_messages_controller;
 pub mod watch_room_participants_controller;
+pub mod auth;
+
 use shared::http_logging_middleware::LoggingMiddleware;
 
 use reqwest_middleware::ClientBuilder;
