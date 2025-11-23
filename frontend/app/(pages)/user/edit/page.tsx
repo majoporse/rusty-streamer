@@ -18,36 +18,62 @@ import {
 } from "@/components/ui/shadcn-io/dropzone";
 import { Textarea } from "@/components/ui/textarea";
 import { TypographyH3 } from "@/components/ui/typo";
-import { UpdateUser, UploadsApi, UsersApi } from "@/generated";
+import { UpdateUser, UploadsApi, User, UsersApi } from "@/generated";
+import { AuthContainer } from "@/hooks/useAuth";
 import { uploadAzureSas } from "@/lib/azureUpload";
 import { AxiosConfig } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
-const registerSchema = z
-  .object({
-    email: z.email("Enter a valid email").optional(),
-    bio: z.string().optional(),
-    display_name: z.string().optional(),
-    password: z
-      .string()
-      .min(6, "Password must be at least 6 characters")
-      .optional(),
-    confirmPassword: z
-      .string()
-      .min(6, "Please confirm your password")
-      .optional(),
-  })
-  .refine((vals) => vals.password === vals.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+const registerSchema = z.object({
+  email: z.string().email("Enter a valid email").optional(),
+  bio: z.string().optional(),
+  username: z.string().optional(),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .optional(),
+  confirmPassword: z.string().min(6, "Please confirm your password").optional(),
+});
+// .refine(
+//   (vals) =>
+//     // If neither password nor confirmPassword is provided → OK
+//     (!vals.password && !vals.confirmPassword) ||
+//     // Otherwise they must match
+//     vals.password === vals.confirmPassword,
+//   {
+//     message: "Passwords do not match",
+//     path: ["confirmPassword"],
+//   }
+// );
 
 type FormValues = z.infer<typeof registerSchema>;
 
 export default function UserEdit() {
+  const auth = AuthContainer.useContainer();
+  let userId = auth.user?._id;
+
+  const fetchUser = async () => {
+    if (!userId) {
+      throw new Error("No user ID found");
+    }
+    const api = new UsersApi(AxiosConfig);
+    const response = await api.getUserById(userId);
+    return response.data;
+  };
+
+  const {
+    data: user,
+    isLoading,
+    isError,
+  } = useQuery<User>({
+    queryKey: ["user", userId],
+    queryFn: fetchUser,
+  });
+
   const [movieFile, setMovieFile] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
@@ -56,6 +82,11 @@ export default function UserEdit() {
   });
 
   async function onSubmit(data: FormValues) {
+    if (!userId) {
+      console.error("No user ID found for editing profile");
+      return;
+    }
+
     let api = new UsersApi(AxiosConfig);
     let uploadApi = new UploadsApi(AxiosConfig);
 
@@ -81,11 +112,11 @@ export default function UserEdit() {
       setUploadProgress(null);
     }
 
-    api.updateUser("", {
+    api.updateUser(userId, {
       profile_picture_url: upload?.data.blob_url,
       email: data.email,
       password: data.password,
-      display_name: data.display_name,
+      username: data.username,
       bio: data.bio,
     } as UpdateUser);
   }
@@ -105,6 +136,7 @@ export default function UserEdit() {
       reader.readAsDataURL(files[0]);
     }
   };
+
   return (
     <div className="h-full w-full items-center justify-center flex flex-col p-6">
       <Card className="flex w-full max-w-sm">
@@ -219,14 +251,14 @@ export default function UserEdit() {
 
               <FormField
                 control={form.control}
-                name="display_name"
+                name="username"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Display Name</FormLabel>
+                    <FormLabel>Username</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
-                        placeholder="Your display name"
+                        placeholder="Your username"
                         {...field}
                       />
                     </FormControl>

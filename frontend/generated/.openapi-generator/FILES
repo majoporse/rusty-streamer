@@ -4,7 +4,10 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/AuthApi.md
 docs/GenresApi.md
+docs/LoginRequest.md
+docs/LoginResponse.md
 docs/MovieCrewDetail.md
 docs/MoviesApi.md
 docs/NewUser.md
@@ -14,6 +17,7 @@ docs/NewWatchRoomMessage.md
 docs/NewWatchRoomParticipant.md
 docs/NewWatchlist.md
 docs/PeopleApi.md
+docs/RefreshResponse.md
 docs/ReviewsApi.md
 docs/UpdateUser.md
 docs/UpdateWatchHistory.md

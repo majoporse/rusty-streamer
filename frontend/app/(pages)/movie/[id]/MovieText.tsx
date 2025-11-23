@@ -3,7 +3,6 @@
 import React from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { WrapperMovieDetail } from "@/generated";
-import Example from "../../../../components/StarRating";
 import { TypographyH2, TypographyP } from "../../../../components/ui/typo";
 import {
   Card,
@@ -12,8 +11,8 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { Separator } from "@radix-ui/react-separator";
-
-
+import { StarRating } from "@/components/StarRating";
+import { Rating, RatingButton } from "@/components/ui/shadcn-io/rating";
 
 export default function MovieText({
   movie,
@@ -44,7 +43,11 @@ export default function MovieText({
               {movie?.mpaa_rating == null ? (
                 <span className="text-sm text-neutral-500">No ratings yet</span>
               ) : (
-                <Example />
+                <Rating defaultValue={3} readOnly>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <RatingButton key={index} />
+                  ))}
+                </Rating>
               )}
             </div>
 

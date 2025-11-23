@@ -17,16 +17,18 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { AuthContainer } from "@/hooks/useAuth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import z from "zod";
 
 const schema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email: z.email("Enter a valid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 export default function LoginPage() {
+  let auth = AuthContainer.useContainer();
 
   const router = useRouter();
   const form = useForm({
@@ -36,6 +38,8 @@ export default function LoginPage() {
 
   const onSubmit = (data: any) => {
     console.log("Login submit", data);
+    auth.login(data.email, data.password);
+    router.push("/");
   };
 
   return (
@@ -46,7 +50,9 @@ export default function LoginPage() {
           Enter your email below to login to your account
         </CardDescription>
         <CardAction>
-          <Button variant="link" onClick={() => router.push("/auth/register")}>Sign Up</Button>
+          <Button variant="link" onClick={() => router.push("/auth/register")}>
+            Sign Up
+          </Button>
         </CardAction>
       </CardHeader>
 
@@ -77,7 +83,11 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" placeholder="your password" {...field} />
+                      <Input
+                        type="password"
+                        placeholder="your password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -90,7 +100,6 @@ export default function LoginPage() {
                 Login
               </Button>
             </div>
-
           </form>
         </Form>
       </CardContent>

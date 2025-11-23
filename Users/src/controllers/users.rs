@@ -13,7 +13,6 @@ use uuid::Uuid;
 
 static TAG: &str = "Users";
 
-
 #[utoipa::path(
     params(
         ("limit" = i64, Query, description = "Max number of users to return", example = 100),
@@ -150,8 +149,38 @@ pub async fn delete_user(
     }
 }
 
+#[utoipa::path(
+    params(
+        ("email" = String, Path, description = "Email of the user to retrieve")
+    ),
+    responses(
+        (status = 200, description = "Get user by email", body = User),
+        (status = 404, description = "User not found"),
+        (status = 500, description = "Internal Server Error")
+    ),
+    tag = TAG
+)]
+#[get("/users/by_email/{email}")]
+pub async fn get_user_by_email(
+    pool: web::Data<Arc<r2d2::Pool<ConnectionManager<DbConnection>>>>,
+    email: web::Path<String>,
+) -> impl Responder {
+    let mut db_conn = pool.get().expect("Couldn't get DB connection from pool");
+    match users::get_user_by_email(&mut db_conn, &email) {
+        Ok(user) => HttpResponse::Ok().json(user),
+        Err(e) => error::handle_db_error(&e, "get_user_by_email"),
+    }
+}
+
 #[derive(OpenApi)]
-#[openapi(paths(get_all_users, get_user_by_id, create_user, update_user, delete_user,))]
+#[openapi(paths(
+    get_all_users,
+    get_user_by_id,
+    create_user,
+    update_user,
+    delete_user,
+    get_user_by_email
+))]
 pub struct ApiDoc;
 
 pub fn scoped_config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) {
@@ -160,4 +189,5 @@ pub fn scoped_config(cfg: &mut utoipa_actix_web::service_config::ServiceConfig) 
     cfg.service(create_user);
     cfg.service(update_user);
     cfg.service(delete_user);
+    cfg.service(get_user_by_email);
 }

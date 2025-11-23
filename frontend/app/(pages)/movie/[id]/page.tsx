@@ -12,6 +12,7 @@ import MovieImage from "./MovieImage";
 import { Button } from "@/components/ui/button";
 import SubmitReviewButton from "./SubmitReviewDialog";
 import { AxiosConfig } from "@/lib/utils";
+import { AuthContainer } from "@/hooks/useAuth";
 
 type MoviePageProps = {
   params: Promise<{
@@ -21,6 +22,7 @@ type MoviePageProps = {
 
 export default function MoviePage({ params }: MoviePageProps) {
   const { id: movieId } = React.use(params);
+  const auth = AuthContainer.useContainer();
 
   const fetchMovie = async () => {
     const api = new MoviesApi(AxiosConfig);
@@ -48,11 +50,9 @@ export default function MoviePage({ params }: MoviePageProps) {
           <MovieImage movie={movie} loading={isLoading} />
           <div className="gap-5 flex flex-col">
             {/* trailer */}
-
             {movie && (
               <VideoPlayer
-                src={movie?.video_url!}
-                posterSrc={movie?.poster_url ?? ""}
+                movie={movie}
                 className=""
               />
             )}
@@ -61,9 +61,15 @@ export default function MoviePage({ params }: MoviePageProps) {
 
             <div className="flex justify-end w-full gap-4">
               <Button variant="outline">
-                {movie ? "Add to Watchlist" : "Loading..."}
+                Add to Watchlist
               </Button>
-              <SubmitReviewButton movie={movie!} />
+              {auth.user ? (
+                <SubmitReviewButton movie={movie} loading={isLoading}/>
+              ) : (
+                <Button variant="outline" disabled>
+                  Log in to write a review
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -72,8 +78,7 @@ export default function MoviePage({ params }: MoviePageProps) {
 
         {movie && (
           <VideoPlayer
-            src={movie?.video_url!}
-            posterSrc={movie?.poster_url ?? ""}
+            movie={movie}
             className="w-full rounded-xl"
           />
         )}

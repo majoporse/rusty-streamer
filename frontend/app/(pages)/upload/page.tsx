@@ -72,17 +72,7 @@ export default function UploadMoviePage() {
   const [imageFile, setImageFile] = useState<File[]>([]);
   const [movieFile, setMovieFile] = useState<File[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-
-  const previewUrl = useMemo(() => {
-    if (!imageFile.length) return null;
-    return URL.createObjectURL(imageFile[0]);
-  }, [imageFile]);
-
-  useEffect(() => {
-    return () => {
-      previewUrl && URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
+  const [previewUrl, setFilePreview] = useState<string | null>(null);
 
   const [selectedPeople, setSelectedPeople] = useState<PersonCharacter[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<WrapperGenre[]>([]);
@@ -163,6 +153,21 @@ export default function UploadMoviePage() {
       alert("Error creating movie — see console.");
     }
   }
+
+  const handleDrop = (files: File[]) => {
+    console.log(files);
+    setMovieFile(files);
+
+    if (files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (typeof e.target?.result === "string") {
+          setFilePreview(e.target?.result);
+        }
+      };
+      reader.readAsDataURL(files[0]);
+    }
+  };
 
   return (
     <main className="flex justify-center items-center w-full p-5">
@@ -276,36 +281,25 @@ export default function UploadMoviePage() {
                   <label className="block text-sm font-medium mb-1">
                     Poster
                   </label>
-                  <Dropzone
-                    accept={{ "image/*": [] }}
-                    maxFiles={1}
-                    maxSize={1024 * 1024 * 10}
-                    minSize={1024}
-                    onDrop={setImageFile}
-                    onError={console.error}
-                  >
-                    <DropzoneEmptyState />
-                    <DropzoneContent />
-                  </Dropzone>
-
-                  <div className="relative w-full h-64 my-2 overflow-hidden rounded-md">
-                    {previewUrl ? (
+                <Dropzone
+                  accept={{ "image/*": [".png", ".jpg", ".jpeg"] }}
+                  maxFiles={1}
+                  maxSize={1024 * 1024 * 10}
+                  minSize={1024}
+                  onDrop={handleDrop}
+                  onError={console.error}
+                  className="flex-1"
+                >
+                  <DropzoneEmptyState />
+                    {previewUrl && (
                       <Image
                         src={previewUrl}
                         alt="preview"
                         fill
                         className="rounded-md w-full h-full object-cover"
                       />
-                    ) : imageFile.length > 0 ? (
-                      <div className="border border-dashed border-neutral-200 p-6 text-center text-sm text-neutral-500 rounded-xl">
-                        {imageFile[0].name}
-                      </div>
-                    ) : (
-                      <div className="flex h-full border border-dashed border-neutral-200 p-6 text-center text-sm text-neutral-500 rounded-xl">
-                        No image selected
-                      </div>
                     )}
-                  </div>
+                </Dropzone>
                 </div>
               </div>
 

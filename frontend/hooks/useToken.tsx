@@ -1,27 +1,25 @@
-// useToken.ts
-
+"use client";
 import Axios, { AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+
 import { useCallback, useEffect, useRef } from 'react';
 import { configure } from 'axios-hooks';
 import { useTokenExpiration } from './useTokenExpiration';
-import { User } from '@/generated';
+import { User } from './useAuth';
+import axios from 'axios';
 import { AxiosConfig } from '@/lib/utils';
+import { AuthApi } from '@/generated';
 
-interface TokenResponse {
+export interface TokenResponse {
   access_token: string;
-  token_expiration: string;
+  token_expiration: number;
 }
 
 export interface UserAndTokenResponse extends TokenResponse {
   user: User;
 }
 
-export const axios = Axios.create({
-  baseURL: AxiosConfig.basePath,
-});
-
 export function useToken(onTokenInvalid: Function, onRefreshRequired: Function) {
-  const accessToken = useRef<string>("");
+  const accessToken = useRef<string>(null);
   const { clearAutomaticTokenRefresh, setTokenExpiration } = useTokenExpiration(onRefreshRequired);
 
   const setToken = useCallback(
@@ -40,7 +38,8 @@ export function useToken(onTokenInvalid: Function, onRefreshRequired: Function) 
   const clearToken = useCallback(
     (shouldClearCookie = true) => {
       // if we came from a different tab, we should not clear the cookie again
-      const clearRefreshTokenCookie = shouldClearCookie ? axios.get('logout') : Promise.resolve();
+      let api = new AuthApi(AxiosConfig);
+      const clearRefreshTokenCookie = shouldClearCookie ? api.logout() : Promise.resolve();
 
       // clear refresh token
       return clearRefreshTokenCookie.finally(() => {
@@ -73,6 +72,7 @@ export function useToken(onTokenInvalid: Function, onRefreshRequired: Function) 
           // let the app know that the current token was cleared
           onTokenInvalid();
         }
+        console.log("Response error intercepted:", error.response);
         return Promise.reject(error);
       },
     );

@@ -8,21 +8,25 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
+import { AuthContainer } from "@/hooks/useAuth";
 
-export default function Home() {
+export default function UserPage() {
+  let auth = AuthContainer.useContainer();
+  let userId = auth.user?._id;
+
   const [q, setQ] = useState("");
   const [debouncedQ] = useDebounce(q, 300);
   const pageSize = 2;
 
   const {
     data,
-    isLoading: peopleLoading,
-    isError: peopleError,
+    isLoading: moviesLoading,
+    isError: moviesError,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["people", debouncedQ],
+    queryKey: ["movies", debouncedQ],
     queryFn: async ({ pageParam = 0 }: any) => {
       const api = new MoviesApi(AxiosConfig);
       const res = await api.searchMoviesByTitle(debouncedQ, pageSize, pageParam);
@@ -51,8 +55,8 @@ export default function Home() {
           className="my-6 w-40 md:w-60"
         />
         <div className="w-full p-6 grid grid-cols-2 md:grid-cols-3 gap-4">
-          {peopleLoading ? <p>Loading movies...</p> : null}
-          {peopleError ? (
+          {moviesLoading ? <p>Loading movies...</p> : null}
+          {moviesError ? (
             <p className="text-red-500">Failed to load movies.</p>
           ) : null}
           {data?.pages

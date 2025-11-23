@@ -29,6 +29,7 @@ Class | Method | HTTP request | Description
 *UsersApi* | [**create_user**](docs/UsersApi.md#create_user) | **POST** /users | 
 *UsersApi* | [**delete_user**](docs/UsersApi.md#delete_user) | **DELETE** /users/{user_id} | 
 *UsersApi* | [**get_all_users**](docs/UsersApi.md#get_all_users) | **GET** /users | 
+*UsersApi* | [**get_user_by_email**](docs/UsersApi.md#get_user_by_email) | **GET** /users/by_email/{email} | 
 *UsersApi* | [**get_user_by_id**](docs/UsersApi.md#get_user_by_id) | **GET** /users/{user_id} | 
 *UsersApi* | [**update_user**](docs/UsersApi.md#update_user) | **PUT** /users/{user_id} | 
 *WatchHistoryApi* | [**create_watch_history**](docs/WatchHistoryApi.md#create_watch_history) | **POST** /watch-history | 

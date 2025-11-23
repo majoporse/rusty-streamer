@@ -1,9 +1,8 @@
-// useTokenExpiration.ts
-
+"use client";
 import { useEffect, useRef, useState } from 'react';
 
 export function useTokenExpiration(onTokenRefreshRequired: Function) {
-  const clearAutomaticRefresh = useRef<number>(0);
+  const clearAutomaticRefresh = useRef<number>(undefined);
   const [tokenExpiration, setTokenExpiration] = useState<Date>();
 
   useEffect(() => {

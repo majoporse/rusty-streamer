@@ -7,6 +7,7 @@ Method | HTTP request | Description
 [**create_user**](UsersApi.md#create_user) | **POST** /users | 
 [**delete_user**](UsersApi.md#delete_user) | **DELETE** /users/{user_id} | 
 [**get_all_users**](UsersApi.md#get_all_users) | **GET** /users | 
+[**get_user_by_email**](UsersApi.md#get_user_by_email) | **GET** /users/by_email/{email} | 
 [**get_user_by_id**](UsersApi.md#get_user_by_id) | **GET** /users/{user_id} | 
 [**update_user**](UsersApi.md#update_user) | **PUT** /users/{user_id} | 
 
@@ -84,6 +85,34 @@ Name | Type | Description  | Required | Notes
 ### Return type
 
 [**Vec<models::User>**](User.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## get_user_by_email
+
+> models::User get_user_by_email(email)
+
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**email** | **String** | Email of the user to retrieve | [required] |
+
+### Return type
+
+[**models::User**](User.md)
 
 ### Authorization
 

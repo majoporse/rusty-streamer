@@ -202,7 +202,7 @@
         }
       }
     },
-    "/login/{user_id}": {
+    "/login": {
       "post": {
         "tags": [
           "Auth"
@@ -220,7 +220,30 @@
         },
         "responses": {
           "200": {
-            "description": "Login user and set auth cookies"
+            "description": "Login user and set auth cookies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Logout user by clearing auth cookies"
           },
           "500": {
             "description": "Internal Server Error"
@@ -689,7 +712,14 @@
         "operationId": "refresh",
         "responses": {
           "200": {
-            "description": "Refresh tokens"
+            "description": "Refresh tokens",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshResponse"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal Server Error"
@@ -2382,16 +2412,43 @@
       "LoginRequest": {
         "type": "object",
         "required": [
-          "user_id",
+          "email",
           "password"
         ],
         "properties": {
+          "email": {
+            "type": "string"
+          },
           "password": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "user_name",
+          "user_email",
+          "access_token",
+          "refresh_token"
+        ],
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "refresh_token": {
+            "type": "string"
+          },
+          "user_email": {
             "type": "string"
           },
           "user_id": {
             "type": "string",
             "format": "uuid"
+          },
+          "user_name": {
+            "type": "string"
           }
         }
       },
@@ -2589,6 +2646,34 @@
           "user_id": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "RefreshResponse": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "user_name",
+          "user_email",
+          "access_token",
+          "refresh_token"
+        ],
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "refresh_token": {
+            "type": "string"
+          },
+          "user_email": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_name": {
+            "type": "string"
           }
         }
       },

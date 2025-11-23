@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { TypographyH1 } from "@/components/ui/typo";
+import { TypographyH1, TypographyH3, TypographyP } from "@/components/ui/typo";
 import { ReviewsApi, User, UsersApi, WrapperReview } from "@/generated";
 import { AxiosConfig } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -9,9 +9,16 @@ import Image from "next/image";
 import ReviewList from "./ReviewList";
 import WatchHistoryList from "./WatchList";
 import { Separator } from "@radix-ui/react-separator";
+import React from "react";
 
-export default function UserPage() {
-  const userId = "1507d84a-2d1b-414f-88e0-1201b184bd68"; // TODO: get from route params
+type UserPageProps = {
+  params: Promise<{
+    id: string;
+  }>;
+};
+
+export default function UserPage({ params }: UserPageProps) {
+  const { id: userId } = React.use(params);
 
   const fetchMovie = async () => {
     const api = new UsersApi(AxiosConfig);
@@ -27,24 +34,7 @@ export default function UserPage() {
     queryKey: ["user", userId],
     queryFn: fetchMovie,
   });
-
-  const fetchReviews = async () => {
-    const api = new ReviewsApi(AxiosConfig);
-    const response = await api.getAllReviews();
-    return response.data;
-  };
-
-  const {
-    data: reviews,
-    isLoading: reviewsLoading,
-    isError: reviewsError,
-  } = useQuery<WrapperReview[]>({
-    queryKey: ["user", userId],
-    queryFn: fetchReviews,
-  });
-
-  let imageSrc =
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0sMnmt0Av66zxbV0lEW2oLHGtCpo8IxZlfUX44NxPZAiykuQNH1LJvAE-FQUPGgjyf66Cy_DjZYTwoB36Lqga8j0KF1D88IDUYz2QCw&s=10";
+  let imageSrc = user?.profile_picture_url;
 
   return (
     <main className="w-full place-items-center flex flex-col">
@@ -52,7 +42,7 @@ export default function UserPage() {
         <TypographyH1 str="User Profile" />
         <div className="grid md:grid-cols-2 gap-6 items-start">
           {/* profile pic */}
-          <div className="relative rounded-2xl w-100 h-100">
+          <div className="relative rounded-2xl overflow-hidden w-full h-150 md:h-96 bg-muted">
             {imageSrc && (
               <Image
                 src={imageSrc}
@@ -65,21 +55,27 @@ export default function UserPage() {
           </div>
 
           {/* user bio */}
-          <Card className="p-5">
-            <CardHeader>Bio</CardHeader>
-            <CardContent>{user?.bio}</CardContent>
+          <Card className="p-5 h-full">
+            <CardHeader>
+              <TypographyH3 str="Bio" />
+            </CardHeader>
+            <CardContent>
+              {user?.bio ? (
+                <p className="whitespace-pre-wrap">{user?.bio}</p>
+              ) : (
+                <p className="text-muted-foreground">
+                  This user has not added a bio yet.
+                </p>
+              )}
+            </CardContent>
           </Card>
         </div>
 
         <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <TypographyH1 str="Reviews" />
-            <Separator className="my-5" />
-            <ReviewList user={user} loading={reviewsLoading} />
+            <ReviewList user={user} />
           </div>
           <div>
-            <TypographyH1 str="Watch History" />
-            <Separator className="my-5" />
             <WatchHistoryList user={user} />
           </div>
         </div>

@@ -23,12 +23,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ReviewsApi, WrapperMovieDetail } from "@/generated";
+import { ReviewsApi, WrapperMovieDetail, WrapperNewReview } from "@/generated";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { AxiosConfig } from "@/lib/utils";
+import { AuthContainer } from "@/hooks/useAuth";
 
 const movieSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -39,9 +40,13 @@ type FormValues = z.infer<typeof movieSchema>;
 
 export default function SubmitReviewButton({
   movie,
+  loading,
 }: {
-  movie: WrapperMovieDetail;
+  movie: WrapperMovieDetail | undefined;
+  loading: boolean;
 }) {
+  const auth = AuthContainer.useContainer();
+
   const [stars, setStars] = useState(0);
 
   const form = useForm<FormValues>({
@@ -53,20 +58,30 @@ export default function SubmitReviewButton({
   });
 
   async function onSubmit(data: FormValues) {
-    console.log("Submitting review:", data);
+    if (!auth.user || !movie) {
+      console.error("User not logged in");
+      return;
+    }
+    console.log(auth.user);
     const api = new ReviewsApi(AxiosConfig);
-    const userId = "1507d84a-2d1b-414f-88e0-1201b184bd68"; // TODO: get from route params
     const res = await api.createReview({
       title: data.title,
       body: data.body,
       movie_id: movie.id,
       rating: stars,
-      // TODO: replace with actual user ID from auth context
-      user_id: userId,
-      user_name: "TODO User",
-    });
+      user_id: auth.user._id,
+      user_name: auth.user.name,
+    } as WrapperNewReview);
     console.log("Review submitted:", res.data);
     form.reset();
+  }
+
+  if (loading) {
+    return (
+      <Button variant="outline" disabled>
+        Loading...
+      </Button>
+    );
   }
 
   return (

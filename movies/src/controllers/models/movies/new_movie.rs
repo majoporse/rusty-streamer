@@ -1,7 +1,5 @@
-use crate::controllers::models::movie_crew::movie_crew::MovieCrew;
 use crate::controllers::models::movie_crew::new_movie_crew::NewMovieCrew;
 use crate::services::dtos::movie::new_movie_dto::NewMovieDto;
-use crate::services::dtos::movie_crew::movie_crew_dto::MovieCrewDto;
 use crate::services::dtos::movie_crew::new_movie_crew_dto::NewMovieCrewDto;
 use chrono::NaiveDate;
 use serde::Deserialize;

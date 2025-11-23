@@ -4,6 +4,7 @@ import ReactQueryProvider from "@/components/ReactQueryProvider";
 import { ModeToggle } from "@/components/ToggleTheme";
 import { ThemeProvider } from "next-themes";
 import { Metadata } from "next";
+import AuthProvider from "./AuthProvider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,26 +19,28 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <SidebarProvider
-          style={
-            {
-              "--sidebar-width": "10rem",
-              "--sidebar-width-mobile": "20rem",
-            } as React.CSSProperties
-          }
-        >
-          <ReactQueryProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <ModeToggle />
-              {children}
-            </ThemeProvider>
-          </ReactQueryProvider>
-        </SidebarProvider>
+        <AuthProvider>
+          <SidebarProvider
+            style={
+              {
+                // "--sidebar-width": "13rem",
+                "--sidebar-width-mobile": "20rem",
+              } as React.CSSProperties
+            }
+          >
+            <ReactQueryProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                <ModeToggle />
+                {children}
+              </ThemeProvider>
+            </ReactQueryProvider>
+          </SidebarProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -15,15 +15,12 @@ export default function WatchHistoryLog(props: Props) {
     <div>
       <Card className="p-5 gap-0 h-full">
         <div className="gap-1 flex flex-col items-center justify-center">
-
           {props.loading ? (
             <Skeleton className="w-full h-48 mb-4" />
           ) : (
-            <>
-              <p className="text-lg font-medium">
-                {props.WatchHistory?.content_id || "Untitled Movie"}
-              </p>
-            </>
+            <p className="text-lg font-medium">
+              {props.WatchHistory?.content_id || "Untitled Movie"}
+            </p>
           )}
 
           {props.loading ? (

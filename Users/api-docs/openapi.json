@@ -90,6 +90,43 @@
         }
       }
     },
+    "/users/by_email/{email}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "get_user_by_email",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "description": "Email of the user to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Get user by email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/users/{host_user_id}/watch-rooms": {
       "get": {
         "tags": [

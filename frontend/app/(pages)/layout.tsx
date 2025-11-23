@@ -1,8 +1,7 @@
 import "../globals.css";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/Sidebar";
 import { ModeToggle } from "@/components/ToggleTheme";
-
 
 export default function RootLayout({
   children,
@@ -10,10 +9,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex p-2 w-full">
+    <main className="flex p-2 w-full rounded-lg">
+      <ModeToggle />
       <AppSidebar />
       <SidebarTrigger />
-      <ModeToggle />
       {children}
     </main>
   );
